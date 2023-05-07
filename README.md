@@ -125,16 +125,65 @@ To the best of my knowledge, the following image files are currently __unused__ 
 | wshrm.nec | 217x37 BGRA | "Yes" and "No" text, with "Yes" selected |
 | x86e.hgp | 640x480 RGB | Neogeo game-list background |
 
+### Other Files
+
+These are other files that have been identified, which don't fit into the other categories. Non-Latin characters in the files are encoded in UTF-8.
+
+| Filename | Description |
+| -------- | ----------- |
+| bfrjd.odb | UI strings in Korean |
+| bxvtb.sby | UI strings in Thai |
+| dufdr.cwr | UI strings in Turkish |
+| eknjo.ofd | UI strings in Spanish |
+| fhshl.skb | UI strings in English |
+| Foldername.ini | Used to control menu rotation for the main menu (this information came from the 4PDA forum) |
+| jsnno.uby | UI strings in Dutch |
+| kcbn7.avc | Duplicate copy of `bisrv.asd`, the main firmware for the device which is found in the BIOS folder  |
+| lf9lb.cut | UI strings in Portuguese |
+| ntrcq.oba | UI strings in Japanese |
+| ouenj.dut | UI strings in Polish |
+| qdbec.ofd | UI strings in Italian |
+| sgotd.cwt | UI strings in French |
+| snbqj.uby | UI strings in German |
+| t2act.sgf | UI strings in Chinese |
+| Test.zsf | A SNES ROM, which displays a controller test program |
+| tvctu.uby | UI strings in Russian |
+| vdaz5.bjk | UI strings in Arabic |
+| wtrxj.lbd | UI strings in Malay |
+| xjebd.clq | UI strings in Hebrew |
+
+### ROM Lists
+
+Credit for this section goes to `taizou#9644`, author of [Frog Tool|https://github.com/tzlion/frogtool]. These files relate to the built-in game lists under each main system; the list of games is pulled from these files instead of being built at runtime - annoying, but presumably for performance reasons. It means if you want to change the list of built-in games (instead of using the User ROMs section), you have to edit these files - hence Frog Tool, you should really check it out.
+
+| Files | Description |
+| mfpmp.bvs (Arcade), mgdel.bvs (Game Boy Color), nethn.bvs (NES), qdvd6.bvs (Game Boy), sppnp.bvs (Game Boy Advance), wmiui.bvs (Genesis/Mega Drive), xvb6c.bvs (SNES) | Pinyin translations of the English ROM names, used for Chinese language searching. Not all game names are translated |
+| adsnt.nec (SNES), fhcfg.nec (NES), htuiw.nec (Game Boy Advance), msdtc.nec (Arcade), setxa.nec (Genesis/Mega Drive), umboa.nec (Game Boy), wjere.nec (Game Boy Color) | Chinese translations of the English ROM names, used to display the game lists when the UI language is set to Chinese. Not all game names are translated |
+| mswb7.tax (Arcade), pnpui.tax (Game Boy Color), rdbui.tax (NES), scksp.tax (Genesis/Mega Drive), urefs.tax (SNES), vdsdc.tax (Game Boy), vfnet.tax (Game Boy Advance) | English ROM Names, used to display the game lists when the UI language is set to English |
+| xfgle.hgp, xfgle.hgp.bak | The `xfgle.hgp` file contains the ROM "shortcuts" on the main menu for each game system. The `xfgle.hgp.bak` file appears to be a test version of this file that was not removed from the firmware before being sent to production |
+
+### Sounds
+
+There are two sound files in the `20230420` firmware, both in raw signed 16-bit PCM format (little-endian, mono, at 22050 Hz). The SF2000 seems to play the files back at an incorrect sample rate vs. the raw data; if you want to customise the background music, resample your audio to 21543 Hz, and then speed the audio up to 22050 Hz, using the resulting audio as the raw data (credit to `notv37#4200` in Discord for doing the math on that).
+
+| Filename | Description |
+| -------- | ----------- |
+| pagefile.sys | Main menu background music |
+| swapfile.sys | Short "navigation" sound |
+
 ### Unknown Files
+
+These are files that I have not yet determined what they do; if anyone has any information on these, do post about it in the Data Frog channel in the Retro Handhelds Discord server please!
+
 | Filename | Description |
 | -------- | ----------- |
 | Archive.sys | UNKNOWN; 8 bytes, first are `0x02`, the rest are all `0x00` |
 | c2fkec.pgt | UNKNOWN; binary |
 | dpnet.dll | UNKNOWN; binary |
-| dsreg.bvs | UNKNOWN; binary |
+| dsreg.bvs | UNKNOWN; binary. __Not__ the same format as the `*.bvs` files mentioned in the "ROM Lists" section above |
 | help.lis | UNKNOWN; binary |
 | kcnuv.lit | UNKNOWN; a bunch of 4-byte binary chunks (e.g., `0xC4 0x00 0x00 0x00`), followed by a list of .NES ROM file names. Very similar to the `.bvs`/`.nec`/`.tax` files detailed above, but doesn't have the same type of "header" they have |
 | mfsvr.nkf | UNKNOWN; binary |
 | nyquest.gdb | UNKNOWN; binary |
 | oldversion.kbe | UNKNOWN; binary |
-| TSMFK.TAX | UNKNOWN; four bytes, all `0x00` |
+| TSMFK.TAX | UNKNOWN; four bytes, all `0x00`. __Not__ the same format as the `*.tax` files mentioned in the "ROM Lists" section above |

@@ -24,113 +24,113 @@ The Resources folder on the microSD card contains all of the resources used by t
 
 ### Images (Used)
 
-As far as I am aware, all of the below images are actively used by the `20230420` version of the firmware; happy to take any corrections if it turns out any of them are unused!
+As far as I am aware, all of the below images are actively used by the `20230420` version of the firmware; happy to take any corrections if it turns out any of them are unused! Note that while the stock theme is based around a `640x480` resolution, the actual //display// on the SF2000 is a `320x240` one. The OS on the device uses nearest-neighbour scaling for its images, giving the stock UI a somewhat aliased appearance. If you're planning to make your own theme for the SF2000, design it for `320x240`, and then double the resolution when exporting the final images to the device for a crisper look.
 
-| Filename | Format | Description |
-| -------- | ------ | ----------- |
-| aepic.nec | 576x256 BGRA | Main menu labels in Korean |
-| apisa.dlk | 640x480 RGB | Arcade game list background |
-| appvc.ikb | 150x214 BRGA | Game art placeholder |
-| awusa.tax | 576x256 BRGA | Main menu labels in Thai |
-| bisrv.nec | 640x480 RGB | In-game menu (position 3) |
-| bttlve.kbp | 60x144 BGRA | Battery level indicator icons |
-| c1eac.pal | 640x480 RGB | SNES game-list background |
-| cero.phl | 640x480 RGB | Game Boy Color game-list background |
-| certlm.msa | 40x24 BGRA | NES game-list indicator |
-| d2d1.hgp | 640x480 RGB | In-game menu (position 2) |
-| dism.csf | 640x480 RGB | In-game menu (position 1) |
-| djctq.rsd | 40x24 BGRA | SNES game-list indicator |
-| djoin.nec | 576x256 BRGA | Main menu labels in Spanish |
-| dpskc.ctp | 640x320 RGB | In-game menu save-state slots (positions 1, 2, 3 and 4) |
-| drivr.ers | 640x480 RGB | SNES main menu background |
-| dsuei.cpl | 640x480 RGB | User ROMs main menu background |
-| dxdiag.bin | 40x24 BGRA | Genesis/Mega Drive game-list indicator |
-| dxkgi.ctp | 576x256 BRGA | Main menu labels in English |
-| dxva2.nec | 640x480 RGB | Search keyboard (pressed) |
-| ectte.bke | 161x126 BRGA | Main menu icon selection box |
-| efsui.stc | 640x480 RGB | Game Boy Advance game-list background |
-| esent.bvs | 576x256 BRGA | Main menu labels in Turkish |
-| exaxz.hsp | 152x1224 BRGA | Main menu "Games Exist" and "Start: Open" labels for all languages |
-| fixas.ctp | 640x480 RGB | NES main menu background |
-| fltmc.sta | 640x480 RGB | Game Boy game-list background |
-| fvecpl.ai | 40x24 BGRA | Game Boy game-list indicator |
-| gpsvc.bvs | 392x80 RGB | In-game menu save-state slot (position 3) |
-| hctml.ers | 640x480 RGB | Arcade main menu background |
-| hgcpl.cke | 392x80 RGB | In-game menu save-state slot (position 2) |
-| hlink.bvs | 640x480 RGB | Search keyboard (hover) |
-| htui.kcc | 40x24 BGRA | Game Boy Color game-list indicator |
-| icm32.dll | 40x24 BGRA | Game Boy Advance game-list indicator |
-| icuin.cpl | 640x480 RGB | Genesis/Mega Drive main menu background |
-| ihdsf.bke | 640x480 RGB | Genesis/Mega Drive game-list background |
-| irftp.ctp | 640x480 RGB | Game Boy Advance main menu background |
-| irmon.tax | 576x256 BRGA | Main menu labels in Dutch |
-| itiss.ers | 576x256 BRGA | Main menu labels in Chinese |
-| jccatm.kbp | 640x480 RGB | "Battery Empty" screen |
-| ke89a.bvs | 576x256 BRGA | Main menu labels in Portuguese |
-| ksxbar.ax | 392x80 RGB | In-game menu save-state slot (position 4) |
-| lfsvc.dll | 640x480 RGB | Search game-list background |
-| mksh.rcv | 640x480 RGB | Search keyboard (normal) |
-| msdmo.gdb | 392x80 RGB | In-game menu save-state slot (position 1) |
-| msgsm.dll | 40x24 BGRA | Arcade game-list indicator |
-| mssvp.nec | 576x256 BRGA | Main menu labels in Japanese |
-| normidna.bin | 40x24 BGRA | Search game-list indicator |
-| ntdll.bvs | 576x256 BRGA | Main menu labels in Polish |
-| pcadm.nec | 576x256 BRGA | Main menu labels in Italian |
-| pwsso.occ | 640x480 RGB | In-game menu (position 4) |
-| qasf.bel | 640x480 RGB | User game-list background |
-| qwave.bke | 640x480 RGB | Game Boy Color main menu background |
-| rmapi.tax | 576x256 BRGA | Main menu labels in German |
-| sdclt.occ | 120x2280 RGB | TV system and UI language selection icons |
-| sebsc.bvs | 576x256 BRGA | Main menu labels in French |
-| sfcdr.cpl | 576x1344 BRGA | Main menu system logos |
-| subst.tax | 576x256 BRGA | Main menu labels in Russian |
-| ucby4.aax | 576x256 BRGA | Main menu labels in Arabic |
-| urlkp.bvs | 640x480 RGB | NES game-list background |
-| vidca.bvs | 576x256 BRGA | Main menu labels in Hebrew |
-| vssvc.nec | 576x256 BRGA | Main menu labels in Malay |
-| xajkg.hsp | 640x480 RGB | Game Boy main menu background |
+| Filename | Resolution | Format | Description |
+| -------- | ---------- | ------ | ----------- |
+| aepic.nec | 576x256 | BGRA | Main menu labels in Korean |
+| apisa.dlk | 640x480 | RGB565 Little Endian | Arcade game list background |
+| appvc.ikb | 150x214 | BRGA | Game art placeholder |
+| awusa.tax | 576x256 | BRGA | Main menu labels in Thai |
+| bisrv.nec | 640x480 | RGB565 Little Endian | In-game menu (position 3) |
+| bttlve.kbp | 60x144 | BGRA | Battery level indicator icons |
+| c1eac.pal | 640x480 | RGB565 Little Endian | SNES game-list background |
+| cero.phl | 640x480 | RGB565 Little Endian | Game Boy Color game-list background |
+| certlm.msa | 40x24 | BGRA | NES game-list indicator |
+| d2d1.hgp | 640x480 | RGB565 Little Endian | In-game menu (position 2) |
+| dism.csf | 640x480 | RGB565 Little Endian | In-game menu (position 1) |
+| djctq.rsd | 40x24 | BGRA | SNES game-list indicator |
+| djoin.nec | 576x256 | BRGA | Main menu labels in Spanish |
+| dpskc.ctp | 640x320 | RGB565 Little Endian | In-game menu save-state slots (positions 1, 2, 3 and 4) |
+| drivr.ers | 640x480 | RGB565 Little Endian | SNES main menu background |
+| dsuei.cpl | 640x480 | RGB565 Little Endian | User ROMs main menu background |
+| dxdiag.bin | 40x24 | BGRA | Genesis/Mega Drive game-list indicator |
+| dxkgi.ctp | 576x256 | BRGA | Main menu labels in English |
+| dxva2.nec | 640x480 | RGB565 Little Endian | Search keyboard (pressed) |
+| ectte.bke | 161x126 | BRGA | Main menu icon selection box |
+| efsui.stc | 640x480 | RGB565 Little Endian | Game Boy Advance game-list background |
+| esent.bvs | 576x256 | BRGA | Main menu labels in Turkish |
+| exaxz.hsp | 152x1224 | BRGA | Main menu "Games Exist" and "Start: Open" labels for all languages |
+| fixas.ctp | 640x480 | RGB565 Little Endian | NES main menu background |
+| fltmc.sta | 640x480 | RGB565 Little Endian | Game Boy game-list background |
+| fvecpl.ai | 40x24 | BGRA | Game Boy game-list indicator |
+| gpsvc.bvs | 392x80 | RGB565 Little Endian | In-game menu save-state slot (position 3) |
+| hctml.ers | 640x480 | RGB565 Little Endian | Arcade main menu background |
+| hgcpl.cke | 392x80 | RGB565 Little Endian | In-game menu save-state slot (position 2) |
+| hlink.bvs | 640x480 | RGB565 Little Endian | Search keyboard (hover) |
+| htui.kcc | 40x24 | BGRA | Game Boy Color game-list indicator |
+| icm32.dll | 40x24 | BGRA | Game Boy Advance game-list indicator |
+| icuin.cpl | 640x480 | RGB565 Little Endian | Genesis/Mega Drive main menu background |
+| ihdsf.bke | 640x480 | RGB565 Little Endian | Genesis/Mega Drive game-list background |
+| irftp.ctp | 640x480 | RGB565 Little Endian | Game Boy Advance main menu background |
+| irmon.tax | 576x256 | BRGA | Main menu labels in Dutch |
+| itiss.ers | 576x256 | BRGA | Main menu labels in Chinese |
+| jccatm.kbp | 640x480 | RGB565 Little Endian | "Battery Empty" screen |
+| ke89a.bvs | 576x256 | BRGA | Main menu labels in Portuguese |
+| ksxbar.ax | 392x80 | RGB565 Little Endian | In-game menu save-state slot (position 4) |
+| lfsvc.dll | 640x480 | RGB565 Little Endian | Search game-list background |
+| mksh.rcv | 640x480 | RGB565 Little Endian | Search keyboard (normal) |
+| msdmo.gdb | 392x80 | RGB565 Little Endian | In-game menu save-state slot (position 1) |
+| msgsm.dll | 40x24 | BGRA | Arcade game-list indicator |
+| mssvp.nec | 576x256 | BRGA | Main menu labels in Japanese |
+| normidna.bin | 40x24 | BGRA | Search game-list indicator |
+| ntdll.bvs | 576x256 | BRGA | Main menu labels in Polish |
+| pcadm.nec | 576x256 | BRGA | Main menu labels in Italian |
+| pwsso.occ | 640x480 | RGB565 Little Endian | In-game menu (position 4) |
+| qasf.bel | 640x480 | RGB565 Little Endian | User game-list background |
+| qwave.bke | 640x480 | RGB565 Little Endian | Game Boy Color main menu background |
+| rmapi.tax | 576x256 | BRGA | Main menu labels in German |
+| sdclt.occ | 120x2280 | RGB565 Little Endian | TV system and UI language selection icons |
+| sebsc.bvs | 576x256 | BRGA | Main menu labels in French |
+| sfcdr.cpl | 576x1344 | BRGA | Main menu system logos |
+| subst.tax | 576x256 | BRGA | Main menu labels in Russian |
+| ucby4.aax | 576x256 | BRGA | Main menu labels in Arabic |
+| urlkp.bvs | 640x480 | RGB565 Little Endian | NES game-list background |
+| vidca.bvs | 576x256 | BRGA | Main menu labels in Hebrew |
+| vssvc.nec | 576x256 | BRGA | Main menu labels in Malay |
+| xajkg.hsp | 640x480 | RGB565 Little Endian | Game Boy main menu background |
 
 ### Images (Unused)
 
 To the best of my knowledge, the following image files are currently __unused__ by the `20230420` firmware, and were probably left over from previous devices (the SF2000 shares a bit of lineage with some USB-stick devices) or development. The images marked "Alternate UI" below appear to have been for a UI where the systems were scrolled through horizontally, and the "shortcut" games for each system were scrolled vertically.
 
-| Filename | Format | Description |
-| -------- | ------ | ----------- |
-| aeinv.bke | 640x480 RGB | Alternate UI: Genesis/Mega Drive main menu background |
-| aepic.ers | 640x480 RGB | Alternate UI: User main menu background |
-| c1e.pal | 640x480 RGB | CPS2 game-list background |
-| cca.bvs | 640x480 RGB | In-game menu (position 1; Chinese language hardcoded) |
-| dectMap.key | 640x480 RGB | Button test screen (active) |
-| desk.cpl | 640x480 RGB | Eight-game selection screen |
-| djoin.hsp | 640x480 RGB | Alternate UI: Arcade main menu background |
-| fcont.ctp | 640x480 RGB | Alternate UI: User main menu background |
-| fdbil.ph | 1100x120 BGRA | Large icons for each system, including systems not supported by the SF2000 (selected) |
-| gpapi.bvs | 640x480 RGB | In-game menu (position 5; looks like it was for some kind of button layout changing UI) |
-| igc64.dll | 217x37 BGRA | "Yes" and "No" text, with "No" selected |
-| ihds.bke | 640x480 RGB | Genesis/Mega Drive game-list background, with baked-in thumbnail placeholder |
-| kdill.hsp | 640x480 RGB | Alternate UI: Game Boy Advance main menu background |
-| logilda.be | 40x24 BGRA | CPS1 game-list indicator |
-| mfc64.emc | 40x24 BGRA | CPS2 game-list indicator |
-| mfpmp.ers | 640x480 RGB | Alternate UI: Arcade main menu background |
-| mrtac.klo | 40x24 BGRA | Neogeo game-list indicator |
-| msdtc.bke | 640x480 RGB | Alternate UI: Game Boy Advance main menu background |
-| mswbv.cpl | 640x480 RGB | Alternate UI: Game Boy Advance main menu background |
-| nettrace.dll | 40x24 BGRA | Unknown game-list indicator (grey joystick with yellow buttons) |
-| nsibm.ctp | 640x480 RGB | Alternate UI: Arcade main menu background |
-| nvinf.hsp | 16x240 BGRA | Latin numbers 0 to 9 listed vertically |
-| nvinfohsp | 640x480 RGB | Alternate UI: Genesis/Mega Drive main menu background (note: there's no extension separator for this file, I suspect the file name is typo'd in the filesystem!) |
-| pcadm.hsp | 640x480 RGB | Alternate UI: User main menu background (NTSC TV system selected) |
-| plasy.ers | 640x480 RGB | Alternate UI: Game Boy Advance main menu background |
-| rmapi.cpl | 640x480 RGB | Alternate UI: User main menu background (English UI language selected) |
-| seltMap.key | 640x480 RGB | Button test screen |
-| spmpm.gdp | 640x480 RGB | Alternate UI: NES game-list background, with baked-in thumbnail placeholder |
-| subst.bke | 640x480 RGB | Alternate UI: Arcade main menu background |
-| tsmcf.cpl | 640x480 RGB | Alternate UI: Arcade main menu background |
-| url.bvs | 640x480 RGB | CPS1 game-list background |
-| werui.ioc | 40x24 RGB | "NODATA" save-state thumbnail placeholder image, with a "horror" style typeface |
-| wshom.ocx | 1100x120 BGRA | Large icons for each system, including systems not supported by the SF2000 (normal) |
-| wshrm.nec | 217x37 BGRA | "Yes" and "No" text, with "Yes" selected |
-| x86e.hgp | 640x480 RGB | Neogeo game-list background |
+| Filename | Resolution | Format | Description |
+| -------- | ---------- | ------ | ----------- |
+| aeinv.bke | 640x480 | RGB565 Little Endian | Alternate UI: Genesis/Mega Drive main menu background |
+| aepic.ers | 640x480 | RGB565 Little Endian | Alternate UI: User main menu background |
+| c1e.pal | 640x480 | RGB565 Little Endian | CPS2 game-list background |
+| cca.bvs | 640x480 | RGB565 Little Endian | In-game menu (position 1; Chinese language hardcoded) |
+| dectMap.key | 640x480 | RGB565 Little Endian | Button test screen (active) |
+| desk.cpl | 640x480 | RGB565 Little Endian | Eight-game selection screen |
+| djoin.hsp | 640x480 | RGB565 Little Endian | Alternate UI: Arcade main menu background |
+| fcont.ctp | 640x480 | RGB565 Little Endian | Alternate UI: User main menu background |
+| fdbil.ph | 1100x120 | BGRA | Large icons for each system, including systems not supported by the SF2000 (selected) |
+| gpapi.bvs | 640x480 | RGB565 Little Endian | In-game menu (position 5; looks like it was for some kind of button layout changing UI) |
+| igc64.dll | 217x37 | BGRA | "Yes" and "No" text, with "No" selected |
+| ihds.bke | 640x480 | RGB565 Little Endian | Genesis/Mega Drive game-list background, with baked-in thumbnail placeholder |
+| kdill.hsp | 640x480 | RGB565 Little Endian | Alternate UI: Game Boy Advance main menu background |
+| logilda.be | 40x24 | BGRA | CPS1 game-list indicator |
+| mfc64.emc | 40x24 | BGRA | CPS2 game-list indicator |
+| mfpmp.ers | 640x480 | RGB565 Little Endian | Alternate UI: Arcade main menu background |
+| mrtac.klo | 40x24 | BGRA | Neogeo game-list indicator |
+| msdtc.bke | 640x480 | RGB565 Little Endian | Alternate UI: Game Boy Advance main menu background |
+| mswbv.cpl | 640x480 | RGB565 Little Endian | Alternate UI: Game Boy Advance main menu background |
+| nettrace.dll | 40x24 | BGRA | Unknown game-list indicator (grey joystick with yellow buttons) |
+| nsibm.ctp | 640x480 | RGB565 Little Endian | Alternate UI: Arcade main menu background |
+| nvinf.hsp | 16x240 | BGRA | Latin numbers 0 to 9 listed vertically |
+| nvinfohsp | 640x480 | RGB565 Little Endian | Alternate UI: Genesis/Mega Drive main menu background (note: there's no extension separator for this file, I suspect the file name is typo'd in the filesystem!) |
+| pcadm.hsp | 640x480 | RGB565 Little Endian | Alternate UI: User main menu background (NTSC TV system selected) |
+| plasy.ers | 640x480 | RGB565 Little Endian | Alternate UI: Game Boy Advance main menu background |
+| rmapi.cpl | 640x480 | RGB565 Little Endian | Alternate UI: User main menu background (English UI language selected) |
+| seltMap.key | 640x480 | RGB565 Little Endian | Button test screen |
+| spmpm.gdp | 640x480 | RGB565 Little Endian | Alternate UI: NES game-list background, with baked-in thumbnail placeholder |
+| subst.bke | 640x480 | RGB565 Little Endian | Alternate UI: Arcade main menu background |
+| tsmcf.cpl | 640x480 | RGB565 Little Endian | Alternate UI: Arcade main menu background |
+| url.bvs | 640x480 | RGB565 Little Endian | CPS1 game-list background |
+| werui.ioc | 320x240 | RGB565 Little Endian | "NODATA" save-state thumbnail placeholder image, with a "horror" style typeface |
+| wshom.ocx | 1100x120 | BGRA | Large icons for each system, including systems not supported by the SF2000 (normal) |
+| wshrm.nec | 217x37 | BGRA | "Yes" and "No" text, with "Yes" selected |
+| x86e.hgp | 640x480 | RGB565 Little Endian | Neogeo game-list background |
 
 ### Other Files
 

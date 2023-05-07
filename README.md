@@ -207,3 +207,8 @@ These are files that I have not yet determined what they do; if anyone has any i
 | nyquest.gdb | UNKNOWN; binary |
 | oldversion.kbe | UNKNOWN; binary |
 | TSMFK.TAX | UNKNOWN; four bytes, all `0x00`. __Not__ the same format as the `*.tax` files mentioned in the "ROM Lists" section above |
+
+---
+
+## Version History
+20230507 - 1.0: Original creation of this page.

@@ -1,5 +1,4 @@
 # SF2000
-
 The SF2000 is a cheap hand-held emulation gaming console which was released in early 2023. Although the device itself is sold by a variety of vendors, it was the vendor "Data Frog" who caught public attention, and so the device is often simply referred to as "the Data Frog".
 
 For a cheap device, it's actually fairly capable - most Game Boy, Game Boy Color, NES and Genesis/Mega Drive games play at full speed, and many arcade, Game Boy Advance and SNES titles do as well. The device has an IPS panel (not OCA laminated), and a user-replacable "18650" battery, which can be charged via a USB-C port on the device. It also has analog A/V out (note: not HDMI), meaning it can be connected to a CRT TV - the type of display most arcade, Genesis/Mega Drive and SNES games were originally intended to be displayed on. It has a built-in 2.4GHz antenna, and can receive input from a compatible wireless controller (usually sold separately).
@@ -8,13 +7,14 @@ Some downsides to the device: it's mono-only, there's no head-phone jack (althou
 
 So is the "Data Frog" any good? Only you can answer that question for yourself. There are certainly more powerful devices out there, more fully featured devices, devices with better hardware, etc. - but almost all of those devices cost a lot more than the SF2000. At the end of the day, you have to look at the features offered at the given price-point, and only then can you decide if you're interested in the device or not.
 
+---
+
 ## Hardware
 Although the main CPU of the SF2000 has literally had it's markings milled off by a routing tool, the community has determined that it's a HCSEMI B210, a single-core MIPS processor running at 810 MHz. It appears to be a clone of an ALi Tech chip.
 
 ---
 
 ## biserv.asd
-
 The firmware for the SF2000 is actually located on the microSD card, in a file called `biserv.asd` located in the BIOS folder. This file is a monolithic binary blob, which contains the device's OS, the emulators, their settings... basically everything. The file is currently being investigated. Here are some findings from it:
 
 ### Key Bindings
@@ -28,7 +28,6 @@ When the device is powered on, a "Welcome" image is displayed for a short time b
 ---
 
 ## Resources
-
 The Resources folder on the microSD card contains all of the resources used by the device's firmware to construct the user interface at runtime. The following tables list the files from the `20230420` firmware and what they are used for, grouped by broad categories:
 
 ### Fonts
@@ -42,7 +41,6 @@ The Resources folder on the microSD card contains all of the resources used by t
 | yahei_Arial.ttf | The "Arial" typeface, containing Latin, Greek, Cyrillic, Chinese, Japanese and Korean characters |
 
 ### Images (Used)
-
 As far as I am aware, all of the below images are actively used by the `20230420` version of the firmware; happy to take any corrections if it turns out any of them are unused! Note that while the stock theme is based around a `640x480` resolution, the actual //display// on the SF2000 is a `320x240` one. The OS on the device uses nearest-neighbour scaling for its images, giving the stock UI a somewhat aliased appearance. If you're planning to make your own theme for the SF2000, design it for `320x240`, and then double the resolution when exporting the final images to the device for a crisper look.
 
 | Filename | Resolution | Format | Description | View |
@@ -110,49 +108,47 @@ As far as I am aware, all of the below images are actively used by the `20230420
 | xajkg.hsp | 640x480 | RGB565 Little Endian | Game Boy main menu background | [view](/images/xajkg.png) |
 
 ### Images (Unused)
-
 To the best of my knowledge, the following image files are currently __unused__ by the `20230420` firmware, and were probably left over from previous devices (the SF2000 shares a bit of lineage with some USB-stick devices) or development. The images marked "Alternate UI" below appear to have been for a UI where the systems were scrolled through horizontally, and the "shortcut" games for each system were scrolled vertically.
 
-| Filename | Resolution | Format | Description |
-| -------- | ---------- | ------ | ----------- |
-| aeinv.bke | 640x480 | RGB565 Little Endian | Alternate UI: Genesis/Mega Drive main menu background |
-| aepic.ers | 640x480 | RGB565 Little Endian | Alternate UI: User main menu background |
-| c1e.pal | 640x480 | RGB565 Little Endian | CPS2 game-list background |
-| cca.bvs | 640x480 | RGB565 Little Endian | In-game menu (position 1; Chinese language hardcoded) |
-| dectMap.key | 640x480 | RGB565 Little Endian | Button test screen (active) |
-| desk.cpl | 640x480 | RGB565 Little Endian | Eight-game selection screen |
-| djoin.hsp | 640x480 | RGB565 Little Endian | Alternate UI: Arcade main menu background |
-| fcont.ctp | 640x480 | RGB565 Little Endian | Alternate UI: User main menu background |
-| fdbil.ph | 1100x120 | BGRA | Large icons for each system, including systems not supported by the SF2000 (selected) |
-| gpapi.bvs | 640x480 | RGB565 Little Endian | In-game menu (position 5; looks like it was for some kind of button layout changing UI) |
-| igc64.dll | 217x37 | BGRA | "Yes" and "No" text, with "No" selected |
-| ihds.bke | 640x480 | RGB565 Little Endian | Genesis/Mega Drive game-list background, with baked-in thumbnail placeholder |
-| kdill.hsp | 640x480 | RGB565 Little Endian | Alternate UI: Game Boy Advance main menu background |
-| logilda.be | 40x24 | BGRA | CPS1 game-list indicator |
-| mfc64.emc | 40x24 | BGRA | CPS2 game-list indicator |
-| mfpmp.ers | 640x480 | RGB565 Little Endian | Alternate UI: Arcade main menu background |
-| mrtac.klo | 40x24 | BGRA | Neogeo game-list indicator |
-| msdtc.bke | 640x480 | RGB565 Little Endian | Alternate UI: Game Boy Advance main menu background |
-| mswbv.cpl | 640x480 | RGB565 Little Endian | Alternate UI: Game Boy Advance main menu background |
-| nettrace.dll | 40x24 | BGRA | Unknown game-list indicator (grey joystick with yellow buttons) |
-| nsibm.ctp | 640x480 | RGB565 Little Endian | Alternate UI: Arcade main menu background |
-| nvinf.hsp | 16x240 | BGRA | Latin numbers 0 to 9 listed vertically |
-| nvinfohsp | 640x480 | RGB565 Little Endian | Alternate UI: Genesis/Mega Drive main menu background (note: there's no extension separator for this file, I suspect the file name is typo'd in the filesystem!) |
-| pcadm.hsp | 640x480 | RGB565 Little Endian | Alternate UI: User main menu background (NTSC TV system selected) |
-| plasy.ers | 640x480 | RGB565 Little Endian | Alternate UI: Game Boy Advance main menu background |
-| rmapi.cpl | 640x480 | RGB565 Little Endian | Alternate UI: User main menu background (English UI language selected) |
-| seltMap.key | 640x480 | RGB565 Little Endian | Button test screen |
-| spmpm.gdp | 640x480 | RGB565 Little Endian | Alternate UI: NES game-list background, with baked-in thumbnail placeholder |
-| subst.bke | 640x480 | RGB565 Little Endian | Alternate UI: Arcade main menu background |
-| tsmcf.cpl | 640x480 | RGB565 Little Endian | Alternate UI: Arcade main menu background |
-| url.bvs | 640x480 | RGB565 Little Endian | CPS1 game-list background |
-| werui.ioc | 320x240 | RGB565 Little Endian | "NODATA" save-state thumbnail placeholder image, with a "horror" style typeface |
-| wshom.ocx | 1100x120 | BGRA | Large icons for each system, including systems not supported by the SF2000 (normal) |
-| wshrm.nec | 217x37 | BGRA | "Yes" and "No" text, with "Yes" selected |
-| x86e.hgp | 640x480 | RGB565 Little Endian | Neogeo game-list background |
+| Filename | Resolution | Format | Description | View |
+| -------- | ---------- | ------ | ----------- | ---- |
+| aeinv.bke | 640x480 | RGB565 Little Endian | Alternate UI: Genesis/Mega Drive main menu background | [view](/images/unused/aeinv.png) |
+| aepic.ers | 640x480 | RGB565 Little Endian | Alternate UI: User main menu background | [view](/images/unused/aepic.png) |
+| c1e.pal | 640x480 | RGB565 Little Endian | CPS2 game-list background | [view](/images/unused/c1e.png) |
+| cca.bvs | 640x480 | RGB565 Little Endian | In-game menu (position 1; Chinese language hardcoded) | [view](/images/unused/cca.png) |
+| dectMap.key | 640x480 | RGB565 Little Endian | Button test screen (active) | [view](/images/unused/dectMap.png) |
+| desk.cpl | 640x480 | RGB565 Little Endian | Eight-game selection screen | [view](/images/unused/desk.png) |
+| djoin.hsp | 640x480 | RGB565 Little Endian | Alternate UI: Arcade main menu background | [view](/images/unused/djoin.png) |
+| fcont.ctp | 640x480 | RGB565 Little Endian | Alternate UI: User main menu background | [view](/images/unused/fcont.png) |
+| fdbil.ph | 1100x120 | BGRA | Large icons for each system, including systems not supported by the SF2000 (selected) | [view](/images/unused/fdbil.png) |
+| gpapi.bvs | 640x480 | RGB565 Little Endian | In-game menu (position 5; looks like it was for some kind of button layout changing UI) | [view](/images/unused/gpapi.png) |
+| igc64.dll | 217x37 | BGRA | "Yes" and "No" text, with "No" selected | [view](/images/unused/igc64.png) |
+| ihds.bke | 640x480 | RGB565 Little Endian | Genesis/Mega Drive game-list background, with baked-in thumbnail placeholder | [view](/images/unused/ihds.png) |
+| kdill.hsp | 640x480 | RGB565 Little Endian | Alternate UI: Game Boy Advance main menu background | [view](/images/unused/kdill.png) |
+| logilda.be | 40x24 | BGRA | CPS1 game-list indicator | [view](/images/unused/logilda.png) |
+| mfc64.emc | 40x24 | BGRA | CPS2 game-list indicator | [view](/images/unused/mfc64.png) |
+| mfpmp.ers | 640x480 | RGB565 Little Endian | Alternate UI: Arcade main menu background | [view](/images/unused/mfpmp.png) |
+| mrtac.klo | 40x24 | BGRA | Neogeo game-list indicator | [view](/images/unused/mrtac.png) |
+| msdtc.bke | 640x480 | RGB565 Little Endian | Alternate UI: Game Boy Advance main menu background | [view](/images/unused/msdtc.png) |
+| mswbv.cpl | 640x480 | RGB565 Little Endian | Alternate UI: Game Boy Advance main menu background | [view](/images/unused/mswbv.png) |
+| nettrace.dll | 40x24 | BGRA | Unknown game-list indicator (grey joystick with yellow buttons) | [view](/images/unused/nettrace.png) |
+| nsibm.ctp | 640x480 | RGB565 Little Endian | Alternate UI: Arcade main menu background | [view](/images/unused/nsibm.png) |
+| nvinf.hsp | 16x240 | BGRA | Latin numbers 0 to 9 listed vertically | [view](/images/unused/nvinf.png) |
+| nvinfohsp | 640x480 | RGB565 Little Endian | Alternate UI: Genesis/Mega Drive main menu background (note: there's no extension separator for this file, I suspect the file name is typo'd in the filesystem!) | [view](/images/unused/nvinfohsp.png) |
+| pcadm.hsp | 640x480 | RGB565 Little Endian | Alternate UI: User main menu background (NTSC TV system selected) | [view](/images/unused/pcadm.png) |
+| plasy.ers | 640x480 | RGB565 Little Endian | Alternate UI: Game Boy Advance main menu background | [view](/images/unused/plasy.png) |
+| rmapi.cpl | 640x480 | RGB565 Little Endian | Alternate UI: User main menu background (English UI language selected) | [view](/images/unused/rmapi.png) |
+| seltMap.key | 640x480 | RGB565 Little Endian | Button test screen | [view](/images/unused/seltMap.png) |
+| spmpm.gdp | 640x480 | RGB565 Little Endian | Alternate UI: NES game-list background, with baked-in thumbnail placeholder | [view](/images/unused/spmpm.png) |
+| subst.bke | 640x480 | RGB565 Little Endian | Alternate UI: Arcade main menu background | [view](/images/unused/subst.png) |
+| tsmcf.cpl | 640x480 | RGB565 Little Endian | Alternate UI: Arcade main menu background | [view](/images/unused/tsmcf.png) |
+| url.bvs | 640x480 | RGB565 Little Endian | CPS1 game-list background | [view](/images/unused/url.png) |
+| werui.ioc | 320x240 | RGB565 Little Endian | "NODATA" save-state thumbnail placeholder image, with a "horror" style typeface | [view](/images/unused/werui.png) |
+| wshom.ocx | 1100x120 | BGRA | Large icons for each system, including systems not supported by the SF2000 (normal) | [view](/images/unused/wshom.png) |
+| wshrm.nec | 217x37 | BGRA | "Yes" and "No" text, with "Yes" selected | [view](/images/unused/wshrm.png) |
+| x86e.hgp | 640x480 | RGB565 Little Endian | Neogeo game-list background | [view](/images/unused/x86e.png) |
 
 ### Other Files
-
 These are other files that have been identified, which don't fit into the other categories. Non-Latin characters in the files are encoded in UTF-8.
 
 | Filename | Description |
@@ -179,7 +175,6 @@ These are other files that have been identified, which don't fit into the other 
 | xjebd.clq | UI strings in Hebrew |
 
 ### ROM Lists
-
 Credit for this section goes to `taizou#9644`, author of [Frog Tool](https://github.com/tzlion/frogtool). These files relate to the built-in game lists under each main system; the list of games is pulled from these files instead of being built at runtime - annoying, but presumably for performance reasons. It means if you want to change the list of built-in games (instead of using the User ROMs section), you have to edit these files - hence Frog Tool, you should really check it out.
 
 | Files | Description |
@@ -190,7 +185,6 @@ Credit for this section goes to `taizou#9644`, author of [Frog Tool](https://git
 | xfgle.hgp, xfgle.hgp.bak | The `xfgle.hgp` file contains the ROM "shortcuts" on the main menu for each game system. The `xfgle.hgp.bak` file appears to be a test version of this file that was not removed from the firmware before being sent to production |
 
 ### Sounds
-
 There are two sound files in the `20230420` firmware, both in raw signed 16-bit PCM format (little-endian, mono, at 22050 Hz). The SF2000 seems to play the files back at an incorrect sample rate vs. the raw data; if you want to customise the background music, resample your audio to 21543 Hz, and then speed the audio up to 22050 Hz, using the resulting audio as the raw data (credit to `notv37#4200` in Discord for doing the math on that).
 
 | Filename | Description |
@@ -199,7 +193,6 @@ There are two sound files in the `20230420` firmware, both in raw signed 16-bit 
 | swapfile.sys | Short "navigation" sound |
 
 ### Unknown Files
-
 These are files that I have not yet determined what they do; if anyone has any information on these, do post about it in the Data Frog channel in the Retro Handhelds Discord server please!
 
 | Filename | Description |

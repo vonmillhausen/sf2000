@@ -154,6 +154,7 @@ These are other files that have been identified, which don't fit into the other 
 Credit for this section goes to `taizou#9644`, author of [Frog Tool|https://github.com/tzlion/frogtool]. These files relate to the built-in game lists under each main system; the list of games is pulled from these files instead of being built at runtime - annoying, but presumably for performance reasons. It means if you want to change the list of built-in games (instead of using the User ROMs section), you have to edit these files - hence Frog Tool, you should really check it out.
 
 | Files | Description |
+| ----- | ----------- |
 | mfpmp.bvs (Arcade), mgdel.bvs (Game Boy Color), nethn.bvs (NES), qdvd6.bvs (Game Boy), sppnp.bvs (Game Boy Advance), wmiui.bvs (Genesis/Mega Drive), xvb6c.bvs (SNES) | Pinyin translations of the English ROM names, used for Chinese language searching. Not all game names are translated |
 | adsnt.nec (SNES), fhcfg.nec (NES), htuiw.nec (Game Boy Advance), msdtc.nec (Arcade), setxa.nec (Genesis/Mega Drive), umboa.nec (Game Boy), wjere.nec (Game Boy Color) | Chinese translations of the English ROM names, used to display the game lists when the UI language is set to Chinese. Not all game names are translated |
 | mswb7.tax (Arcade), pnpui.tax (Game Boy Color), rdbui.tax (NES), scksp.tax (Genesis/Mega Drive), urefs.tax (SNES), vdsdc.tax (Game Boy), vfnet.tax (Game Boy Advance) | English ROM Names, used to display the game lists when the UI language is set to English |

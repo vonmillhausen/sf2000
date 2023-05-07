@@ -15,6 +15,8 @@ The Resources folder on the microSD card contains all of the resources used by t
 | yahei_Arial.ttf | The "Arial" typeface, containing Latin, Greek, Cyrillic, Chinese, Japanese and Korean characters |
 
 ### Images (Used)
+As far as I am aware, all of the below images are actively used by the `20230420` version of the firmware; happy to take any corrections if it turns out any of them are unused!
+
 | Filename | Format | Description |
 | -------- | ------ | ----------- |
 | aepic.nec | 576x256 BGRA | Main menu labels in Korean |
@@ -48,14 +50,52 @@ The Resources folder on the microSD card contains all of the resources used by t
 | hgcpl.cke | 392x80 RGB | In-game menu save-state slot (position 2) |
 | hlink.bvs | 640x480 RGB | Search keyboard (hover) |
 | htui.kcc | 40x24 BGRA | Game Boy Color game-list indicator |
+| icm32.dll | 40x24 BGRA | Game Boy Advance game-list indicator |
+| icuin.cpl | 640x480 RGB | Genesis/Mega Drive main menu background |
+| ihdsf.bke | 640x480 RGB | Genesis/Mega Drive game-list background |
+| irftp.ctp | 640x480 RGB | Game Boy Advance main menu background |
 | irmon.tax | 576x256 BRGA | Main menu labels in Dutch |
+| itiss.ers | 576x256 BRGA | Main menu labels in Chinese |
+| jccatm.kbp | 640x480 RGB | "Battery Empty" screen |
 | ke89a.bvs | 576x256 BRGA | Main menu labels in Portuguese |
+| ksxbar.ax | 392x80 RGB | In-game menu save-state slot (position 4) |
+| lfsvc.dll | 640x480 RGB | Search game-list background |
+| mksh.rcv | 640x480 RGB | Search keyboard (normal) |
+| msdmo.gdb | 392x80 RGB | In-game menu save-state slot (position 1) |
+| msgsm.dll | 40x24 BGRA | Arcade game-list indicator |
 | mssvp.nec | 576x256 BRGA | Main menu labels in Japanese |
+| normidna.bin | 40x24 BGRA | Search game-list indicator |
 | ntdll.bvs | 576x256 BRGA | Main menu labels in Polish |
 | pcadm.nec | 576x256 BRGA | Main menu labels in Italian |
 | pwsso.occ | 640x480 RGB | In-game menu (position 4) |
+| qasf.bel | 640x480 RGB | User game-list background |
+| qwave.bke | 640x480 RGB | Game Boy Color main menu background |
+| rmapi.tax | 576x256 BRGA | Main menu labels in German |
+| sdclt.occ | 120x2280 RGB | TV system and UI language selection icons |
+| sebsc.bvs | 576x256 BRGA | Main menu labels in French |
+| sfcdr.cpl | 576x1344 BRGA | Main menu system logos |
+| subst.tax | 576x256 BRGA | Main menu labels in Russian |
+| ucby4.aax | 576x256 BRGA | Main menu labels in Arabic |
+| urlkp.bvs | 640x480 RGB | NES game-list background |
 | vidca.bvs | 576x256 BRGA | Main menu labels in Hebrew |
 | vssvc.nec | 576x256 BRGA | Main menu labels in Malay |
+| xajkg.hsp | 640x480 RGB | Game Boy main menu background |
+
+### Images (Unused)
+To the best of my knowledge, the following image files are currently __unused__ by the `20230420` firmware, and were probably left over from previous devices (the SF2000 shares a bit of lineage with some USB-stick devices) or development.
+
+| Filename | Format | Description |
+| -------- | ------ | ----------- |
+| fdbil.ph | 1100x120 BGRA | Large icons for each system, including systems not supported by the SF2000 (selected) |
+| igc64.dll | 217x37 BGRA | "Yes" and "No" text, with "No" selected |
+| logilda.be | 40x24 BGRA | CPS1 game-list indicator |
+| mfc64.emc | 40x24 BGRA | CPS2 game-list indicator |
+| mrtac.klo | 40x24 BGRA | Neogeo game-list indicator |
+| nettrace.dll | 40x24 BGRA | Unknown game-list indicator (grey joystick with yellow buttons) |
+| nvinf.hsp | 16x240 BGRA | Latin numbers 0 to 9 listed vertically |
+| werui.ioc | 40x24 RGB | "NODATA" save-state thumbnail placeholder image, with a "horror" style typeface |
+| wshom.ocx | 1100x120 BGRA | Large icons for each system, including systems not supported by the SF2000 (normal) |
+| wshrm.nec | 217x37 BGRA | "Yes" and "No" text, with "Yes" selected |
 
 ### Unknown Files
 | Filename | Description |

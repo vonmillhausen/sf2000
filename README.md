@@ -7,7 +7,6 @@ The Resources folder on the microSD card contains all of the resources used by t
 ### Fonts
 | Filename | Description |
 | -------- | ----------- |
-
 | Arial_cn.ttf | The "Arial" typeface, containing Latin, Greek, Cyrillic, Chinese, and Japanese characters. Duplicate of `yahei_Arial.ttf`, the single font file from the original firmware version |
 | Arial_en.ttf | The "Arial" typeface, containing Latin, Greek, Cyrillic, Armenian, Hebrew and Arabic characters |
 | Arial_jp.ttf | The "Arial" typeface, containing Latin, Greek, Cyrillic, Chinese and Japanese characters |
@@ -18,7 +17,6 @@ The Resources folder on the microSD card contains all of the resources used by t
 ### Images (Used)
 | Filename | Format | Description |
 | -------- | ------ | ----------- |
-
 | aepic.nec | 576x256 BGRA | Main menu labels in Korean |
 | apisa.dlk | 640x480 RGB | Arcade game list background |
 | appvc.ikb | 150x214 BRGA | Game art placeholder |
@@ -62,7 +60,6 @@ The Resources folder on the microSD card contains all of the resources used by t
 ### Unknown Files
 | Filename | Description |
 | -------- | ----------- |
-
 | Archive.sys | UNKNOWN; 8 bytes, first are `0x02`, the rest are all `0x00` |
 | c2fkec.pgt | UNKNOWN; binary |
 | dpnet.dll | UNKNOWN; binary |

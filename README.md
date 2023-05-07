@@ -183,14 +183,22 @@ Credit for this section goes to `taizou#9644`, author of [Frog Tool](https://git
 | adsnt.nec (SNES), fhcfg.nec (NES), htuiw.nec (Game Boy Advance), msdtc.nec (Arcade), setxa.nec (Genesis/Mega Drive), umboa.nec (Game Boy), wjere.nec (Game Boy Color) | Chinese translations of the English ROM names, used to display the game lists when the UI language is set to Chinese. Not all game names are translated |
 | mswb7.tax (Arcade), pnpui.tax (Game Boy Color), rdbui.tax (NES), scksp.tax (Genesis/Mega Drive), urefs.tax (SNES), vdsdc.tax (Game Boy), vfnet.tax (Game Boy Advance) | English ROM Names, used to display the game lists when the UI language is set to English |
 | xfgle.hgp, xfgle.hgp.bak | The `xfgle.hgp` file contains the ROM "shortcuts" on the main menu for each game system. The `xfgle.hgp.bak` file appears to be a test version of this file that was not removed from the firmware before being sent to production |
+| TSMFK.TAX | This is a ROM list file similar to the other `.tax` files, except it is built at run-time from the ROM files in the user roms folder. The file is regenerated each time the device boots |
 
 ### Sounds
-There are two sound files in the `20230420` firmware, both in raw signed 16-bit PCM format (little-endian, mono, at 22050 Hz). The SF2000 seems to play the files back at an incorrect sample rate vs. the raw data; if you want to customise the background music, resample your audio to 21543 Hz, and then speed the audio up to 22050 Hz, using the resulting audio as the raw data (credit to `notv37#4200` in Discord for doing the math on that).
+There are several sound files in the `20230420` firmware, stored in raw signed 16-bit PCM format (mono, little-endian at 22050 Hz). The SF2000 seems to play the files back at an incorrect sample rate vs. the raw data; if you want to customise the background music, resample your audio to 21543 Hz, and then speed the audio up to 22050 Hz, using the resulting audio as the raw data (credit to `notv37#4200` in Discord for doing the math on that).
 
-| Filename | Description |
-| -------- | ----------- |
-| pagefile.sys | Main menu background music |
-| swapfile.sys | Short "navigation" sound |
+| Filename | Description | Listen |
+| -------- | ----------- | ------ |
+| c2fkec.pgt | "Popping" sound that is played when moving around the search keyboard | [listen](/sounds/c2fkec.mp3) |
+| dpnet.dll | "Downwards Zap" sound, unknown usage | [listen](/sounds/dpnet.mp3) |
+| dsreg.bvs | "Upwards Bleeping" sound, unknown usage | [listen](/sounds/dsreg.mp3) |
+| help.lis | "Double Buzzer" sound, unknown usage | [listen](/sounds/help.mp3) |
+| mfsvr.nkf | "Beep" sound that is played when entering a letter on the search keyboard | [listen](/sounds/mfsvr.mp3) |
+| nyquest.gdb | "Whooshing" sound that is played when switching between emulated systems on the main menu, between the "Resume", "Quit", "Load" and "Save" options on the in-game menu, and scrolling by pages within a system's game-list | [listen](/sounds/nyquest.mp3) |
+| oldversion.kbe | "Three Note Upward Chime" sound that is played when deleting a letter on the search keyboard | [listen](/sounds/oldversion.mp3) |
+| pagefile.sys | Main menu background music | [listen](/sounds/pagefile.mp3) |
+| swapfile.sys | "Squishy" sound played when navigating horizontally through "shortcut" games on the main menu, or vertically within a system's game-list | [listen](/sounds/swapfile.mp3) |
 
 ### Unknown Files
 These are files that I have not yet determined what they do; if anyone has any information on these, do post about it in the Data Frog channel in the Retro Handhelds Discord server please!
@@ -198,17 +206,12 @@ These are files that I have not yet determined what they do; if anyone has any i
 | Filename | Description |
 | -------- | ----------- |
 | Archive.sys | UNKNOWN; 8 bytes, first are `0x02`, the rest are all `0x00` |
-| c2fkec.pgt | UNKNOWN; binary |
-| dpnet.dll | UNKNOWN; binary |
-| dsreg.bvs | UNKNOWN; binary. __Not__ the same format as the `*.bvs` files mentioned in the "ROM Lists" section above |
-| help.lis | UNKNOWN; binary |
 | kcnuv.lit | UNKNOWN; a bunch of 4-byte binary chunks (e.g., `0xC4 0x00 0x00 0x00`), followed by a list of .NES ROM file names. Very similar to the `.bvs`/`.nec`/`.tax` files detailed above, but doesn't have the same type of "header" they have |
-| mfsvr.nkf | UNKNOWN; binary |
-| nyquest.gdb | UNKNOWN; binary |
-| oldversion.kbe | UNKNOWN; binary |
-| TSMFK.TAX | UNKNOWN; four bytes, all `0x00`. __Not__ the same format as the `*.tax` files mentioned in the "ROM Lists" section above |
 
 ---
 
 ## Version History
+
+20230507 - 1.1: Some "unknown" files from the `Resources` folder identified with `taizou#9644`'s help (thanks!); moved them to the Sounds and Rom Lists sections with details. Only two files left!
+
 20230507 - 1.0: Original creation of this page.

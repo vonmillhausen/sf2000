@@ -8,6 +8,25 @@ Some downsides to the device: it's mono-only, there's no head-phone jack (althou
 
 So is the "Data Frog" any good? Only you can answer that question for yourself. There are certainly more powerful devices out there, more fully featured devices, devices with better hardware, etc. - but almost all of those devices cost a lot more than the SF2000. At the end of the day, you have to look at the features offered at the given price-point, and only then can you decide if you're interested in the device or not.
 
+## Hardware
+Although the main CPU of the SF2000 has literally had it's markings milled off by a routing tool, the community has determined that it's a HCSEMI B210, a single-core MIPS processor running at 810 MHz. It appears to be a clone of an ALi Tech chip.
+
+---
+
+## biserv.asd
+
+The firmware for the SF2000 is actually located on the microSD card, in a file called `biserv.asd` located in the BIOS folder. This file is a monolithic binary blob, which contains the device's OS, the emulators, their settings... basically everything. The file is currently being investigated. Here are some findings from it:
+
+### Key Bindings
+`osaka#9664` discovered that the OS supports loading game-specific key bindings from `.kmp` files, stored in the `save` folder for each system and named after a game's ROM file (e.g., `/FC/save/Game Name.kmp`). They also discovered where in the `biserv.asd` file the default mappings for each emulator are stored. Working with this information, `notv37#4200` worked out what bits related to what buttons for each emulator. Using `notv37#4200`'s findings, `osaka#9664` has put together a web-based tool which can be used to alter the default key bindings for each emulator, as well as to create game-specific bindings - you can [find that tool here](https://bnister.github.io/sf2000/bisrv_keymaps.html).
+
+### Boot Logo
+When the device is powered on, a "Welcome" image is displayed for a short time before the main menu appears. This image comes from inside `biserv.asd`, at offset `0x9B91D8`. It's a `512x200` RGB565 Little Endian raw image file, and looks like this:
+
+![Boot Logo](/images/bootlogo.png)
+
+---
+
 ## Resources
 
 The Resources folder on the microSD card contains all of the resources used by the device's firmware to construct the user interface at runtime. The following tables list the files from the `20230420` firmware and what they are used for, grouped by broad categories:

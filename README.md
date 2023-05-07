@@ -2,6 +2,7 @@
 Information regarding the SF2000 handheld console
 
 ## Resources
+
 The Resources folder on the microSD card contains all of the resources used by the device's firmware to construct the user interface at runtime. The following tables list the files from the `20230420` firmware and what they are used for, grouped by broad categories:
 
 ### Fonts
@@ -15,6 +16,7 @@ The Resources folder on the microSD card contains all of the resources used by t
 | yahei_Arial.ttf | The "Arial" typeface, containing Latin, Greek, Cyrillic, Chinese, Japanese and Korean characters |
 
 ### Images (Used)
+
 As far as I am aware, all of the below images are actively used by the `20230420` version of the firmware; happy to take any corrections if it turns out any of them are unused!
 
 | Filename | Format | Description |
@@ -82,20 +84,46 @@ As far as I am aware, all of the below images are actively used by the `20230420
 | xajkg.hsp | 640x480 RGB | Game Boy main menu background |
 
 ### Images (Unused)
-To the best of my knowledge, the following image files are currently __unused__ by the `20230420` firmware, and were probably left over from previous devices (the SF2000 shares a bit of lineage with some USB-stick devices) or development.
+
+To the best of my knowledge, the following image files are currently __unused__ by the `20230420` firmware, and were probably left over from previous devices (the SF2000 shares a bit of lineage with some USB-stick devices) or development. The images marked "Alternate UI" below appear to have been for a UI where the systems were scrolled through horizontally, and the "shortcut" games for each system were scrolled vertically.
 
 | Filename | Format | Description |
 | -------- | ------ | ----------- |
+| aeinv.bke | 640x480 RGB | Alternate UI: Genesis/Mega Drive main menu background |
+| aepic.ers | 640x480 RGB | Alternate UI: User main menu background |
+| c1e.pal | 640x480 RGB | CPS2 game-list background |
+| cca.bvs | 640x480 RGB | In-game menu (position 1; Chinese language hardcoded) |
+| dectMap.key | 640x480 RGB | Button test screen (active) |
+| desk.cpl | 640x480 RGB | Eight-game selection screen |
+| djoin.hsp | 640x480 RGB | Alternate UI: Arcade main menu background |
+| fcont.ctp | 640x480 RGB | Alternate UI: User main menu background |
 | fdbil.ph | 1100x120 BGRA | Large icons for each system, including systems not supported by the SF2000 (selected) |
+| gpapi.bvs | 640x480 RGB | In-game menu (position 5; looks like it was for some kind of button layout changing UI) |
 | igc64.dll | 217x37 BGRA | "Yes" and "No" text, with "No" selected |
+| ihds.bke | 640x480 RGB | Genesis/Mega Drive game-list background, with baked-in thumbnail placeholder |
+| kdill.hsp | 640x480 RGB | Alternate UI: Game Boy Advance main menu background |
 | logilda.be | 40x24 BGRA | CPS1 game-list indicator |
 | mfc64.emc | 40x24 BGRA | CPS2 game-list indicator |
+| mfpmp.ers | 640x480 RGB | Alternate UI: Arcade main menu background |
 | mrtac.klo | 40x24 BGRA | Neogeo game-list indicator |
+| msdtc.bke | 640x480 RGB | Alternate UI: Game Boy Advance main menu background |
+| mswbv.cpl | 640x480 RGB | Alternate UI: Game Boy Advance main menu background |
 | nettrace.dll | 40x24 BGRA | Unknown game-list indicator (grey joystick with yellow buttons) |
+| nsibm.ctp | 640x480 RGB | Alternate UI: Arcade main menu background |
 | nvinf.hsp | 16x240 BGRA | Latin numbers 0 to 9 listed vertically |
+| nvinfohsp | 640x480 RGB | Alternate UI: Genesis/Mega Drive main menu background (note: there's no extension separator for this file, I suspect the file name is typo'd in the filesystem!) |
+| pcadm.hsp | 640x480 RGB | Alternate UI: User main menu background (NTSC TV system selected) |
+| plasy.ers | 640x480 RGB | Alternate UI: Game Boy Advance main menu background |
+| rmapi.cpl | 640x480 RGB | Alternate UI: User main menu background (English UI language selected) |
+| seltMap.key | 640x480 RGB | Button test screen |
+| spmpm.gdp | 640x480 RGB | Alternate UI: NES game-list background, with baked-in thumbnail placeholder |
+| subst.bke | 640x480 RGB | Alternate UI: Arcade main menu background |
+| tsmcf.cpl | 640x480 RGB | Alternate UI: Arcade main menu background |
+| url.bvs | 640x480 RGB | CPS1 game-list background |
 | werui.ioc | 40x24 RGB | "NODATA" save-state thumbnail placeholder image, with a "horror" style typeface |
 | wshom.ocx | 1100x120 BGRA | Large icons for each system, including systems not supported by the SF2000 (normal) |
 | wshrm.nec | 217x37 BGRA | "Yes" and "No" text, with "Yes" selected |
+| x86e.hgp | 640x480 RGB | Neogeo game-list background |
 
 ### Unknown Files
 | Filename | Description |

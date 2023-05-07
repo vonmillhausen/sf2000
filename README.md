@@ -151,7 +151,7 @@ These are other files that have been identified, which don't fit into the other 
 
 ### ROM Lists
 
-Credit for this section goes to `taizou#9644`, author of [Frog Tool|https://github.com/tzlion/frogtool]. These files relate to the built-in game lists under each main system; the list of games is pulled from these files instead of being built at runtime - annoying, but presumably for performance reasons. It means if you want to change the list of built-in games (instead of using the User ROMs section), you have to edit these files - hence Frog Tool, you should really check it out.
+Credit for this section goes to `taizou#9644`, author of [Frog Tool](https://github.com/tzlion/frogtool). These files relate to the built-in game lists under each main system; the list of games is pulled from these files instead of being built at runtime - annoying, but presumably for performance reasons. It means if you want to change the list of built-in games (instead of using the User ROMs section), you have to edit these files - hence Frog Tool, you should really check it out.
 
 | Files | Description |
 | ----- | ----------- |

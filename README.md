@@ -153,6 +153,7 @@ These are other files that have been identified, which don't fit into the other 
 
 | Filename | Description |
 | -------- | ----------- |
+| Archive.sys | Stores the settings for UI language and TV system. Two 32-bit words (4-bytes), little endian. The first is UI language; `0x00000000` is English, `0x01000000` is Chinese, etc.. The second is the TV system setting; `0x00000000` is NTSC, `0x01000000` is PAL |
 | bfrjd.odb | UI strings in Korean |
 | bxvtb.sby | UI strings in Thai |
 | dufdr.cwr | UI strings in Turkish |
@@ -205,12 +206,12 @@ These are files that I have not yet determined what they do; if anyone has any i
 
 | Filename | Description |
 | -------- | ----------- |
-| Archive.sys | UNKNOWN; 8 bytes, first are `0x02`, the rest are all `0x00` |
 | kcnuv.lit | UNKNOWN; a bunch of 4-byte binary chunks (e.g., `0xC4 0x00 0x00 0x00`), followed by a list of .NES ROM file names. Very similar to the `.bvs`/`.nec`/`.tax` files detailed above, but doesn't have the same type of "header" they have |
 
 ---
 
 ## Version History
+20230508 - 1.2: Added details for `Archive.sys` - thanks to `osaka#9664` for the hints on what it related to!
 
 20230507 - 1.1: Some "unknown" files from the `Resources` folder identified with `taizou#9644`'s help (thanks!); moved them to the Sounds and Rom Lists sections with details. Only two files left!
 

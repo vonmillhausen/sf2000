@@ -18,7 +18,7 @@ Although the main CPU of the SF2000 has literally had it's markings milled off b
 The firmware for the SF2000 is actually located on the microSD card, in a file called `biserv.asd` located in the BIOS folder. This file is a monolithic binary blob, which contains the device's OS, the emulators, their settings... basically everything. The file is currently being investigated. Here are some findings from it:
 
 ### Key Bindings
-`osaka#9664` discovered that the OS supports loading game-specific key bindings from `.kmp` files, stored in the `save` folder for each system and named after a game's ROM file (e.g., `/FC/save/Game Name.kmp`). They also discovered where in the `biserv.asd` file the default mappings for each emulator are stored. Working with this information, `notv37#4200` worked out what bits related to what buttons for each emulator. Using `notv37#4200`'s findings, `osaka#9664` has put together a web-based tool which can be used to alter the default key bindings for each emulator, as well as to create game-specific bindings - you can [find that tool here](https://bnister.github.io/sf2000/bisrv_keymaps.html).
+`osaka#9664` discovered that the OS supports loading game-specific key bindings from `.kmp` files, stored in the `save` folder for each system and named after a game's ROM file (e.g., `/FC/save/Game Name.kmp`). They also discovered where in the `biserv.asd` file the default mappings for each emulator are stored. Working with this information, `notv37#4200` worked out what bits related to what buttons for each emulator. Using both their findings, we now have a tool which can be used to update both the global button mappings for the emulators, as well as create per-ROM mappings - you can [find this tool here](https://vonmillhausen.github.io/sf2000/tools/buttonMappingChanger.htm).
 
 ### Boot Logo
 When the device is powered on, a "Welcome" image is displayed for a short time before the main menu appears. This image comes from inside `biserv.asd`, at offset `0x9B91D8`. It's a `512x200` RGB565 Little Endian raw image file, and looks like this:
@@ -213,6 +213,8 @@ These are files that I have not yet determined what they do; if anyone has any i
 ---
 
 ## Version History
+20230510 - 1.4: Added my own version of `osaka#9664`'s button mapping tool at their request, and changed the link in the Key Mapping section accordingly.
+
 20230509 - 1.3: Added more details about how the boot logo ends up scaled on the screen, as well as a link to a new tool I wrote for altering the logo. Corrected one small formatting error.
 
 20230508 - 1.2: Added details for `Archive.sys` - thanks to `osaka#9664` for the hints on what it related to!

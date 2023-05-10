@@ -10,7 +10,28 @@ So is the "Data Frog" any good? Only you can answer that question for yourself. 
 ---
 
 ## Hardware
-Although the main CPU of the SF2000 has literally had it's markings milled off by a routing tool, the community has determined that it's a HCSEMI B210, a single-core MIPS processor running at 810 MHz. It appears to be a clone of an ALi Tech chip.
+
+### CPU
+Although the main CPU of the SF2000 has literally had it's markings milled off by a routing tool, the community has determined that it's a HCSEMI B210, a single-core MIPS processor running at 810 MHz. It appears to be a clone of an ALi Tech chip. No SDK is currently available for it, and the device is closed-source.
+
+### Buttons
+The ABXY are basically a clone of the original SNES controller buttons. Although everyone seems to be getting two purple and two lilac coloured buttons, there's a disparity to the _type_ of buttons folks are getting - some get two convex and two concave buttons, others have gotten three concave and one convex, etc..
+
+It has been reported that both the buttons and the underlying membrane from an original SNES controller can be swapped into the SF2000, which may improve the "feel" of the buttons. Note that the SF2000 uses ABXY buttons that have two plastic tabs sticking out to keep them in the shell (at 180 degrees from each other); some after-market SNES-style buttons have _three_ tabs, and won't fit the housing.
+
+Some folks have modded the stock ABXY buttons on their SF2000s by adding a thin strip of tape or other thin material into the circular depression under each button - this causes the buttons to be raised a bit higher out of the shell, and to not sink as far into the shell when the button is pressed.
+
+### D-Pad
+Just like the ABXY buttons, the d-pad is a clone of the SNES d-pad. It has been reported that an original SNES d-pad and membrane can be swapped into the SF2000 as well.
+
+### Thumb Stick
+The SF2000 uses a Switch-style thumb stick that does _not_ depress for L2/R2. It is compatible with Switch thumb stick third-party covers.
+
+### Battery
+The SF2000 takes a 18650 type rechargable battery, which is easily user replacable (it's behind a battery door with a screw), and comes with a 1,500mAh one. 18650 with and without "nubs" both fit fine. The console has built-in over-charge protection, but _does not have under-charge protection, so for safety do not leave the console turned on when the battery is low_. From when it displays a full-screen low battery indicator, it takes about 3.5 hours to charge the stock battery. The green charging light does _not_ turn off when fully charged.
+
+### Wireless Connectivity
+The SF2000 does not feature WIFI or Bluetooth, but it _does_ have a 2.4Ghz antenna to support local wireless multiplayer using a compatible 2.4Ghz wireless controller for Player 2. The Y2 SFC wireless controller and the SF900 wireless controller have both been reported to work fine.
 
 ---
 
@@ -213,6 +234,8 @@ These are files that I have not yet determined what they do; if anyone has any i
 ---
 
 ## Version History
+20230510 - 1.5: Added additional detail to the Hardware section about the buttons, d-pad, thumb-stick, battery, and wireless controller support.
+
 20230510 - 1.4: Added my own version of `osaka#9664`'s button mapping tool at their request, and changed the link in the Key Mapping section accordingly.
 
 20230509 - 1.3: Added more details about how the boot logo ends up scaled on the screen, as well as a link to a new tool I wrote for altering the logo. Corrected one small formatting error.

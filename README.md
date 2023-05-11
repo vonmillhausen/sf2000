@@ -14,6 +14,9 @@ So is the "Data Frog" any good? Only you can answer that question for yourself. 
 ### CPU
 Although the main CPU of the SF2000 has literally had it's markings milled off by a routing tool, the community has determined that it's a HCSEMI B210, a single-core MIPS processor running at 810 MHz. It appears to be a clone of an ALi Tech chip. No SDK is currently available for it, and the device is closed-source.
 
+### Display
+The SF2000 features a `240x320` IPS display panel (not OCA laminated), which has been rotated 90&deg; clockwise to give a `320x240` display. It demonstrates screen tearing for all emulators, running from the right of the console to the left due to the panel rotation.
+
 ### Buttons
 The ABXY are basically a clone of the original SNES controller buttons. Although everyone seems to be getting two purple and two lilac coloured buttons, there's a disparity to the _type_ of buttons folks are getting - some get two convex and two concave buttons, others have gotten three concave and one convex, etc..
 
@@ -35,10 +38,48 @@ The SF2000 does not feature WIFI or Bluetooth, but it _does_ have a 2.4Ghz anten
 
 ---
 
+## Emulators
+
+The device advertises support for arcade, NES, SNES, Genesis/Mega Drive, Game Boy, Game Boy Color and Game Boy Advance; it also supports loading Master System ROMs. SNES and GBA performance are very hit-or miss (more miss than hit, really); the other consoles actually perform fairly well. All consoles currently stretch their output to fill the display, and do not maintain aspect ratio.
+
+The SF2000 appears to be using Libretro with a custom front-end (i.e., not RetroArch).
+
+### Arcade
+The device is running some version of Final Burn Alpha - it ships with a subset of the v0.2.97.24 ROM set, so likely that version. `adcockm#8175` from the Retro Handhelds Discord did some phenomenal work checking the full v0.2.97.24 against the device's April 20th firmware - thanks `adcockm#8175`! The below table has their findings:
+
+| List | Name | Description |
+| ---- | ---- | ----------- |
+| [view](/text/inrom_sf2000_fba.txt) | On microSD | These were the ROMs included on the microSD card shipped with the device |
+| [view](/text/notlistedinrom_sf2000_fba.txt) | Not Listed | The SF2000's firmware contains a list of FBA ROM names, including ROMs not included on the microSD card - it is assumed these are the only games the flavour of FBA on the SF2000 knows about. This text file contains a list of the ROMs from the v0.2.97.24 set that were _not_ listed in the firmware; these are assumed to be incompatible, and were not tested |
+| [view](/text/testednoload_sf2000_fba.txt) | No Load | These ROMs immediately hung the emulator without any indication it had loaded any files successfully |
+| [view](/text/testedloadhang_sf2000_fba.txt) | Load Hang | These ROMs indicated they were loading some files on startup, but hung before completing |
+| [view](/text/testedloadcorrupt_sf2000_fba.txt) | Load Corrupt | These ROMs appeared to complete loading, but only showed severe graphical corruption (e.g., garbage, static, a black screen, etc.) and usually wouldn't allow exit back to the SF2000's menu via start+select |
+| [view](/text/working_sf2000_fba.txt) | Working | These ROMs loaded successfully; note that "working" does not mean "works perfectly" - some may be too slow to play, may not have any audio, may not be controllable (e.g., light-gun games), etc. - they just finish loading successfully |
+
+### NES
+Appears to be a version of FCEUMM. There are references in the firmware to different NES palettes, but there's no interface or configuration for the emulator itself to choose one. On the original firmware, the A and B buttons were swapped. See "Button Mappings/Key Bindings" section below.
+
+### SNES
+With the April 20th version of the firmware, SNES games appear to run very slowly _on first launch_; but if you exit the game and load it again, it usually starts performing _much_ better.
+
+### Genesis/Mega Drive
+Works pretty well. On the original firmware, A was mapped to A, B was mapped to B, and RB was mapped to C for some reason. See "Button Mappings/Key Bindings" section below.
+
+### Game Boy
+Uses a black and white colour palette, which currently cannot be changed. On the original firmware, the A and B buttons were swapped. See "Button Mappings/Key Bindings" section below.
+
+### Game Boy Color
+On the original firmware, the A and B buttons were swapped. See "Button Mappings/Key Bindings" section below.
+
+### Game Boy Advance
+Performance is fairly poor. On the original firmware, A and B buttons are mapped correctly, but the GBA shoulder buttons are mapped to X and Y for some reason. See "Button Mappings/Key Bindings" section below.
+
+---
+
 ## biserv.asd
 The firmware for the SF2000 is actually located on the microSD card, in a file called `biserv.asd` located in the BIOS folder. This file is a monolithic binary blob, which contains the device's OS, the emulators, their settings... basically everything. The file is currently being investigated. Here are some findings from it:
 
-### Key Bindings
+### Button Mappings/Key Bindings
 `osaka#9664` discovered that the OS supports loading game-specific key bindings from `.kmp` files, stored in the `save` folder for each system and named after a game's ROM file (e.g., `/FC/save/Game Name.kmp`). They also discovered where in the `biserv.asd` file the default mappings for each emulator are stored. Working with this information, `notv37#4200` worked out what bits related to what buttons for each emulator. Using both their findings, we now have a tool which can be used to update both the global button mappings for the emulators, as well as create per-ROM mappings - you can [find this tool here](https://vonmillhausen.github.io/sf2000/tools/buttonMappingChanger.htm).
 
 ### Boot Logo
@@ -234,6 +275,8 @@ These are files that I have not yet determined what they do; if anyone has any i
 ---
 
 ## Version History
+20230511 - 1.6: Added a quick note about the display panel to the Hardware section, and added a new section for Emulators, including an incredible collection of ROM notes for Arcade thanks to `adcockm#8175`!
+
 20230510 - 1.5: Added additional detail to the Hardware section about the buttons, d-pad, thumb-stick, battery, and wireless controller support.
 
 20230510 - 1.4: Added my own version of `osaka#9664`'s button mapping tool at their request, and changed the link in the Key Mapping section accordingly.

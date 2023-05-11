@@ -9,6 +9,40 @@ So is the "Data Frog" any good? Only you can answer that question for yourself. 
 
 ---
 
+## Table of Contents
+- [SF2000](#sf2000)
+  - [Table of Contents](#table-of-contents)
+  - [Hardware](#hardware)
+    - [CPU](#cpu)
+    - [Display](#display)
+    - [Buttons](#buttons)
+    - [D-Pad](#d-pad)
+    - [Thumb Stick](#thumb-stick)
+    - [Battery](#battery)
+    - [Wireless Connectivity](#wireless-connectivity)
+  - [Emulators](#emulators)
+    - [Arcade](#arcade)
+    - [NES](#nes)
+    - [SNES](#snes)
+    - [Genesis/Mega Drive](#genesismega-drive)
+    - [Game Boy](#game-boy)
+    - [Game Boy Color](#game-boy-color)
+    - [Game Boy Advance](#game-boy-advance)
+  - [biserv.asd](#biservasd)
+    - [Button Mappings/Key Bindings](#button-mappingskey-bindings)
+    - [Boot Logo](#boot-logo)
+  - [Resources](#resources)
+    - [Fonts](#fonts)
+    - [Images (Used)](#images-used)
+    - [Images (Unused)](#images-unused)
+    - [Other Files](#other-files)
+    - [ROM Lists](#rom-lists)
+    - [Sounds](#sounds)
+    - [Unknown Files](#unknown-files)
+  - [Version History](#version-history)
+
+---
+
 ## Hardware
 
 ### CPU
@@ -63,7 +97,7 @@ Appears to be a version of FCEUMM. There are references in the firmware to diffe
 With the April 20th version of the firmware, SNES games appear to run very slowly _on first launch_; but if you exit the game and load it again, it usually starts performing _much_ better.
 
 ### Genesis/Mega Drive
-Works pretty well. On the original firmware, A was mapped to A, B was mapped to B, and RB was mapped to C for some reason. See "[Button Mappings/Key Bindings](#button-mappingskey-bindings)" section below.
+Works pretty well. This emulator is capable of loading Master System ROMs if placed in the user ROMs folder on the microSD card; Game Gear ROMs do not load. On the original firmware, A was mapped to A, B was mapped to B, and RB was mapped to C for some reason. See "[Button Mappings/Key Bindings](#button-mappingskey-bindings)" section below.
 
 ### Game Boy
 Uses a black and white colour palette, which currently cannot be changed. On the original firmware, the A and B buttons were swapped. See "[Button Mappings/Key Bindings](#button-mappingskey-bindings)" section below.
@@ -275,7 +309,7 @@ These are files that I have not yet determined what they do; if anyone has any i
 ---
 
 ## Version History
-20230511 - 1.6: Added a quick note about the display panel to the Hardware section, and added a new section for Emulators, including an incredible collection of ROM notes for Arcade thanks to `adcockm#8175`! Also added a "silent" background music file for download.
+20230511 - 1.6: Added a quick note about the display panel to the Hardware section, and added a new section for Emulators, including an incredible collection of ROM notes for Arcade thanks to `adcockm#8175`! Also added a "silent" background music file for download, and a table of contents (this page is getting fairly long 😅)
 
 20230510 - 1.5: Added additional detail to the Hardware section about the buttons, d-pad, thumb-stick, battery, and wireless controller support.
 

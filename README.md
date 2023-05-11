@@ -57,22 +57,22 @@ The device is running some version of Final Burn Alpha - it ships with a subset 
 | [view](/text/working_sf2000_fba.txt) | Working | These ROMs loaded successfully; note that "working" does not mean "works perfectly" - some may be too slow to play, may not have any audio, may not be controllable (e.g., light-gun games), etc. - they just finish loading successfully |
 
 ### NES
-Appears to be a version of FCEUMM. There are references in the firmware to different NES palettes, but there's no interface or configuration for the emulator itself to choose one. On the original firmware, the A and B buttons were swapped. See "Button Mappings/Key Bindings" section below.
+Appears to be a version of FCEUMM. There are references in the firmware to different NES palettes, but there's no interface or configuration for the emulator itself to choose one. On the original firmware, the A and B buttons were swapped. See "[Button Mappings/Key Bindings](#button-mappingskey-bindings)" section below.
 
 ### SNES
 With the April 20th version of the firmware, SNES games appear to run very slowly _on first launch_; but if you exit the game and load it again, it usually starts performing _much_ better.
 
 ### Genesis/Mega Drive
-Works pretty well. On the original firmware, A was mapped to A, B was mapped to B, and RB was mapped to C for some reason. See "Button Mappings/Key Bindings" section below.
+Works pretty well. On the original firmware, A was mapped to A, B was mapped to B, and RB was mapped to C for some reason. See "[Button Mappings/Key Bindings](#button-mappingskey-bindings)" section below.
 
 ### Game Boy
-Uses a black and white colour palette, which currently cannot be changed. On the original firmware, the A and B buttons were swapped. See "Button Mappings/Key Bindings" section below.
+Uses a black and white colour palette, which currently cannot be changed. On the original firmware, the A and B buttons were swapped. See "[Button Mappings/Key Bindings](#button-mappingskey-bindings)" section below.
 
 ### Game Boy Color
-On the original firmware, the A and B buttons were swapped. See "Button Mappings/Key Bindings" section below.
+On the original firmware, the A and B buttons were swapped. See "[Button Mappings/Key Bindings](#button-mappingskey-bindings)" section below.
 
 ### Game Boy Advance
-Performance is fairly poor. On the original firmware, A and B buttons are mapped correctly, but the GBA shoulder buttons are mapped to X and Y for some reason. See "Button Mappings/Key Bindings" section below.
+Performance is fairly poor. On the original firmware, A and B buttons are mapped correctly, but the GBA shoulder buttons are mapped to X and Y for some reason. See "[Button Mappings/Key Bindings](#button-mappingskey-bindings)" section below.
 
 ---
 

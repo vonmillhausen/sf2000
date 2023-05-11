@@ -262,7 +262,7 @@ There are several sound files in the `20230420` firmware, stored in raw signed 1
 | mfsvr.nkf | "Beep" sound that is played when entering a letter on the search keyboard | [listen](/sounds/mfsvr.mp3) |
 | nyquest.gdb | "Whooshing" sound that is played when switching between emulated systems on the main menu, between the "Resume", "Quit", "Load" and "Save" options on the in-game menu, and scrolling by pages within a system's game-list | [listen](/sounds/nyquest.mp3) |
 | oldversion.kbe | "Three Note Upward Chime" sound that is played when deleting a letter on the search keyboard | [listen](/sounds/oldversion.mp3) |
-| pagefile.sys | Main menu background music | [listen](/sounds/pagefile.mp3) |
+| pagefile.sys | Main menu background music. If you don't like background music, and would rather just have silence, you can [find a replacement silent `pagefile.sys` here](/sounds/silentMusic/pagefile.sys) - just replace the one in the `Resources` folder (don't forget to backup the original file first, in case you ever want that jaunty tune again!) | [listen](/sounds/pagefile.mp3) |
 | swapfile.sys | "Squishy" sound played when navigating horizontally through "shortcut" games on the main menu, or vertically within a system's game-list | [listen](/sounds/swapfile.mp3) |
 
 ### Unknown Files
@@ -275,7 +275,7 @@ These are files that I have not yet determined what they do; if anyone has any i
 ---
 
 ## Version History
-20230511 - 1.6: Added a quick note about the display panel to the Hardware section, and added a new section for Emulators, including an incredible collection of ROM notes for Arcade thanks to `adcockm#8175`!
+20230511 - 1.6: Added a quick note about the display panel to the Hardware section, and added a new section for Emulators, including an incredible collection of ROM notes for Arcade thanks to `adcockm#8175`! Also added a "silent" background music file for download.
 
 20230510 - 1.5: Added additional detail to the Hardware section about the buttons, d-pad, thumb-stick, battery, and wireless controller support.
 

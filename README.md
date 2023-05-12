@@ -20,6 +20,7 @@ So is the "Data Frog" any good? Only you can answer that question for yourself. 
     - [Thumb Stick](#thumb-stick)
     - [Battery](#battery)
     - [Wireless Connectivity](#wireless-connectivity)
+    - [A/V Output](#av-output)
   - [Emulators](#emulators)
     - [Arcade](#arcade)
     - [NES](#nes)
@@ -28,7 +29,7 @@ So is the "Data Frog" any good? Only you can answer that question for yourself. 
     - [Game Boy](#game-boy)
     - [Game Boy Color](#game-boy-color)
     - [Game Boy Advance](#game-boy-advance)
-  - [biserv.asd](#biservasd)
+  - [Firmware/BIOS (biserv.asd)](#firmwarebios-biservasd)
     - [Button Mappings/Key Bindings](#button-mappingskey-bindings)
     - [Boot Logo](#boot-logo)
   - [Resources](#resources)
@@ -65,10 +66,19 @@ Just like the ABXY buttons, the d-pad is a clone of the SNES d-pad. It has been 
 The SF2000 uses a Switch-style thumb stick that does _not_ depress for L2/R2. It is compatible with Switch thumb stick third-party covers.
 
 ### Battery
-The SF2000 takes a 18650 type rechargable battery, which is easily user replacable (it's behind a battery door with a screw), and comes with a 1,500mAh one. 18650 with and without "nubs" both fit fine. The console has built-in over-charge protection, but _does not have under-charge protection, so for safety do not leave the console turned on when the battery is low_. From when it displays a full-screen low battery indicator, it takes about 3.5 hours to charge the stock battery. The green charging light does _not_ turn off when fully charged.
+The SF2000 takes a 18650 type rechargable battery, which is easily user replacable (it's behind a battery door with a screw), and comes with a 1,500mAh one which runs for about 4 hours. 18650 batteries with and without "nubs" both fit fine. The console has built-in over-charge protection, but _does not have under-charge protection, so for safety do not leave the console turned on when the battery is low_. From when it displays a full-screen low battery indicator, it takes about 3.5 hours to charge the stock battery. The green charging light does _not_ turn off when fully charged.
 
 ### Wireless Connectivity
 The SF2000 does not feature WIFI or Bluetooth, but it _does_ have a 2.4Ghz antenna to support local wireless multiplayer using a compatible 2.4Ghz wireless controller for Player 2. The Y2 SFC wireless controller and the SF900 wireless controller have both been reported to work fine.
+
+### A/V Output
+The SF2000 features a mini-jack for analogue composite A/V output. The device is capable of output a user-selectable PAL or NTSC video signal. Only the _left_ audio channel is output - the device does _not_ down-mix to mono, which results in missing audio channels in games that expect to output stereo sound.
+
+There's some limited evidence to suggest the A/V output is at 576i. When outputting a PAL signal, while the signal is indeed 50Hz, it seems like the emulators are still targeting 60Hz output - PAL scrolling is "jerky". Switching the device to output NTSC, scrolling becomes smooth. This holds true regardless of using a PAL or NTSC version of a ROM.
+
+Video output over A/V is also somewhat heavily cropped on all screen edges - this may result in UI elements at screen edges in games (health bars, remaining credits, etc.) being out-of-frame. Switching between PAL and NTSC doesn't alter the visible screen area.
+
+On my own unit, plugging in a charging cable while outputting over A/V introduces a lot of video noise in the A/V signal; so those planning to use the SF2000 as a TV console may need to do so while running on battery for the best experience.
 
 ---
 
@@ -97,7 +107,7 @@ Appears to be a version of FCEUMM. There are references in the firmware to diffe
 With the April 20th version of the firmware, SNES games appear to run very slowly _on first launch_; but if you exit the game and load it again, it usually starts performing _much_ better.
 
 ### Genesis/Mega Drive
-Works pretty well. This emulator is capable of loading Master System ROMs if placed in the user ROMs folder on the microSD card; Game Gear ROMs do not load. On the original firmware, A was mapped to A, B was mapped to B, and RB was mapped to C for some reason. See "[Button Mappings/Key Bindings](#button-mappingskey-bindings)" section below.
+Works pretty well. This emulator is capable of loading Master System ROMs if placed in the user ROMs folder on the microSD card; Game Gear ROMs do not load. Some PAL-region games may run too fast; NTSC-region games seem to always run at the correct speed. On the original firmware, A was mapped to A, B was mapped to B, and RB was mapped to C for some reason. See "[Button Mappings/Key Bindings](#button-mappingskey-bindings)" section below.
 
 ### Game Boy
 Uses a black and white colour palette, which currently cannot be changed. On the original firmware, the A and B buttons were swapped. See "[Button Mappings/Key Bindings](#button-mappingskey-bindings)" section below.
@@ -110,8 +120,8 @@ Performance is fairly poor. On the original firmware, A and B buttons are mapped
 
 ---
 
-## biserv.asd
-The firmware for the SF2000 is actually located on the microSD card, in a file called `biserv.asd` located in the BIOS folder. This file is a monolithic binary blob, which contains the device's OS, the emulators, their settings... basically everything. The file is currently being investigated. Here are some findings from it:
+## Firmware/BIOS (biserv.asd)
+The firmware for the SF2000 is actually located on the microSD card, in a file called `biserv.asd` located in the BIOS folder. This file is a monolithic binary blob, which contains the device's OS, the emulators, their settings... basically everything. There is not currently any custom firmware (CFW) for the device. The stock firmware is currently being investigated; here are some findings from it:
 
 ### Button Mappings/Key Bindings
 `osaka#9664` discovered that the OS supports loading game-specific key bindings from `.kmp` files, stored in the `save` folder for each system and named after a game's ROM file (e.g., `/FC/save/Game Name.kmp`). They also discovered where in the `biserv.asd` file the default mappings for each emulator are stored. Working with this information, `notv37#4200` worked out what bits related to what buttons for each emulator. Using both their findings, we now have a tool which can be used to update both the global button mappings for the emulators, as well as create per-ROM mappings - you can [find this tool here](https://vonmillhausen.github.io/sf2000/tools/buttonMappingChanger.htm).
@@ -309,6 +319,8 @@ These are files that I have not yet determined what they do; if anyone has any i
 ---
 
 ## Version History
+20230512 - 1.7: Added a note about stock battery runtime. Added a section with information about A/V output performance. Added a bit of info about PAL/NTSC region speed for Genesis/Mega Drive. Retitled the "bisrv.asd" section to make it clearer that's the BIOS/firmware. 
+
 20230511 - 1.6: Added a quick note about the display panel to the Hardware section, and added a new section for Emulators, including an incredible collection of ROM notes for Arcade thanks to `adcockm#8175`! Also added a "silent" background music file for download, and a table of contents (this page is getting fairly long 😅). Added a `favicon.ico` to get rid of that one annoying console error.
 
 20230510 - 1.5: Added additional detail to the Hardware section about the buttons, d-pad, thumb-stick, battery, and wireless controller support.

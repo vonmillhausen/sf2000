@@ -186,6 +186,7 @@ As far as I am aware, all of the below images are actively used by the `20230420
 | htui.kcc | 40x24 | BGRA | Game Boy Color game-list indicator | [view](/images/htui.png) |
 | icm32.dll | 40x24 | BGRA | Game Boy Advance game-list indicator | [view](/images/icm32.png) |
 | icuin.cpl | 640x480 | RGB565 Little Endian | Genesis/Mega Drive main menu background | [view](/images/icuin.png) |
+| igc64.dll | 217x37 | BGRA | "Yes" and "No" text, with "No" selected; used when being asked if you want to overwrite a save-game slot | [view](/images/igc64.png) |
 | ihdsf.bke | 640x480 | RGB565 Little Endian | Genesis/Mega Drive game-list background | [view](/images/ihdsf.png) |
 | irftp.ctp | 640x480 | RGB565 Little Endian | Game Boy Advance main menu background | [view](/images/irftp.png) |
 | irmon.tax | 576x256 | BRGA | Main menu labels in Dutch | [view](/images/irmon.png) |
@@ -213,6 +214,7 @@ As far as I am aware, all of the below images are actively used by the `20230420
 | urlkp.bvs | 640x480 | RGB565 Little Endian | NES game-list background | [view](/images/urlkp.png) |
 | vidca.bvs | 576x256 | BRGA | Main menu labels in Hebrew | [view](/images/vidca.png) |
 | vssvc.nec | 576x256 | BRGA | Main menu labels in Malay | [view](/images/vssvc.png) |
+| wshrm.nec | 217x37 | BGRA | "Yes" and "No" text, with "Yes" selected; used when being asked if you want to overwrite a save-game slot | [view](/images/wshrm.png) |
 | xajkg.hsp | 640x480 | RGB565 Little Endian | Game Boy main menu background | [view](/images/xajkg.png) |
 
 ### Images (Unused)
@@ -230,7 +232,6 @@ To the best of my knowledge, the following image files are currently __unused__ 
 | fcont.ctp | 640x480 | RGB565 Little Endian | Alternate UI: User main menu background | [view](/images/unused/fcont.png) |
 | fdbil.ph | 1100x120 | BGRA | Large icons for each system, including systems not supported by the SF2000 (selected) | [view](/images/unused/fdbil.png) |
 | gpapi.bvs | 640x480 | RGB565 Little Endian | In-game menu (position 5; looks like it was for some kind of button layout changing UI) | [view](/images/unused/gpapi.png) |
-| igc64.dll | 217x37 | BGRA | "Yes" and "No" text, with "No" selected | [view](/images/unused/igc64.png) |
 | ihds.bke | 640x480 | RGB565 Little Endian | Genesis/Mega Drive game-list background, with baked-in thumbnail placeholder | [view](/images/unused/ihds.png) |
 | kdill.hsp | 640x480 | RGB565 Little Endian | Alternate UI: Game Boy Advance main menu background | [view](/images/unused/kdill.png) |
 | logilda.be | 40x24 | BGRA | CPS1 game-list indicator | [view](/images/unused/logilda.png) |
@@ -253,7 +254,6 @@ To the best of my knowledge, the following image files are currently __unused__ 
 | url.bvs | 640x480 | RGB565 Little Endian | CPS1 game-list background | [view](/images/unused/url.png) |
 | werui.ioc | 320x240 | RGB565 Little Endian | "NODATA" save-state thumbnail placeholder image, with a "horror" style typeface | [view](/images/unused/werui.png) |
 | wshom.ocx | 1100x120 | BGRA | Large icons for each system, including systems not supported by the SF2000 (normal) | [view](/images/unused/wshom.png) |
-| wshrm.nec | 217x37 | BGRA | "Yes" and "No" text, with "Yes" selected | [view](/images/unused/wshrm.png) |
 | x86e.hgp | 640x480 | RGB565 Little Endian | Neogeo game-list background | [view](/images/unused/x86e.png) |
 
 ### Other Files
@@ -319,6 +319,8 @@ These are files that I have not yet determined what they do; if anyone has any i
 ---
 
 ## Version History
+20230513 - 1.8: Discovered two "unused" images (the yes/no buttons) are indeed actually used, when being asked if you want to overwrite a saved game.
+
 20230512 - 1.7: Added a note about stock battery runtime. Added a section with information about A/V output performance. Added a bit of info about PAL/NTSC region speed for Genesis/Mega Drive. Retitled the "bisrv.asd" section to make it clearer that's the BIOS/firmware. 
 
 20230511 - 1.6: Added a quick note about the display panel to the Hardware section, and added a new section for Emulators, including an incredible collection of ROM notes for Arcade thanks to `adcockm#8175`! Also added a "silent" background music file for download, and a table of contents (this page is getting fairly long 😅). Added a `favicon.ico` to get rid of that one annoying console error.

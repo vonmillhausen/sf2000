@@ -175,7 +175,7 @@
             mappingTableOffset = 0x8DBC0C;
             mappingConsoles = ["Arcade", "Game Boy Advance", "SNES", "Genesis/Mega Drive, Master System", "NES, Game Boy, Game Boy Color"];
             bisrvData = data;
-            document.getElementById("fileOutput").innerHTML = "<p class=\"infoMessage\">INFO: March 28th bisrv.asd detected</p>";
+            document.getElementById("fileOutput").innerHTML = "<p class=\"infoMessage\">INFO: March 28th <code>bisrv.asd</code> detected</p>";
           }
           else if (data.length == 12648068) {
             // That's the correct length for an April 20th version of bisrv.asd, so
@@ -183,7 +183,14 @@
             mappingTableOffset = 0x8DBC9C;
             mappingConsoles = ["Arcade", "Game Boy Advance", "Game Boy, Game Boy Color", "SNES", "Genesis/Mega Drive, Master System", "NES"];
             bisrvData = data;
-            document.getElementById("fileOutput").innerHTML = "<p class=\"infoMessage\">INFO: April 20th bisrv.asd detected</p>";
+            document.getElementById("fileOutput").innerHTML = "<p class=\"infoMessage\">INFO: April 20th <code>bisrv.asd</code> detected</p>";
+          }
+          else if (data.length == 12656068) {
+            // That's the correct length for the May 15th version of the file
+            // However this firmware version is not currently supported by this tool
+            // Report this to the user to help avoid confusion in the meantime...
+            document.getElementById("fileOutput").innerHTML = "<p class=\"errorMessage\">ERROR: May 15th <code>bisrv.asd</code> detected, however this version of the firmware is not currently supported. Please use the SF2000's new built-in button mapping feature in the meantime.</p>";
+            return;
           }
           // If we're still checking, next test the file extensions for the individual console's ROMs...
           else if (/\.(zfb|zip)$/i.exec(file.name)) {

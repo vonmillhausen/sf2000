@@ -154,7 +154,7 @@ The Resources folder on the microSD card contains all of the resources used by t
 | `yahei_Arial.ttf` | ✨ | ✅ | ✅ | The "Arial" typeface, containing Latin, Greek, Cyrillic, Chinese, Japanese and Korean characters |
 
 ### Images (Used)
-As far as I am aware, all of the below images are actively used by the `20230420` version of the firmware; happy to take any corrections if it turns out any of them are unused! Note that while the stock theme is based around a `640x480` resolution, the actual _display_ on the SF2000 is a `320x240` one. The OS on the device uses nearest-neighbour scaling for its images, giving the stock UI a somewhat aliased appearance. If you're planning to make your own theme for the SF2000, design it for `320x240`, and then double the resolution when exporting the final images to the device for a crisper look on the internal panel.
+As far as I am aware, all of the below images are actively used by the `20230515` version of the firmware; happy to take any corrections if it turns out any of them are unused! Note that while the stock theme is based around a `640x480` resolution, the actual _display_ on the SF2000 is a `320x240` one. The OS on the device uses nearest-neighbour scaling for its images, giving the stock UI a somewhat aliased appearance. If you're planning to make your own theme for the SF2000, design it for `320x240`, and then double the resolution when exporting the final images to the device for a crisper look on the internal panel.
 
 | Filename | Resolution | Format | 03.15 | 04.20 | 05.15 | Description | View |
 | -------- | ---------- | ------ | ----- | ----- | ----- | ----------- | ---- |
@@ -233,7 +233,7 @@ As far as I am aware, all of the below images are actively used by the `20230420
 | `ztrba.nec` | 64x320 | RGB565 Little Endian |  |  | ✨ | Non-transparent labels for the button assignments in the new button mapping feature; these are the ones that pop up when you go to change a button assignment | [view](/images/ztrba.nec.png) |
 
 ### Images (Unused)
-To the best of my knowledge, the following image files are currently __unused__ by the `20230420` firmware, and were probably left over from previous devices (the SF2000 shares a bit of lineage with some USB-stick devices) or development. The images marked "Alternate UI" below appear to have been for a UI where the systems were scrolled through horizontally, and the "shortcut" games for each system were scrolled vertically.
+To the best of my knowledge, the following image files are currently __unused__ by the `20230515` firmware, and were probably left over from previous devices (the SF2000 shares a bit of lineage with some USB-stick devices) or development. The images marked "Alternate UI" below appear to have been for a UI where the systems were scrolled through horizontally, and the "shortcut" games for each system were scrolled vertically.
 
 | Filename | Resolution | Format | 03.15 | 04.20 | 05.15 | Description | View |
 | -------- | ---------- | ------ | ----- | ----- | ----- | ----------- | ---- |

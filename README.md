@@ -284,7 +284,7 @@ These are other files that have been identified, which don't fit into the other 
 | `dufdr.cwr` |  | ✨ | 🚩 | UI strings in Turkish |
 | `eknjo.ofd` |  | ✨ | 🚩 | UI strings in Spanish |
 | `fhshl.skb` | ✨ | ✅ | 🚩 | UI strings in English |
-| `Foldername.ini` | ✨ | 🚩 |  | Used to control menu rotation for the main menu (this information came from the 4PDA forum) |
+| `Foldername.ini` | ✨ | 🚩 | 🚩 | Used to control menu rotation for the main menu (this information came from the 4PDA forum) |
 | `History.bin` |  |  | ✨ | Used to store the history of played ROMs; only appears after the first game is played after installing the 05.15 or later firmware. User ROMs are not added to history, only built-in games. If a built-in game that is referenced in history is removed from the device, the device will crash when trying to view the History screen. You can delete the History.bin file to clear the device's history; there is no built-in functionality to do so |
 | `jsnno.uby` |  | ✨ | 🚩 | UI strings in Dutch |
 | `kcbn7.avc` |  | ✨ | ❌ | Duplicate copy of `bisrv.asd`, the main firmware for the device which is found in the BIOS folder  |

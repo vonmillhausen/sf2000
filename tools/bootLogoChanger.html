@@ -119,6 +119,12 @@
             bisrvData = data;
             document.getElementById("bisrvOutput").innerHTML = "<p class=\"infoMessage\">INFO: April 20th bisrv.asd detected</p>";
           }
+          else if (data.length == 12656068) {
+            // That's the correct length for the May 15th version of the file
+            logoOffset = 0x9BB0B8;
+            bisrvData = data;
+            document.getElementById("bisrvOutput").innerHTML = "<p class=\"infoMessage\">INFO: May 15th bisrv.asd detected</p>";
+          }
           else {
             document.getElementById("bisrvOutput").innerHTML = "<p class=\"errorMessage\">ERROR: The selected file does not appear to be a known bisrv.asd file!</p>";
             document.getElementById("imageSelector").setAttribute("disabled", "");
@@ -264,6 +270,6 @@
       }
     </script>
     <hr>
-    <p><a rel="license" href="http://creativecommons.org/publicdomain/zero/1.0/">CC0</a>: public domain. Version 1.0, 20230509.1</p>
+    <p><a rel="license" href="http://creativecommons.org/publicdomain/zero/1.0/">CC0</a>: public domain. Version 1.1, 20230516.1</p>
   </body>
 </html>

@@ -119,7 +119,9 @@ Performance is fairly poor. On the original firmware, A and B buttons are mapped
 ---
 
 ## Firmware/BIOS (biserv.asd)
-The firmware for the SF2000 is actually located on the microSD card, in a file called `biserv.asd` located in the BIOS folder. This file is a monolithic binary blob, which contains the device's OS, the emulators, their settings... basically everything. There is not currently any custom firmware (CFW) for the device. The stock firmware is currently being investigated; here are some findings from it:
+The firmware for the SF2000 is actually located on the microSD card, in a file called `biserv.asd` located in the BIOS folder. This file is a monolithic binary blob, which contains the device's OS, the emulators, their settings... basically everything. Data Frog have issued some firmware updates for the device since launch; the updates have added new features (e.g., additional language support, favourites, history, etc.), but have also introduced bugs (e.g., some SNES games run very slowly until they are quit and launched again, etc.). Data Frog have published a YouTube video showing how to update the firmware on the device, which [you can find here](https://www.youtube.com/watch?v=j8dT2fdGfck); the video's description contains a link to where you can download the latest firmware.
+
+There is not currently any custom firmware (CFW) for the device. The stock firmware is currently being investigated; here are some findings from it:
 
 ### Button Mappings/Key Bindings
 `osaka#9664` discovered that the OS supports loading game-specific key bindings from `.kmp` files, stored in the `save` folder for each system and named after a game's ROM file (e.g., `/FC/save/Game Name.EXT.kmp`). They also discovered where in the `biserv.asd` file the default mappings for each emulator are stored. Working with this information, `notv37#4200` worked out what bits related to what buttons for each emulator. Using both their findings, we now have a tool which can be used to update both the global button mappings for the emulators, as well as create per-ROM mappings - you can [find this tool here](https://vonmillhausen.github.io/sf2000/tools/buttonMappingChanger.htm).
@@ -127,7 +129,7 @@ The firmware for the SF2000 is actually located on the microSD card, in a file c
 Note that the game-specific key bindings function may have been removed from the May 15th firmware.
 
 ### Boot Logo
-When the device is powered on, a "Welcome" image is displayed for a short time before the main menu appears. This image comes from inside `biserv.asd`, at offset `0x9B91D8`. It's a `512x200` RGB565 Little Endian raw image file, and looks like this:
+When the device is powered on, a "Welcome" image is displayed for a short time before the main menu appears. This image comes from inside `biserv.asd`, (towards the end; exact offset varies between BIOS revisions). It's a `512x200` RGB565 Little Endian raw image file, and looks like this:
 
 ![Boot Logo](/images/bootlogo.png)
 

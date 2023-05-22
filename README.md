@@ -361,7 +361,7 @@ All of these are linked above already in their relevant sections, but just in ca
 ---
 
 ## Version History
-- `20230522 - 1.10`: Updated resource tables for the new `05.22` firmware (no changes); added a table with details about know firmware versions. Added a "Tools & Links" section.
+- `20230522 - 1.10`: Updated resource tables for the new `05.22` firmware (no changes); added a table with details about known firmware versions. Added a "Tools & Links" section.
 
 - `20230516 - 1.9`: Updated most of the Resources file lists to include firmware-related information (added, (un)changed, removed). Added new image resources for the latest May 15th firmware. Updated some images files previews to contain the fake name extensions as well. Added detail about the removal of per-game button maps from May 15th firmware. Renamed the sound previews to contain the fake name extensions as well.
 

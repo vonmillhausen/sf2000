@@ -65,7 +65,6 @@
   <body>
     <h1>Data Frog SF2000 Boot Logo Changer</h1>
     <p>This tool can be used to alter the boot logo on an SF2000 handheld gaming console. Please note this tool is provided as-is, and no support will be given if this corrupts your device's bios; make sure you have backups of anything you care about before messing with your device's critical files! 🙂</p>
-    <h1>NOTE: THIS TOOL IS CURRENTLY INCOMPATIBLE WITH THE MAY 22ND FIRMWARE - DO NOT USE IF YOU ARE ON THAT FIRMWARE. UPDATE WILL COME SOON.</h1>
     <hr>
     <section id="bisrvSection">
       <h2>Step 1: Select Original <code>bisrv.asd</code></h2>
@@ -99,47 +98,174 @@
       var logoOffset;   // Will contain the offset of the boot logo within the bisrv.asd file
       var newLogoData;  // Used to store the little-endian RGB565 binary data of the new boot logo
 
+      // Define a function that takes a Uint8Array and an optional offset and returns the index
+      // of the first match or -1 if not found...
+      function findSequence(needle, haystack, offset) {
+
+        // If offset is not provided, default to 0
+        offset = offset || 0;
+
+        // Loop through the data array starting from the offset
+        for (var i = offset; i < haystack.length - needle.length + 1; i++) {
+
+          // Assume a match until proven otherwise
+          var match = true;
+
+          // Loop through the target sequence and compare each byte
+          for (var j = 0; j < needle.length; j++) {
+
+            if (haystack[i + j] !== needle[j]) {
+              // Mismatch found, break the inner loop and continue the outer loop
+              match = false;
+              break;
+            }
+
+          }
+
+          // If match is still true after the inner loop, we have found a match
+          if (match) {
+
+            // Return the index of the first byte of the match
+            return i;
+
+          }
+        }
+
+        // If we reach this point, no match was found
+        return -1;
+      }
+
+      // Returns an SHA-256 hash of a given firmware (ignoring common user changes), or returns
+      // false on failure...
+      function getFirmwareHash(data) {
+
+        // Data should be a Uint8Array, which as an object is passed by reference... we're going
+        // to be manipulating that data before generating our hash, but we don't want to modify
+        // the original object at all... so we'll create a copy, and work only on the copy...
+        var dataCopy = data.slice();
+
+        // Only really worthwhile doing this for big bisrv.asd files...
+        if (dataCopy.length > 12640000) {
+          // First, replace CRC32 bits with 00...
+          dataCopy[396] = 0x00;
+          dataCopy[397] = 0x00;
+          dataCopy[398] = 0x00;
+          dataCopy[399] = 0x00;
+
+          // Next identify the boot logo position, and blank it out too...
+          var badExceptionOffset = findSequence([0x62, 0x61, 0x64, 0x5F, 0x65, 0x78, 0x63, 0x65, 0x70, 0x74, 0x69, 0x6F, 0x6E, 0x00, 0x00, 0x00], dataCopy);
+          if (badExceptionOffset > -1) {
+            var bootLogoStart = badExceptionOffset + 16;
+            for (var i = bootLogoStart; i < (bootLogoStart + 204800); i++) {
+              dataCopy[i] = 0x00;
+            }
+          }
+          else {
+            return false;
+          }
+
+          // Next identify the emulator button mappings (if they exist), and blank them out too...
+          var preButtonMapOffset = findSequence([0x00, 0x00, 0x00, 0x71, 0xDB, 0x8E, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00], dataCopy);
+          if (preButtonMapOffset > -1) {
+            var postButtonMapOffset = findSequence([0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x02, 0x00, 0x00, 0x00, 0x02, 0x00, 0x00, 0x00], dataCopy, preButtonMapOffset);
+            if (postButtonMapOffset > -1) {
+              for (var i = preButtonMapOffset + 16; i < postButtonMapOffset; i++) {
+                dataCopy[i] = 0x00;
+              }
+            }
+            else {
+              return false;
+            }
+          }
+          else {
+            return false;
+          }
+
+          // If we're here, we've zeroed-out all of the bits of the firmware that are
+          // semi-user modifiable (boot logo, button mappings and the CRC32 bits); now
+          // we can generate a hash of what's left and compare it against some known
+          // values...
+          return crypto.subtle.digest("SHA-256", dataCopy.buffer)
+          .then(function(digest) {
+            var array = Array.from(new Uint8Array(digest));
+            var hash = array.map(byte => ("00" + byte.toString(16)).slice(-2)).join("");
+            return hash;
+          })
+          .catch(function(error) {
+            return false;
+          });
+        }
+        else {
+          return false;
+        }
+      }
+
       function bisrvLoad(file) {
         var frBisrv = new FileReader();
+        frBisrv.readAsArrayBuffer(file);
 
         frBisrv.onload = function(event) {
 
           // Read the provided file's data into an array...
           var data = new Uint8Array(event.target.result);
 
-          // Let's check the data to see if it looks like one of the known bisrv.asd versions...
-          if (data.length == 12647452) {
-            // That's the correct length for the original March 28th version of the file
-            logoOffset = 0x9B9030;
-            bisrvData = data;
-            document.getElementById("bisrvOutput").innerHTML = "<p class=\"infoMessage\">INFO: March 28th bisrv.asd detected</p>";
-          }
-          else if (data.length == 12648068) {
-            // That's the correct length for the April 20th version of the file
-            logoOffset = 0x9B91D8;
-            bisrvData = data;
-            document.getElementById("bisrvOutput").innerHTML = "<p class=\"infoMessage\">INFO: April 20th bisrv.asd detected</p>";
-          }
-          else if (data.length == 12656068) {
-            // That's the correct length for the May 15th version of the file
-            logoOffset = 0x9BB0B8;
-            bisrvData = data;
-            document.getElementById("bisrvOutput").innerHTML = "<p class=\"infoMessage\">INFO: May 15th bisrv.asd detected</p>";
+          // We'll do a hash-check against it...
+          hashResult = getFirmwareHash(data);
+
+          // The result could be either a Promise if it had a bisrv.asd-like structure and we got
+          // a hash, or false otherwise... let's check!
+          if (hashResult instanceof Promise) {
+            // We got a Promise! Wait for it to finish so we get our bisrv.asd hash...
+            hashResult.then(function(dataHash) {
+              // Check the hash against all the known good ones...
+              switch (dataHash) {
+                // Mid-March BIOS...
+                case "4411143d3030adc442e99f7ac4e7772f300c844bbe10d639702fb3ba049a4ee1":
+                  logoOffset = 0x9B9030;
+                  bisrvData = data;
+                  document.getElementById("bisrvOutput").innerHTML = "<p class=\"infoMessage\">INFO: Mid-March <code>bisrv.asd</code> detected</p>";
+                  break;
+
+                // April 20th BIOS...
+                case "b50e50aa4b1b1d41489586e989f09d47c4e2bc27c072cb0112f83e6bc04e2cca":
+                  logoOffset = 0x9B91D8;
+                  bisrvData = data;
+                  document.getElementById("bisrvOutput").innerHTML = "<p class=\"infoMessage\">INFO: April 20th <code>bisrv.asd</code> detected</p>";
+                  break;
+
+                // May 15th BIOS...
+                case "d878a99d26242836178b452814e916bef532d05acfcc24d71baa31b8b6f38ffd":
+                  logoOffset = 0x9BB0B8;
+                  bisrvData = data;
+                  document.getElementById("bisrvOutput").innerHTML = "<p class=\"infoMessage\">INFO: May 15th bisrv.asd detected</p>";
+                  break;
+
+                // May 22nd BIOS...
+                case "6aebab0e4da39e0a997df255ad6a1bd12fdd356cdf51a85c614d47109a0d7d07":
+                  logoOffset = 0x9BB098;
+                  bisrvData = data;
+                  document.getElementById("bisrvOutput").innerHTML = "<p class=\"infoMessage\">INFO: May 22nd bisrv.asd detected</p>";
+                  break;
+
+                default:
+                  // Huh... wasn't false so had bisrv.asd structure, but didn't return
+                  // a known hash... a new BIOS version? Unknown anyway!
+                  console.log(dataHash);
+                  document.getElementById("bisrvOutput").innerHTML = "<p class=\"errorMessage\">ERROR: While the file you've selected does appear to be generally structured like the SF2000's <code>bisrv.asd</code> BIOS file, the specifics of your file don't match any known SF2000 BIOS version. As such, this tool cannot modify the selected file.</p>";
+                  return;
+                  break;
+              }
+
+              // If we're here we've got a good file, so enable the input for step 2 (image selection)...
+              document.getElementById("imageSelector").removeAttribute("disabled");
+            });
           }
           else {
-            document.getElementById("bisrvOutput").innerHTML = "<p class=\"errorMessage\">ERROR: The selected file does not appear to be a known bisrv.asd file!</p>";
-            document.getElementById("imageSelector").setAttribute("disabled", "");
-            document.getElementById("downloadButton").setAttribute("disabled", "");
-            bisrvData = undefined;
-            logoOffset = undefined;
+            // We got false, so whatever it was, it wasn't a bisrv.asd...
+            document.getElementById("bisrvOutput").innerHTML = "<p class=\"errorMessage\">ERROR: The file you've selected doesn't appear to have the same data structure as expected for a <code>bisrv.asd</code> file.</p>";
             return;
           }
-
-          // If we're here we've got a good file, so enable the input for step 2 (image selection)...
-          document.getElementById("imageSelector").removeAttribute("disabled");
         };
-
-        frBisrv.readAsArrayBuffer(file);
       }
 
       function imageLoad(file) {
@@ -271,6 +397,6 @@
       }
     </script>
     <hr>
-    <p><a rel="license" href="http://creativecommons.org/publicdomain/zero/1.0/">CC0</a>: public domain. Version 1.1, 20230516.1</p>
+    <p><a rel="license" href="http://creativecommons.org/publicdomain/zero/1.0/">CC0</a>: public domain. Version 1.2, 20230522.1</p>
   </body>
 </html>

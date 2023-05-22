@@ -94,30 +94,20 @@
   </head>
   <body>
     <h1>Data Frog SF2000 Button Mapping Tool</h1>
-    <p>This tool lets you alter the button mappings for the SF2000 hand-held console; it can generate per-game mappings, as well as alter the global mappings defined in the device's <code>bisrv.asd</code> BIOS file or in the <code>KeyMapInfo.kmp</code> file used by newer BIOS versions. As the SF2000 supports multiplayer gaming via an optional wireless controller (sold separately), mappings for both Player 1 and Player 2 are possible.</p>
-    <p> Please note this tool is provided as-is, and no support will be given if this corrupts your device's BIOS or keymap file; make sure you have backups of anything you care about before messing with your device's critical files! 🙂 Also note that per-ROM mappings are only possible on firmwares prior to the May 15th firmware.</p>
+    <p>This tool lets you alter the button mappings for the SF2000 hand-held console; it can generate per-game mappings (NOTE:  only possible on firmwares prior to the May 15th firmware), as well as alter the global mappings defined in the device's <code>bisrv.asd</code> BIOS file or in the <code>KeyMapInfo.kmp</code> file used by newer BIOS versions. As the SF2000 supports multiplayer gaming via an optional wireless controller (sold separately), mappings for both Player 1 and Player 2 are possible.</p>
+    <p> Please note this tool is provided as-is, and no support will be given if this corrupts your device's BIOS or keymap file; make sure you have backups of anything you care about before messing with your device's critical files! 🙂</p>
     <p>This tool was originally written by nikita.burnashev (email) gmail.com; it was re-written (mostly just re-styled) by myself upon their request.</p>
     <hr>
-    <section id="fileSection">
-      <h2>Step 1: Select <code>bisrv.asd</code>, <code>KeyMapInfo.kmp</code>, or a game ROM</h2>
-      <p>Select the <code>bisrv.asd</code> or <code>KeyMapInfo.kmp</code> (for global device mappings) or game ROM file (for per-game mappings) whose button mappings you want to modify. If you're choosing your <code>bisrv.asd</code> or <code>KeyMapInfo.kmp</code> file, you should probably make a backup of it first, just in case! You can find the <code>bisrv.asd</code> file in the <code>bios</code> folder on your device's microSD card; you can find the <code>KeyMapInfo.kmp</code> file in the <code>Resources</code> folder instead.</p>
-      <form id="fileForm" action="#">
-        <label>Open file: <input id="fileSelector" type="file" onchange="fileLoad(event.target.files[0])"></label>
-      </form>
-      <div id="fileOutput"></div>
-    </section>
-    <hr>
-    <section id="mappingSection">
-      <h2>Step 2: Choose your button mappings</h2>
-      <p id="mappingInstructions">Instructions for Step 2 will appear here when you have chosen a file in Step 1 above.</p>
-      <div id="mappingControls"></div>
-    </section>
-    <hr>
-    <section id="saveSection">
-      <h2>Step 3: Save your mapping changes</h2>
-      <p id="saveInstructions">Instructions for Step 3 will appear here when you have chosen a file in Step 1 above.</p>
-      <div id="saveControls"></div>
-    </section>
+    <div id="steps">
+      <section id="fileSection">
+        <h2>Step 1: Select <code>bisrv.asd</code> or a game ROM</h2>
+        <p>Select the <code>bisrv.asd</code> (for global device mappings) or game ROM file (for per-game mappings) whose button mappings you want to modify. You can find the <code>bisrv.asd</code> file in the <code>bios</code> folder on your device's microSD card.</p>
+        <form id="fileForm" action="#">
+          <label>Open file: <input id="fileSelector" type="file" onchange="fileLoad(event.target.files[0])"></label>
+        </form>
+        <div id="fileOutput"></div>
+      </section>
+    </div>
     <script>
 
       // Global variables...
@@ -143,6 +133,108 @@
           return { 'A': 8, 'B': 0, 'L': 10, 'R': 11, 'X': 9, 'Y': 1 };
       }
 
+      // Define a function that takes a Uint8Array and an optional offset and returns the index
+      // of the first match or -1 if not found...
+      function findSequence(needle, haystack, offset) {
+
+        // If offset is not provided, default to 0
+        offset = offset || 0;
+
+        // Loop through the data array starting from the offset
+        for (var i = offset; i < haystack.length - needle.length + 1; i++) {
+
+          // Assume a match until proven otherwise
+          var match = true;
+
+          // Loop through the target sequence and compare each byte
+          for (var j = 0; j < needle.length; j++) {
+
+            if (haystack[i + j] !== needle[j]) {
+              // Mismatch found, break the inner loop and continue the outer loop
+              match = false;
+              break;
+            }
+
+          }
+
+          // If match is still true after the inner loop, we have found a match
+          if (match) {
+
+            // Return the index of the first byte of the match
+            return i;
+
+          }
+        }
+
+        // If we reach this point, no match was found
+        return -1;
+        }
+
+      // Returns an SHA-256 hash of a given firmware (ignoring common user changes), or returns
+      // false on failure...
+      function getFirmwareHash(data) {
+
+        // Data should be a Uint8Array, which as an object is passed by reference... we're going
+        // to be manipulating that data before generating our hash, but we don't want to modify
+        // the original object at all... so we'll create a copy, and work only on the copy...
+        var dataCopy = data.slice();
+
+        // Only really worthwhile doing this for big bisrv.asd files...
+        if (dataCopy.length > 12640000) {
+          // First, replace CRC32 bits with 00...
+          dataCopy[396] = 0x00;
+          dataCopy[397] = 0x00;
+          dataCopy[398] = 0x00;
+          dataCopy[399] = 0x00;
+
+          // Next identify the boot logo position, and blank it out too...
+          var badExceptionOffset = findSequence([0x62, 0x61, 0x64, 0x5F, 0x65, 0x78, 0x63, 0x65, 0x70, 0x74, 0x69, 0x6F, 0x6E, 0x00, 0x00, 0x00], dataCopy);
+          if (badExceptionOffset > -1) {
+            var bootLogoStart = badExceptionOffset + 16;
+            for (var i = bootLogoStart; i < (bootLogoStart + 204800); i++) {
+              dataCopy[i] = 0x00;
+            }
+          }
+          else {
+            return false;
+          }
+
+          // Next identify the emulator button mappings (if they exist), and blank them out too...
+          var preButtonMapOffset = findSequence([0x00, 0x00, 0x00, 0x71, 0xDB, 0x8E, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00], dataCopy);
+          if (preButtonMapOffset > -1) {
+            var postButtonMapOffset = findSequence([0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x02, 0x00, 0x00, 0x00, 0x02, 0x00, 0x00, 0x00], dataCopy, preButtonMapOffset);
+            if (postButtonMapOffset > -1) {
+              for (var i = preButtonMapOffset + 16; i < postButtonMapOffset; i++) {
+                dataCopy[i] = 0x00;
+              }
+            }
+            else {
+              return false;
+            }
+          }
+          else {
+            return false;
+          }
+
+          // If we're here, we've zeroed-out all of the bits of the firmware that are
+          // semi-user modifiable (boot logo, button mappings and the CRC32 bits); now
+          // we can generate a hash of what's left and compare it against some known
+          // values...
+          return crypto.subtle.digest("SHA-256", dataCopy.buffer)
+          .then(function(digest) {
+            var array = Array.from(new Uint8Array(digest));
+            var hash = array.map(byte => ("00" + byte.toString(16)).slice(-2)).join("");
+            return hash;
+          })
+          .catch(function(error) {
+            return false;
+          });
+        }
+        else {
+          return false;
+        }
+      }
+
       // This function is called whenever a file is selected in Step 1...
       function fileLoad(file) {
 
@@ -160,96 +252,196 @@
           mappingData = undefined;
           fileName = undefined;
 
-          // Reset our Step 2 and Step 3 instructions and controls...
-          document.getElementById("mappingInstructions").innerHTML = "Instructions for Step 2 will appear here when you have chosen a file in Step 1 above.";
-          document.getElementById("mappingControls").innerHTML = "";
-          document.getElementById("saveInstructions").innerHTML = "Instructions for Step 3 will appear here when you have chosen a file in Step 1 above.";
-          document.getElementById("saveControls").innerHTML = "";
+          // Clear out any HTML that might already exist after Step 1...
+          while(document.getElementById("fileSection").nextSibling) {
+            document.getElementById("fileSection").nextSibling.remove();
+          }
 
           // Read the provided file's data from the buffer array into an unsigned 8-bit int array...
           var data = new Uint8Array(event.target.result);
 
-          // Let's check the data to see what kind of file we got. First, let's 
-          // check if it looks like one of the known bisrv.asd versions...
-          if (data.length == 12647452) {
-            // That's the correct length for an original March 28th version of bisrv.asd, so
-            // set up for re-mapping all game consoles...
-            mappingTableOffset = 0x8DBC0C;
-            mappingConsoles = ["Arcade", "Game Boy Advance", "SNES", "Genesis/Mega Drive, Master System", "NES, Game Boy, Game Boy Color"];
-            document.getElementById("fileOutput").innerHTML = "<p class=\"infoMessage\">INFO: March 28th <code>bisrv.asd</code> detected</p>";
-          }
-          else if (data.length == 12648068) {
-            // That's the correct length for an April 20th version of bisrv.asd, so
-            // set up for re-mapping all game consoles...
-            mappingTableOffset = 0x8DBC9C;
-            mappingConsoles = ["Arcade", "Game Boy Advance", "Game Boy, Game Boy Color", "SNES", "Genesis/Mega Drive, Master System", "NES"];
-            document.getElementById("fileOutput").innerHTML = "<p class=\"infoMessage\">INFO: April 20th <code>bisrv.asd</code> detected</p>";
-          }
-          else if (data.length == 12656068) {
-            // That's the correct length for the May 15th version of the file
-            // However this firmware version moved its key mappings elsewhere; let's
-            // let the user know...
-            document.getElementById("fileOutput").innerHTML = "<p class=\"errorMessage\">ERROR: May 15th <code>bisrv.asd</code> detected, however this version of the firmware stores its button mappings in a file called <code>KeyMapInfo.kmp</code>, in the <code>Resources</code> folder on the microSD card. Please choose that file instead.</p>";
-            return;
-          }
-          else if (data.length == 288) {
-            // That's the correct length for a KeyMapInfo.kmp file, so let's set
-            // up for re-mapping all game consoles...
-            mappingTableOffset = 0;
-            // NES, GENESIS, SNES, GB/GBC, GBA, ARCADE
-            mappingConsoles = ["NES", "Genesis/Mega Drive, Master System", "SNES", "Game Boy, Game Boy Color", "Game Boy Advance", "Arcade"];
-            document.getElementById("fileOutput").innerHTML = "<p class=\"infoMessage\">INFO: <code>KeyMapInfo.kmp</code> detected</p>";
-          }
-          // If we're still checking, next test the file extensions for the individual console's ROMs...
-          else if (/\.(zfb|zip)$/i.exec(file.name)) {
-            // The file's name ends with .zfb or .zip - assume it's an arcade ROM!
-            mappingConsoles = ["Arcade"];
-          }
-          else if (/\.(zgb|gba|agb|gbz)$/i.exec(file.name)) {
-            // The file's name ends with .zgb, .gba, .agb or .gbz - assume it's a Game Boy Advance ROM!
-            mappingConsoles = ["Game Boy Advance"];
-          }
-          else if (/\.(gbc|gb|sgb)$/i.exec(file.name)) {
-            // The file's name ends with .gbc, .gb or .sgb - assume it's a Game Boy or Game Boy Color ROM!
-            mappingConsoles = ["Game Boy, Game Boy Color"];
-          }
-          else if (/\.(zsf|smc|fig|sfc|gd3|gd7|dx2|bsx|swc)$/i.exec(file.name)) {
-            // The file's name ends with .zsf, .smc, .fig, .sfc, .gd3, .gd7, .dx2, .bsx or .swc - assume it's a SNES ROM!
-            mappingConsoles = ["SNES"];
-          }
-          else if (/\.(zmd|bin|md|smd|gen|sms)$/i.exec(file.name)) {
-            // The file's name ends with .zmd, .bin, .md, .smd, .gen or .sms - assume it's a Genesis/Mega Drive or Master System ROM!
-            mappingConsoles = ["Genesis/Mega Drive, Master System"];
-          }
-          else if (/\.(zfc|nes|nfc|fds|unf)$/i.exec(file.name)) {
-            // The file's name ends with .zfc, .nes, .nfc, .fds or .unf - assume it's a NES ROM!
-            mappingConsoles = ["NES"];
+          // We'll do a hash-check against it, even if it's not a bisrv.asd...
+          hashResult = getFirmwareHash(data);
+
+          // The result could be either a Promise if it had a bisrv.asd-like structure and we got
+          // a hash, or false otherwise... let's check!
+          if (hashResult instanceof Promise) {
+            // We got a Promise! Wait for it to finish so we get our bisrv.asd hash...
+            hashResult.then(function(dataHash) {
+              // If we have a newer bisrv.asd that stores button mappings in an external KeyMapInfo.kmp,
+              // we'll need a Step 1b to load that file as well...
+              var step1BRequired = false;
+
+              // Check the hash against all the known good ones...
+              switch (dataHash) {
+                // Mid-March BIOS...
+                case "4411143d3030adc442e99f7ac4e7772f300c844bbe10d639702fb3ba049a4ee1":
+                  mappingTableOffset = 0x8DBC0C;
+                  mappingConsoles = ["Arcade", "Game Boy Advance", "SNES", "Genesis/Mega Drive, Master System", "NES, Game Boy, Game Boy Color"];
+                  document.getElementById("fileOutput").innerHTML = "<p class=\"infoMessage\">INFO: Mid-March <code>bisrv.asd</code> detected</p>";
+                  break;
+
+                // April 20th BIOS...
+                case "b50e50aa4b1b1d41489586e989f09d47c4e2bc27c072cb0112f83e6bc04e2cca":
+                  mappingTableOffset = 0x8DBC9C;
+                  mappingConsoles = ["Arcade", "Game Boy Advance", "Game Boy, Game Boy Color", "SNES", "Genesis/Mega Drive, Master System", "NES"];
+                  document.getElementById("fileOutput").innerHTML = "<p class=\"infoMessage\">INFO: April 20th <code>bisrv.asd</code> detected</p>";
+                  break;
+
+                // May 15th BIOS...
+                case "d878a99d26242836178b452814e916bef532d05acfcc24d71baa31b8b6f38ffd":
+                  mappingTableOffset = 0;
+                  mappingConsoles = ["NES", "Genesis/Mega Drive, Master System", "SNES", "Game Boy, Game Boy Color", "Game Boy Advance", "Arcade"];
+                  step1BRequired = true;
+                  document.getElementById("fileOutput").innerHTML = "<p class=\"infoMessage\">INFO: May 15th <code>bisrv.asd</code> detected</p>";
+                  break;
+
+                // May 22nd BIOS...
+                case "6aebab0e4da39e0a997df255ad6a1bd12fdd356cdf51a85c614d47109a0d7d07":
+                  mappingTableOffset = 0;
+                  mappingConsoles = ["NES", "SNES", "Genesis/Mega Drive, Master System", "Game Boy, Game Boy Color", "Game Boy Advance", "Arcade"];
+                  step1BRequired = true;
+                  document.getElementById("fileOutput").innerHTML = "<p class=\"infoMessage\">INFO: May 22nd <code>bisrv.asd</code> detected</p>";
+                  break;
+
+                default:
+                  // Huh... wasn't false so had bisrv.asd structure, but didn't return
+                  // a known hash... a new BIOS version? Unknown anyway!
+                  console.log(dataHash);
+                  document.getElementById("fileOutput").innerHTML = "<p class=\"errorMessage\">ERROR: While the file you've selected does appear to be generally structured like the SF2000's <code>bisrv.asd</code> BIOS file, the specifics of your file don't match any known SF2000 BIOS version. As such, this tool cannot modify the selected file.</p>";
+                  return;
+                  break;
+              }
+
+              // If we're here, then we got some kind bisrv.asd file we're happy with; we'll set
+              // mappingData to it's full contents...
+              mappingData = data;
+
+              // Keep a record of the input file's name as well...
+              fileName = file.name;
+
+              // Check if we need a KeyMapInfo.kmp file to be provided as well...
+              if (step1BRequired) {
+                // Yup, we're going to need a KeyMapInfo.kmp file as well...
+                stepOneB();
+              }
+              else {
+                // Nope, we're all good; go ahead call our Step Two function...
+                stepTwo();
+              }
+              
+            });
           }
           else {
-            // Oh dear, the provided file didn't match any of the above rules! Display an error
-            // to the user...
-            document.getElementById("fileOutput").innerHTML = "<p class=\"errorMessage\">ERROR: The selected file does not appear to be a known <code>bisrv.asd</code> file, a <code>KeyMapInfo.kmp</code> file, or a game ROM with a known extension!</p>";
-            return;
-          }
+            // We got false, so whatever it was, it wasn't a bisrv.asd... let's check some other
+            // possibilities...
+            if (data.length == 288) {
+              // That's the correct length for a KeyMapInfo.kmp file, however we must know the host
+              // BIOS version before we can correctly process those files. Let the user know...
+              document.getElementById("fileOutput").innerHTML = "<p class=\"errorMessage\">ERROR: The file you've provided may be a <code>KeyMapInfo.kmp</code> button map file; however as the internal data structure of these files varies depending on the version of the host BIOS, you must select your device's <code>bisrv.asd</code> file first. You can find this file in the <code>bios</code> folder on your device's microSD card.";
+              return;
+            }
+            // If we're still checking, next test the file extensions for the individual console's ROMs...
+            else if (/\.(zfb|zip)$/i.exec(file.name)) {
+              // The file's name ends with .zfb or .zip - assume it's an arcade ROM!
+              mappingConsoles = ["Arcade"];
+            }
+            else if (/\.(zgb|gba|agb|gbz)$/i.exec(file.name)) {
+              // The file's name ends with .zgb, .gba, .agb or .gbz - assume it's a Game Boy Advance ROM!
+              mappingConsoles = ["Game Boy Advance"];
+            }
+            else if (/\.(gbc|gb|sgb)$/i.exec(file.name)) {
+              // The file's name ends with .gbc, .gb or .sgb - assume it's a Game Boy or Game Boy Color ROM!
+              mappingConsoles = ["Game Boy, Game Boy Color"];
+            }
+            else if (/\.(zsf|smc|fig|sfc|gd3|gd7|dx2|bsx|swc)$/i.exec(file.name)) {
+              // The file's name ends with .zsf, .smc, .fig, .sfc, .gd3, .gd7, .dx2, .bsx or .swc - assume it's a SNES ROM!
+              mappingConsoles = ["SNES"];
+            }
+            else if (/\.(zmd|bin|md|smd|gen|sms)$/i.exec(file.name)) {
+              // The file's name ends with .zmd, .bin, .md, .smd, .gen or .sms - assume it's a Genesis/Mega Drive or Master System ROM!
+              mappingConsoles = ["Genesis/Mega Drive, Master System"];
+            }
+            else if (/\.(zfc|nes|nfc|fds|unf)$/i.exec(file.name)) {
+              // The file's name ends with .zfc, .nes, .nfc, .fds or .unf - assume it's a NES ROM!
+              mappingConsoles = ["NES"];
+            }
+            else {
+              // Oh dear, the provided file didn't match any of the above rules! Display an error
+              // to the user...
+              document.getElementById("fileOutput").innerHTML = "<p class=\"errorMessage\">ERROR: The selected file does not appear to be a known <code>bisrv.asd</code> file, a <code>KeyMapInfo.kmp</code> file, or a game ROM with a known extension!</p>";
+              return;
+            }
 
-          // If we're here, then we got some kind of file we're happy with. If mappingConsoles
-          // only contains one entry, then it was a ROM file, and we'll want to initialise our
-          // mappingData array with 48 slots; otherwise, it was a bisrv.asd or a KeyMapInfo.kmp
-          // and we'll set mappingData to it's full contents instead...
-          if (mappingConsoles.length == 1) {
-            mappingData = new Uint8Array(48);
-            mappingTableOffset = 0;
-          }
-          else {
-            mappingData = data;
-          }
+            // If we're here, then we got some kind of non-bisrv.asd file we're happy with. If
+            // mappingConsoles only contains one entry, then it was a ROM file, and we'll want to
+            // initialise our mappingData array with 48 slots; otherwise, it was a KeyMapInfo.kmp
+            // and we'll set mappingData to it's full contents instead...
+            if (mappingConsoles.length == 1) {
+              mappingData = new Uint8Array(48);
+              mappingTableOffset = 0;
+            }
+            else {
+              mappingData = data;
+            }
 
-          // Keep a record of the input file's name as well...
-          fileName = file.name;
+            // Keep a record of the input file's name as well...
+            fileName = file.name;
 
-          // Go ahead call our Step Two function...
-          stepTwo();
+            // Go ahead call our Step Two function...
+            stepTwo();
+          }
         }
+      }
+
+      function stepOneB() {
+        var html = "<section id=\"stepOneB\"><h2>Step 1b: Select <code>KeyMapInfo.kmp</code></h2><p>This version of the SF2000 BIOS reads its button mappings from an external file called <code>KeyMapInfo.kmp</code>, stored in the <code>Resources</code> folder on the microSD card. Please select your device's <code>KeyMapInfo.kmp</code> file now.</p><label>Open <code>KeyMapInfo.kmp</code>: <input id=\"keyMapInfoSelector\" type=\"file\"></label><div id=\"stepOneBOutput\"></div></section>";
+
+        // Finally, add a <hr> separator after the last step, and append the new step...
+        document.getElementById("steps").insertAdjacentHTML("beforeend", "<hr>");
+        document.getElementById("steps").insertAdjacentHTML("beforeend", html);
+
+        // Attach our event handler to our new file input control...
+        var keyMapInfoInput = document.getElementById("keyMapInfoSelector");
+        keyMapInfoInput.addEventListener("change", function() {
+          // The user has chosen a new file; it should be a KeyMapInfo.kmp file,
+          // so let's do our best to check!
+          var frKMI = new FileReader();
+          fileName = event.target.files[0].name;
+          frKMI.readAsDataURL(event.target.files[0]);
+          frKMI.onload = function(event) {
+            var fileData = event.target.result;
+            var dataType = fileData.substring(5, fileData.indexOf(";"));
+            if (dataType === "application/octet-stream") {
+              // The user selected a file that appears to contain binary data; it's
+              // a good candidate! Let's check its length next...
+              var base64Data = fileData.substring(fileData.indexOf(",") + 1);
+              var binaryData = atob(base64Data);
+              if (binaryData.length == 288) {
+                // It's the right length - let's assume it's a KeyMapInfo.kmp!
+                mappingData = new Uint8Array(binaryData.length);
+                for (var i = 0; i < binaryData.length; i++) {
+                  mappingData[i] = binaryData.charCodeAt(i);
+                }
+                while(document.getElementById("stepOneB").nextSibling) {
+                  document.getElementById("stepOneB").nextSibling.remove();
+                }
+                stepTwo();
+              }
+              else {
+                // Wrong length for a KeyMapInfo.kmp file!
+                document.getElementById("stepOneBOutput").innerHTML = "<p class=\"errorMessage\">ERROR: The selected file does not appear to be a valid <code>KeyMapInfo.kmp</code> file.</p>";
+                return;
+              }
+            }
+            else {
+              // The file the user selected doesn't appear to be binary data, so
+              // highly unlikely to be a KeyMapInfo.kmp file...
+              document.getElementById("stepOneBOutput").innerHTML = "<p class=\"errorMessage\">ERROR: The selected file does not appear to be a valid <code>KeyMapInfo.kmp</code> file.</p>";
+              return;
+            }
+          }
+        });
       }
 
       function stepTwo() {
@@ -260,17 +452,19 @@
         // mapped, and for each a selection box of the target console's buttons for the mapping.
         // There'll also be a checkbox per button, which can be checked to enable "autofire" on
         // that button.
+        var html = "<section id=\"mappingSection\"><h2>Step 2: Choose your button mappings</h2>";
 
         // First, we need to update Step 2's instructions, depending on whether or not the user
         // supplied a bisrv.asd file or KeyMapInfo.kmp (multiple consoles) or a ROM (one console)...
         if (mappingConsoles.length > 1) {
           // They provided a bisrv.asd or a KeyMapInfo.kmp file!
-          document.getElementById("mappingInstructions").innerHTML = "Below you will see the current global button mappings for the file you provided. Each tile covers the button mappings for a different game console - the physical SF2000 buttons are on the left, and the virtual console buttons are in the middle. On the right are some \"autofire\" checkboxes - if the box for a button is checked, it means holding that button down will trigger multiple repeated button presses in the virtual console automatically. As the SF2000 supports local multiplayer via the use of a second wireless controller, there are <i>two</i> sets of button mappings per console - one for Player 1 and one for Player 2. When you have finished tweaking your button mappings, proceed to Step 3.";
+          html += "<p>Below you will see the current global button mappings for the file you provided. Each tile covers the button mappings for a different game console - the physical SF2000 buttons are on the left, and the virtual console buttons are in the middle. On the right are some \"autofire\" checkboxes - if the box for a button is checked, it means holding that button down will trigger multiple repeated button presses in the virtual console automatically. As the SF2000 supports local multiplayer via the use of a second wireless controller, there are <i>two</i> sets of button mappings per console - one for Player 1 and one for Player 2. When you have finished tweaking your button mappings, proceed to Step 3.</p>";
         }
         else {
           // They provided a ROM file!
-          document.getElementById("mappingInstructions").innerHTML = "Below you will see an empty \"" + mappingConsoles[0] + "\" button mapping table, which will be used to create a unique button mapping profile for \"" + fileName + "\". In the table, the physical SF2000 buttons are on the left, and the virtual console buttons are in the middle. On the right are some \"autofire\" checkboxes - if the box for a button is checked, it means holding that button down will trigger multiple repeated button presses in the virtual console automatically. As the SF2000 supports local multiplayer via the use of a second wireless controller, there are <i>two</i> sets of button mappings per console - one for Player 1 and one for Player 2. When you have finished tweaking your button mappings, proceed to Step 3.";
+          html += "<p>Below you will see an empty \"" + mappingConsoles[0] + "\" button mapping table, which will be used to create a unique button mapping profile for \"" + fileName + "\". In the table, the physical SF2000 buttons are on the left, and the virtual console buttons are in the middle. On the right are some \"autofire\" checkboxes - if the box for a button is checked, it means holding that button down will trigger multiple repeated button presses in the virtual console automatically. As the SF2000 supports local multiplayer via the use of a second wireless controller, there are <i>two</i> sets of button mappings per console - one for Player 1 and one for Player 2. When you have finished tweaking your button mappings, proceed to Step 3.</p>";
         }
+        html += "<div id=\"mappingControls\">";
 
         // Next we'll be looping through all of the consoles we'll be setting up mappings for...
         var presentationButtonOrder = ['A', 'B' ,'X', 'Y', 'L', 'R'];
@@ -278,9 +472,7 @@
 
           // This console's bank of mapping controls will be stored in a <div>, and we'll add
           // a <h3> header for good measure as well...
-          var currentConsoleNode = document.createElement("div");
-          currentConsoleNode.className = "mappingConsole";
-          currentConsoleNode.innerHTML += "<h3>" + mappingConsoles[currentConsole] + "</h3>";
+          html += "<div class=\"mappingConsole\"><h3>" + mappingConsoles[currentConsole] + "</h3>";
 
           // Get the button mapping for this console...
           var buttonMap = getButtonMap(currentConsole);
@@ -290,9 +482,9 @@
           for (var player = 0; player < 2; player++) {
 
             // Start creating our table HTML...
-            var tNode = "<table><caption>Player " + (player + 1) + "</caption>";
-            tNode += "<thead><tr><th class=\"alignL\">SF2000</th><th>Console</th><th>Autofire</th></tr></thead>";
-            tNode += "<tbody>";
+            html += "<table><caption>Player " + (player + 1) + "</caption>";
+            html += "<thead><tr><th class=\"alignL\">SF2000</th><th>Console</th><th>Autofire</th></tr></thead>";
+            html += "<tbody>";
 
             // Loop through all the SF2000's buttons (well, the ones that can be mapped, anyway)...
             for (var button = 0; button < 6; button++) {
@@ -310,45 +502,51 @@
               var offset = mappingTableOffset + (currentConsole * 48) + (player * 24) + (buttonByteOrder.indexOf(presentationButtonOrder[button]) * 4);
 
               // Start creating the HTML data for this row in the table...
-              var tRowHTML = "<tr>";
+              html += "<tr>";
 
               // SF2000 Button Name (e.g., "Player 1 X")...
-              tRowHTML += "<td>Player " + (player + 1).toString() + " " + presentationButtonOrder[button] + "</td>";
+              html += "<td>Player " + (player + 1).toString() + " " + presentationButtonOrder[button] + "</td>";
 
               // Console button selection list...
-              tRowHTML += "<td class=\"alignC\">";
-              tRowHTML += "<select id=\"sel" + offset.toString(16) + "\">";
+              html += "<td class=\"alignC\">";
+              html += "<select id=\"sel" + offset.toString(16) + "\">";
               for (var buttonTable in buttonMap) {
-                tRowHTML += "<option ";
+                html += "<option ";
                 if (mappingData[offset] == buttonMap[buttonTable]) {
-                  tRowHTML += "selected";
+                  html += "selected";
                 }
-                tRowHTML += ">" + buttonTable + "</option>";
+                html += ">" + buttonTable + "</option>";
               }
-              tRowHTML += "</select></td>";
+              html += "</select></td>";
 
               // Autofire checkbox...
-              tRowHTML += "<td class=\"alignC\"><input id=\"cb" + offset.toString(16) + "\" type=\"checkbox\"";
+              html += "<td class=\"alignC\"><input id=\"cb" + offset.toString(16) + "\" type=\"checkbox\"";
               if (mappingData[offset + 2] == 1) {
-                tRowHTML += " checked";
+                html += " checked";
               }
-              tRowHTML += "></td>";
+              html += "></td>";
 
               // And we're finished with the row...
-              tRowHTML += "</tr>";
-              tNode += tRowHTML;
+              html += "</tr>";
             }
 
             // Close off our table body, and add it to the console's <div>...
-            tNode += "</tbody>";
-            currentConsoleNode.innerHTML += tNode;
+            html += "</tbody></table>";
           }
 
-          // Finally, add this console's <div> to our mappingControls container...
-          document.getElementById("mappingControls").appendChild(currentConsoleNode);
+          // Finally, close this console's <div>...
+          html += "</div>";
         }
 
+        // And finally finally, close the mappingControls <div>...
+        html += "</div>";
+
         // OK, we're all done displaying our mapping table HTML; trigger Step 3's setup...
+        document.getElementById("steps").insertAdjacentHTML("beforeend", "<hr>");
+        document.getElementById("steps").insertAdjacentHTML("beforeend", html);
+        while(document.getElementById("mappingSection").nextSibling) {
+          document.getElementById("mappingSection").nextSibling.remove();
+        }
         stepThreeSetup();
       }
 
@@ -357,21 +555,22 @@
         // user (either how to replace the bisrv.asd/KeyMapInfo.kmp file, or where to put
         // the per-rom .kmp file), as well as generate a button that (when clicked) will
         // download the appropriate file to their device...
+        var html = "<section id=\"saveSection\"><h2>Step 3: Save your mapping changes</h2>";
 
         // First up, instructions! These will depend on whether they provided a bisrv.asd,
         // a KeyMapInfo.kmp, or a game ROM...
         if (mappingConsoles.length > 1) {
           if (fileName == "bisrv.asd") {
             // They provided a bisrv.asd file!
-            document.getElementById("saveInstructions").innerHTML = "Click the Download button below to download a new <code>bisrv.asd</code> BIOS file for the SF2000, with your updated global button mappings baked into it. Use it to replace the existing <code>bisrv.asd</code> file in the <code>bios</code> folder on your device's microSD card.";
+            html += "<p>Click the Download button below to download a new <code>bisrv.asd</code> BIOS file for the SF2000, with your updated global button mappings baked into it. Use it to replace the existing <code>bisrv.asd</code> file in the <code>bios</code> folder on your device's microSD card.</p>";
           }
           else if (fileName == "KeyMapInfo.kmp") {
             // They provided a KeyMapInfo.kmp file!
-            document.getElementById("saveInstructions").innerHTML = "Click the Download button below to download a new <code>KeyMapInfo.kmp</code> keymap file for the SF2000, with your updated global button mappings baked into it. Use it to replace the existing <code>KeyMapInfo.kmp</code> file in the <code>Resources</code> folder on your device's microSD card.";
+            html += "<p>Click the Download button below to download a new <code>KeyMapInfo.kmp</code> keymap file for the SF2000, with your updated global button mappings baked into it. Use it to replace the existing <code>KeyMapInfo.kmp</code> file in the <code>Resources</code> folder on your device's microSD card.</p>";
           }
           else {
             // They provided a... something!
-            document.getElementById("saveInstructions").innerHTML = "Click the Download button below to download an updated version of your file, with your updated global button mappings baked into it. Use it to replace the existing file on your device's microSD card.";
+            html += "<p>Click the Download button below to download an updated version of your file, with your updated global button mappings baked into it. Use it to replace the existing file on your device's microSD card.</p>";
           }
         }
         else {
@@ -380,11 +579,18 @@
           var kmpFileName = fileName.replace(/($|\.[^.]*$)/, function(m, p1) {return p1.toUpperCase() + '.kmp';});
 
           // Now the instructions themselves...
-          document.getElementById("saveInstructions").innerHTML = "Click the Download button below to download \"" + kmpFileName + "\", a game-specific keymap file for \"" + fileName + "\". Once downloaded, place it in the <code>save</code> subfolder of the folder where the ROM itself is stored. So for example, if \"" + fileName + "\" is in the <code>ROMS</code> folder on your SF2000's microSD card, place the \"" + kmpFileName + "\" file in <code>ROMS/save/</code>. If the <code>save</code> subfolder does not already exist, create it yourself first.";
+          html += "<p>Click the Download button below to download \"" + kmpFileName + "\", a game-specific keymap file for \"" + fileName + "\". Once downloaded, place it in the <code>save</code> subfolder of the folder where the ROM itself is stored. So for example, if \"" + fileName + "\" is in the <code>ROMS</code> folder on your SF2000's microSD card, place the \"" + kmpFileName + "\" file in <code>ROMS/save/</code>. If the <code>save</code> subfolder does not already exist, create it yourself first.</p>";
         }
 
         // Now let's add the Download button with it's event...
-        document.getElementById("saveControls").innerHTML = "<form id=\"downloadForm\" action=\"#\"><input id=\"downloadButton\" type=\"button\" value=\"Download\" onclick=\"download()\"></form>";
+        html += "<form id=\"downloadForm\" action=\"#\"><input id=\"downloadButton\" type=\"button\" value=\"Download\" onclick=\"download()\"></form>";
+
+        // OK, we're all done; add our HTML to the page...
+        document.getElementById("steps").insertAdjacentHTML("beforeend", "<hr>");
+        document.getElementById("steps").insertAdjacentHTML("beforeend", html);
+        while(document.getElementById("saveSection").nextSibling) {
+          document.getElementById("saveSection").nextSibling.remove();
+        }
       }
 
       function download() {
@@ -467,6 +673,6 @@
       }
     </script>
     <hr>
-    <p><a rel="license" href="http://creativecommons.org/publicdomain/zero/1.0/">CC0</a>: public domain. Version 1.1, 20230516.1</p>
+    <p><a rel="license" href="http://creativecommons.org/publicdomain/zero/1.0/">CC0</a>: public domain. Version 1.2, 20230522.1</p>
   </body>
 </html>

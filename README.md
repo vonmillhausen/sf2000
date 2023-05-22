@@ -40,7 +40,7 @@ So is the "Data Frog" any good? Only you can answer that question for yourself. 
     - [ROM Lists](#rom-lists)
     - [Sounds](#sounds)
     - [Unknown Files](#unknown-files)
-  - [Tools \& Links](#tools--links)
+  - [Tools and Links](#tools-and-links)
   - [Version History](#version-history)
 
 ---
@@ -349,7 +349,7 @@ These are files that I have not yet determined what they do; if anyone has any i
 
 ---
 
-## Tools & Links
+## Tools and Links
 All of these are linked above already in their relevant sections, but just in case you prefer to see them as a pulled-out list, here they are again:
 
 - [Boot Logo Changer](https://vonmillhausen.github.io/sf2000/tools/bootLogoChanger.html)

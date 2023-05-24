@@ -1,0 +1,16 @@
+MAME 0.106
+ - gets to 2000 missing files, and 26 missing sets
+Final Burn Alpha v0.2.97.42
+ - gets to 150 missing files, and 1 missing set
+HBMAME 0.220
+ - gets it to 141 missing files, and 1 missing set
+FinalBurn Legends v1.26
+ - gets it to 34 missing files, and 1 missing set
+MAME_2010
+ - gets it to 30 missing files, and 1 missing set
+NeoGeoRomCollectionByGhostware
+ - gets it to 22 missing files, and 1 missing set
+Royal Ascot II (rascot2)
+ - final missing files and set
+ 
+ A WINNER IS YOU

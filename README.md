@@ -29,7 +29,7 @@ So is the "Data Frog" any good? Only you can answer that question for yourself. 
     - [Game Boy](#game-boy)
     - [Game Boy Color](#game-boy-color)
     - [Game Boy Advance](#game-boy-advance)
-  - [Firmware/BIOS (biserv.asd)](#firmwarebios-biservasd)
+  - [Firmware/BIOS (bisrv.asd)](#firmwarebios-bisrvasd)
     - [Button Mappings/Key Bindings](#button-mappingskey-bindings)
     - [Boot Logo](#boot-logo)
   - [Resources](#resources)
@@ -88,16 +88,22 @@ The device advertises support for arcade, NES, SNES, Genesis/Mega Drive, Game Bo
 The SF2000 appears to be using Libretro with a custom front-end (i.e., not RetroArch).
 
 ### Arcade
-The device is running some version of Final Burn Alpha - it ships with a subset of the v0.2.97.24 ROM set, so likely that version. `adcockm#8175` from the Retro Handhelds Discord did some phenomenal work checking the full v0.2.97.24 against the device's April 20th firmware - thanks `adcockm#8175`! The below table has their findings:
+The device is running some version of Final Burn Alpha. Thanks to some truly exceptional work by `adcockm#8175` from the Retro Handhelds Discord, we know it supports an unusual mix of ROM sets, largely based on MAME 0.106 and Final Burn Alpha v0.2.97.42. `adcockm#8175` has gone ahead and compiled two separate [Clrmamepro](https://mamedev.emulab.it/clrmamepro/) dat files - [one for _all_ sets technically supported by the SF2000's current BIOS](/arcade/DataFrog%20SF2000%20(FBA%20v0.2.97.42).dat) (as of May 2023; though note that "supported" does not mean working or playable), and [one for all playable sets](/arcade/DataFrog%20SF2000%20(FBA%20v0.2.97.42)%20playable_no_dups.dat) with duplicates removed (and note, "playable" may include games with missing sound, graphical glitches, performance issues, but are otherwise technically functional). If you want to build a working set from the dat files, `adcockm#8175` has further provided [a list of "hints"](/arcade/Building%20the%20DataFrog%20SF2000%20(FBA%20v0.2.97.42)%20set.txt) as the sets you'll need to track down - for obvious reasons neither I nor anyone else can provide links to such material, but hopefully the hints will get you something you can start searching for. Finally, there's also [a HTML document](/arcade/DataFrog_SF2000_FBA.html) with a list of all of the supported sets along with some useful metadata, such as the set's full name, playability information, screen orientation, etc..
 
-| List | Name | Description |
-| ---- | ---- | ----------- |
-| [view](/text/inrom_sf2000_fba.txt) | On microSD | These were the ROMs included on the microSD card shipped with the device |
-| [view](/text/notlistedinrom_sf2000_fba.txt) | Not Listed | The SF2000's firmware contains a list of FBA ROM names, including ROMs not included on the microSD card - it is assumed these are the only games the flavour of FBA on the SF2000 knows about. This text file contains a list of the ROMs from the v0.2.97.24 set that were _not_ listed in the firmware; these are assumed to be incompatible, and were not tested |
-| [view](/text/testednoload_sf2000_fba.txt) | No Load | These ROMs immediately hung the emulator without any indication it had loaded any files successfully |
-| [view](/text/testedloadhang_sf2000_fba.txt) | Load Hang | These ROMs indicated they were loading some files on startup, but hung before completing |
-| [view](/text/testedloadcorrupt_sf2000_fba.txt) | Load Corrupt | These ROMs appeared to complete loading, but only showed severe graphical corruption (e.g., garbage, static, a black screen, etc.) and usually wouldn't allow exit back to the SF2000's menu via start+select |
-| [view](/text/working_sf2000_fba.txt) | Working | These ROMs loaded successfully; note that "working" does not mean "works perfectly" - some may be too slow to play, may not have any audio, may not be controllable (e.g., light-gun games), etc. - they just finish loading successfully |
+`adcockm#8175` also provided the following interesting statistics:
+
+- Number of arcade ROMs known by the SF2000's firmware: `1431`
+- Number properly rotated: `1291`
+- Number with vertical orientation: `134`
+- Number with screen upside-down: `6`
+- Number "playable" (maybe no sound, some slowness, minor graphics issues): `949`
+- Number unplayably broken but technically running: `175`
+- Number fully broken (load hang/crash, etc.): `307`
+- Number of playable unique games (dupes filtered out) in proper rotation: `354`
+- Number of playable unique games (dupes filtered out) with rotated display: `61`
+- Number of different versions of Street Fighter 2: `60+` 😵‍💫 [Von Millhausen: I think this stat is only half a joke!]
+- Playable set total size: `3.10 GB` (3,336,344,502 bytes)
+- Full set total size: `11.4 GB` (12,245,306,389 bytes)
 
 ### NES
 Appears to be a version of FCEUmm. There are references in the firmware to different NES palettes, but there's no interface or configuration for the emulator itself to choose one. On the original firmware, the A and B buttons were swapped. See "[Button Mappings/Key Bindings](#button-mappingskey-bindings)" section below.
@@ -119,8 +125,8 @@ Performance is fairly poor. On the original firmware, A and B buttons are mapped
 
 ---
 
-## Firmware/BIOS (biserv.asd)
-The firmware for the SF2000 is actually located on the microSD card, in a file called `biserv.asd` located in the BIOS folder. This file is a monolithic binary blob, which contains the device's OS, the emulators, their settings... basically everything. Data Frog have issued some firmware updates for the device since launch; the updates have added new features (e.g., additional language support, favourites, history, etc.), but have also introduced bugs (e.g., some SNES games run very slowly until they are quit and launched again, etc.). Data Frog have published a YouTube video showing how to update the firmware on the device, which [you can find here](https://www.youtube.com/watch?v=j8dT2fdGfck); the video's description contains a link to where you can download the latest firmware.
+## Firmware/BIOS (bisrv.asd)
+The firmware for the SF2000 is actually located on the microSD card, in a file called `bisrv.asd` located in the BIOS folder. This file is a monolithic binary blob, which contains the device's OS, the emulators, their settings... basically everything. Data Frog have issued some firmware updates for the device since launch; the updates have added new features (e.g., additional language support, favourites, history, etc.), but have also introduced bugs (e.g., some SNES games run very slowly until they are quit and launched again, etc.). Data Frog have published a YouTube video showing how to update the firmware on the device, which [you can find here](https://www.youtube.com/watch?v=j8dT2fdGfck); the video's description contains a link to where you can download the latest firmware.
 
 Known firmware versions are currently (dates approximate):
 
@@ -134,12 +140,12 @@ Known firmware versions are currently (dates approximate):
 There is not currently any custom firmware (CFW) for the device. The stock firmware is currently being investigated; here are some findings from it:
 
 ### Button Mappings/Key Bindings
-`osaka#9664` discovered that the OS supports loading game-specific key bindings from `.kmp` files, stored in the `save` folder for each system and named after a game's ROM file (e.g., `/FC/save/Game Name.EXT.kmp`). They also discovered where in the `biserv.asd` file the default mappings for each emulator are stored. Working with this information, `notv37#4200` worked out what bits related to what buttons for each emulator. Using both their findings, we now have a tool which can be used to update both the global button mappings for the emulators, as well as create per-ROM mappings - you can [find this tool here](https://vonmillhausen.github.io/sf2000/tools/buttonMappingChanger.htm).
+`osaka#9664` discovered that the OS supports loading game-specific key bindings from `.kmp` files, stored in the `save` folder for each system and named after a game's ROM file (e.g., `/FC/save/Game Name.EXT.kmp`). They also discovered where in the `bisrv.asd` file the default mappings for each emulator are stored. Working with this information, `notv37#4200` worked out what bits related to what buttons for each emulator. Using both their findings, we now have a tool which can be used to update both the global button mappings for the emulators, as well as create per-ROM mappings - you can [find this tool here](https://vonmillhausen.github.io/sf2000/tools/buttonMappingChanger.htm).
 
 Note that the game-specific key bindings function have been removed from the May 15th firmware onwards.
 
 ### Boot Logo
-When the device is powered on, a "Welcome" image is displayed for a short time before the main menu appears. This image comes from inside `biserv.asd`, (towards the end; exact offset varies between BIOS revisions). It's a `512x200` RGB565 Little Endian raw image file, and looks like this:
+When the device is powered on, a "Welcome" image is displayed for a short time before the main menu appears. This image comes from inside `bisrv.asd`, (towards the end; exact offset varies between BIOS revisions). It's a `512x200` RGB565 Little Endian raw image file, and looks like this:
 
 ![Boot Logo](/images/bootlogo.png)
 
@@ -166,7 +172,7 @@ The Resources folder on the microSD card contains all of the resources used by t
 | `yahei_Arial.ttf` | ✨ | ✅ | ✅ | ✅ | The "Arial" typeface, containing Latin, Greek, Cyrillic, Chinese, Japanese and Korean characters |
 
 ### Images (Used)
-As far as I am aware, all of the below images are actively used by the `20230515` version of the firmware; happy to take any corrections if it turns out any of them are unused! Note that while the stock theme is based around a `640x480` resolution, the actual _display_ on the SF2000 is a `320x240` one. The OS on the device uses nearest-neighbour scaling for its images, giving the stock UI a somewhat aliased appearance. If you're planning to make your own theme for the SF2000, design it for `320x240`, and then double the resolution when exporting the final images to the device for a crisper look on the internal panel.
+As far as I am aware, all of the below images are actively used by the `20230515` version of the firmware; happy to take any corrections if it turns out any of them are unused! Note that while the stock theme is based around a `640x480` resolution, the actual _display_ on the SF2000 is a `320x240` one. The OS on the device uses nearest-neighbour scaling for its images, giving the stock UI a somewhat aliased appearance. If you're planning to make your own theme for the SF2000, design it for `320x240`, and then double the resolution when exporting the final images to the device for a crisper look on the internal panel. I've written a generic image tool for the SF2000 - it lets you convert SF2000-formatted images to PNG files, and lets you convert PNG or JPEG images to SF2000 formats (which may be useful if you want to theme your device); you can [find this tool here](https://vonmillhausen.github.io/sf2000/tools/genericImageTool.htm).
 
 | Filename | Resolution | Format | 03.15 | 04.20 | 05.15 | 05.22 | Description | View |
 | -------- | ---------- | ------ | ----- | ----- | ----- | ----- | ----------- | ---- |
@@ -225,6 +231,7 @@ As far as I am aware, all of the below images are actively used by the `20230515
 | `mssvp.nec` | 1008x164 | BRGA |  | ✨ | 🚩 | ✅ | User settings screen icons and labels in Japanese | [view](/images/mssvp.nec.png) |
 | `normidna.bin` | 40x24 | BGRA | ✨ | ✅ | ✅ | ✅ | Search game-list indicator | [view](/images/normidna.png) |
 | `ntdll.bvs` | 1008x164 | BRGA |  | ✨ | 🚩 | ✅ | User settings screen icons and labels in Polish | [view](/images/ntdll.bvs.png) |
+| `nvinf.hsp` | 16x240 | BGRA | ✨ | ✅ | ✅ | ✅ | Latin numbers 0 to 9 listed vertically, used for the number of games available in each main menu category | [view](/images/nvinf.hsp.png) |
 | `okcg2.old` | 32x32 | BGRA |  |  | ✨ | ✅ | The star icon that appears beside favourited games in the game-lists | [view](/images/okcg2.old.png) |
 | `pcadm.nec` | 1008x164 | BRGA |  | ✨ | 🚩 | ✅ | User settings screen icons and labels in Italian | [view](/images/pcadm.nec.png) |
 | `pwsso.occ` | 640x480 | RGB565 Little Endian | ✨ | ✅ | ✅ | ✅ | In-game menu (position 4) | [view](/images/pwsso.png) |
@@ -270,7 +277,6 @@ To the best of my knowledge, the following image files are currently __unused__ 
 | `mswbv.cpl` | 640x480 | RGB565 Little Endian | ✨ | ✅ | ✅ | ✅ | Alternate UI: Game Boy Advance main menu background | [view](/images/unused/mswbv.cpl.png) |
 | `nettrace.dll` | 40x24 | BGRA | ✨ | ✅ | ✅ | ✅ | Unknown game-list indicator (grey joystick with yellow buttons) | [view](/images/unused/nettrace.dll.png) |
 | `nsibm.ctp` | 640x480 | RGB565 Little Endian | ✨ | ✅ | ✅ | ✅ | Alternate UI: Arcade main menu background | [view](/images/unused/nsibm.ctp.png) |
-| `nvinf.hsp` | 16x240 | BGRA | ✨ | ✅ | ✅ | ✅ | Latin numbers 0 to 9 listed vertically | [view](/images/unused/nvinf.hsp.png) |
 | `nvinfohsp` | 640x480 | RGB565 Little Endian | ✨ | ✅ | ✅ | ✅ | Alternate UI: Genesis/Mega Drive main menu background (note: there's no extension separator for this file, I suspect the file name is typo'd in the filesystem!) | [view](/images/unused/nvinfohsp.png) |
 | `pcadm.hsp` | 640x480 | RGB565 Little Endian | ✨ | ✅ | ✅ | ✅ | Alternate UI: User main menu background (NTSC TV system selected) | [view](/images/unused/pcadm.hsp.png) |
 | `plasy.ers` | 640x480 | RGB565 Little Endian | ✨ | ✅ | ✅ | ✅ | Alternate UI: Game Boy Advance main menu background | [view](/images/unused/plasy.ers.png) |
@@ -356,11 +362,14 @@ All of these are linked above already in their relevant sections, but just in ca
 - [Button Mapping Tool](https://vonmillhausen.github.io/sf2000/tools/buttonMappingChanger.htm)
 - [Data Frog's firmware update tutorial](https://www.youtube.com/watch?v=j8dT2fdGfck)
 - [FROGTOOL](https://github.com/tzlion/frogtool) (for updating the built-in game lists)
+- [Generic Image Tool](https://vonmillhausen.github.io/sf2000/tools/genericImageTool.htm)
 - [Silent background music file](/sounds/silentMusic/pagefile.sys) (replace the file in the `Resources` folder on the microSD card)
 
 ---
 
 ## Version History
+- `20230524 - 1.11`: Added my new [Generic Image Tool](https://vonmillhausen.github.io/sf2000/tools/genericImageTool.htm). Added more exceptional information from `adcockm#8175` in regards to arcade emulation on the SF2000, and cleaned up the old info accordingly. Corrected some typos related to `bisrv.asd` (thanks `Luke#4448`!). Usage of `nvinf.hsp` was tracked down to the numbers of games available on the main menu pages (thanks `kid_sinn#9691`!).
+
 - `20230522 - 1.10`: Updated resource tables for the new `05.22` firmware (no changes); added a table with details about known firmware versions. Added a "Tools & Links" section.
 
 - `20230516 - 1.9`: Updated most of the Resources file lists to include firmware-related information (added, (un)changed, removed). Added new image resources for the latest May 15th firmware. Updated some images files previews to contain the fake name extensions as well. Added detail about the removal of per-game button maps from May 15th firmware. Renamed the sound previews to contain the fake name extensions as well.

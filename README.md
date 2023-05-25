@@ -37,6 +37,7 @@ So is the "Data Frog" any good? Only you can answer that question for yourself. 
     - [Images (Used)](#images-used)
     - [Images (Unused)](#images-unused)
     - [Other Files](#other-files)
+      - [Foldername.ini](#foldernameini)
     - [ROM Lists](#rom-lists)
     - [Sounds](#sounds)
     - [Unknown Files](#unknown-files)
@@ -88,7 +89,7 @@ The device advertises support for arcade, NES, SNES, Genesis/Mega Drive, Game Bo
 The SF2000 appears to be using Libretro with a custom front-end (i.e., not RetroArch).
 
 ### Arcade
-The device is running some version of Final Burn Alpha. Thanks to some truly exceptional work by `adcockm#8175` from the Retro Handhelds Discord, we know it supports an unusual mix of ROM sets, largely based on MAME 0.106 and Final Burn Alpha v0.2.97.42. `adcockm#8175` has gone ahead and compiled two separate [Clrmamepro](https://mamedev.emulab.it/clrmamepro/) dat files - [one for _all_ sets technically supported by the SF2000's current BIOS](/arcade/DataFrog_SF2000_FBA_v0.2.97.42.dat) (as of May 2023; though note that "supported" does not mean working or playable), and [one for all playable sets](/arcade/DataFrog_SF2000_FBA_v0.2.97.42_playable_no_dups.dat) with duplicates removed (and note, "playable" may include games with missing sound, graphical glitches, performance issues, but are otherwise technically functional). If you want to build a working set (must be non-merged) from the dat files, `adcockm#8175` has further provided [a list of "hints"](/arcade/Building_the_DataFrog_SF2000_FBA_v0.2.97.42_set.txt) as the sets you'll need to track down - for obvious reasons neither I nor anyone else can provide links to such material, but hopefully the hints will get you something you can start searching for. Finally, there's also [a HTML document](/arcade/DataFrog_SF2000_FBA.html) with a list of all of the supported sets along with some useful metadata, such as the set's full name, playability information, screen orientation, etc..
+The device is running some version of Final Burn Alpha. Thanks to some truly exceptional work by `adcockm#8175` from the Retro Handhelds Discord, we know it supports an unusual mix of ROM sets, largely based on MAME 0.106 and Final Burn Alpha v0.2.97.42. `adcockm#8175` has gone ahead and compiled two separate [Clrmamepro](https://mamedev.emulab.it/clrmamepro/) dat files - [one for _all_ sets technically supported by the SF2000's current BIOS](/arcade/DataFrog_SF2000_FBA_v0.2.97.42.dat) (as of May 2023; though note that "supported" does not mean working or playable), and [one for all playable sets](/arcade/DataFrog_SF2000_FBA_v0.2.97.42_playable_no_dups.dat) with duplicates removed (and note, "playable" may include games with missing sound, graphical glitches, performance issues, but are otherwise technically functional). If you want to build a working set (must be non-merged) from the dat files, `adcockm#8175` has further provided [a list of "hints"](/arcade/Building_the_DataFrog_SF2000_FBA_v0.2.97.42_set.txt) as the sets you'll need to track down - for obvious reasons neither I nor anyone else can provide links to such material, but hopefully the hints will get you something you can start searching for. Finally, there's also [a HTML document](/arcade/DataFrog_SF2000_FBA.html) with a list of all of the supported sets along with some useful metadata, such as the set's full name, playability information, screen orientation, etc.. The `inrom` column indicates if the ROM was included on the SF2000's stock microSD card; it's interesting to note that there were more ROMs located on the card than were defined in the `mswb7.tax` file (and thus available from the arcade game list); none of the unlisted games were actually playable on the SF2000, so it's possible someone from Data Frog actually tested the games to an extent, and removed ones from the available list that were broken.
 
 `adcockm#8175` also provided the following interesting statistics:
 
@@ -135,7 +136,7 @@ Known firmware versions are currently (dates approximate):
 | Mid-March | ? | The original firmware that shipped with the first batch of devices |
 | April 20th | ? | The first official firmware update; fixed some button mappings for Genesis, added support for 15 new languages. Also partially broke SNES compatibility - many SNES games will run very slowly on first launch, but quitting and immediately re-launching the game will have it run at normal speed (normal for the SF2000, anyway) |
 | May 15th | ? | Added a built-in UI for global button mapping (which is broken in several ways, mainly SNES and Genesis controls are swapped, and no support for setting Player 2 controls), added a History feature, added a Favourites feature |
-| May 22nd | 1.5V | First firmware with an official version number. Fixed the SNES/Genesis swapped button mappings, and now sets Player 2 controls to be identical to Player 1 (no way to set independently) |
+| May 22nd | 1.5V | First firmware with an official version number. Fixed the SNES/Genesis swapped button mappings, and now sets Player 2 controls to be identical to Player 1 (no way to set independently). There's some evidence of undocumented emulation improvements; some GBA homebrew that was non-functional in previous firmwares now loads correctly, and some GBA titles see marginally improved performance |
 
 There is not currently any custom firmware (CFW) for the device. The stock firmware is currently being investigated; here are some findings from it:
 
@@ -302,10 +303,10 @@ These are other files that have been identified, which don't fit into the other 
 | `dufdr.cwr` |  | ✨ | 🚩 | ✅ | UI strings in Turkish |
 | `eknjo.ofd` |  | ✨ | 🚩 | ✅ | UI strings in Spanish |
 | `fhshl.skb` | ✨ | ✅ | 🚩 | ✅ | UI strings in English |
-| `Foldername.ini` | ✨ | 🚩 | 🚩 | ✅ | Used to control menu rotation for the main menu (this information came from the 4PDA forum) |
+| `Foldername.ini` | ✨ | 🚩 | 🚩 | ✅ | Used to control menu rotation for the main menu; see below for more notes on this |
 | `History.bin` |  |  | ✨ | ✅ | Used to store the history of played ROMs; only appears after the first game is played after installing the 05.15 or later firmware. User ROMs are not added to history, only built-in games. If a built-in game that is referenced in history is removed from the device, the device will crash when trying to view the History screen. You can delete the History.bin file to clear the device's history; there is no built-in functionality to do so |
 | `jsnno.uby` |  | ✨ | 🚩 | ✅ | UI strings in Dutch |
-| `kcbn7.avc` |  | ✨ | ❌ | ✅ | Duplicate copy of `bisrv.asd`, the main firmware for the device which is found in the BIOS folder  |
+| `kcbn7.avc` |  | ✨ | ❌ |  | Duplicate copy of `bisrv.asd`, the main firmware for the device which is found in the BIOS folder  |
 | `KeyMapInfo.kmp` |  |  | ✨ | ✅ | Used to store the user-assignable global button mappings for each emulated system |
 | `lf9lb.cut` |  | ✨ | 🚩 | ✅ | UI strings in Portuguese |
 | `ntrcq.oba` |  | ✨ | 🚩 | ✅ | UI strings in Japanese |
@@ -314,11 +315,46 @@ These are other files that have been identified, which don't fit into the other 
 | `sgotd.cwt` |  | ✨ | 🚩 | ✅ | UI strings in French |
 | `snbqj.uby` |  | ✨ | 🚩 | ✅ | UI strings in German |
 | `t2act.sgf` | ✨ | ✅ | 🚩 | ✅ | UI strings in Chinese |
-| `Test.zsf` |  | ✨ | ❌ | ✅ | A SNES ROM, which displays a controller test program |
+| `Test.zsf` |  | ✨ | ❌ |  | A SNES ROM, which displays a controller test program |
 | `tvctu.uby` |  | ✨ | 🚩 | ✅ | UI strings in Russian |
 | `vdaz5.bjk` |  | ✨ | 🚩 | ✅ | UI strings in Arabic |
 | `wtrxj.lbd` |  | ✨ | 🚩 | ✅ | UI strings in Malay |
 | `xjebd.clq` |  | ✨ | 🚩 | ✅ | UI strings in Hebrew |
+
+#### Foldername.ini
+This file controls some of the UI settings for the main menu. It's a plain-text file, but not an actual INI file. It's contents from the May 22nd firmware (just as an example) are as follows:
+
+```
+SF2000
+17
+FFFFFF
+FF8000 ROMS
+FF8000 FC
+FF8000 SFC
+FF8000 MD
+FF8000 GB
+FF8000 GBC
+FF8000 GBA
+FF8000 ARCADE
+FF8000 ROMS
+FF8000 ROMS
+8 7 0
+24 184 144 208
+40 24
+
+
+```
+
+And here's my current understanding of what each line is used for:
+
+- `SF2000`: The name of the device; I don't believe it's actively used anywhere, please correct me if I'm wrong!
+- `17`: The number of languages supported by the firmware
+- `FFFFFF`: Hexadecimal colour (RGB) for the general game-list texts, and the `x/yyy` game count in the top-right corner of each game-list
+- `FF8000 ROMS`: The first defined main menu section (the sections that are scrolled vertically on the main menu). Internally they are numbered from 0; so the `ROMS` section (user ROMs and settings) is 0, `FC` (NES) is 1, `SFC` (SNES) is 2, etc.. The `FF8000` is the hexadecimal colour (RGB) to display the text of the currently selected/highlighted game in the list; the default colour is orange. _Side note:_ after the `ARCADE` section, there's two additional `ROMS` sections; this is just a guess on my part, but I think the firmware is hard-coded to have ten sections. The SF2000 appears to share its firmware with other similar devices, and some of those devices feature different menu sections (e.g., "CPS1", "Neo Geo", etc.). I suspect that the best of those systems has ten sections in its main menu, which doesn't match up with the eight sections on the SF2000 (seven supported systems + the user ROMs/settings section). As the firmware requires ten sections to be defined, they just repeated the `ROMS` section to fill in the remaining places. Like I say, that's just a guess!
+- `8 7 0`: This is used to control the main menu rotation. `8` tells the firmware how many main menu sections are actually in-use on this device; for the SF2000 that's seven supported consoles + the user ROMs/settings section, for eight total. `7` tells the firmware which menu section to default to when the device boots up, which is why by default it always starts in the `ARCADE` section. `0` tells the firmware which section to display the special "user settings" menu on (the one with History, Favourites, TV System, Language, etc.). So for example, if you wanted the SF2000 to start up on the user ROMs/settings screen instead of Arcade, you could change this line to read `8 0 0`
+- `24 184 144 208`: These numbers control the position and size of the game artwork in each system's game-list. The first two numbers are the X and Y coordinates from the top-left corner of the screen for where to start drawing the artwork; the second two numbers are the width and height of the artwork to draw. Note that the SF2000 doesn't do any image scaling; the dimensions are for the rectangular area the device will begin adding each pixel of the source artwork to. If the artwork's dimensions don't exactly match the dimensions specified here, the artwork will not display properly
+- `40 24`: The width and height of the icon shown beside the currently selected/highlighted game in a game-list. Again, these are the dimensions of the rectangular area the SF2000 draws the pixel data into, so if these numbers don't match the dimensions of the list indicator image, the image will not display properly
+
 
 ### ROM Lists
 Credit for this section goes to `taizou#9644`, author of [FROGTOOL](https://github.com/tzlion/frogtool). These files relate to the built-in game-lists under each main system; the list of games is pulled from these files instead of being built at runtime - annoying, but presumably for performance reasons. It means if you want to change the list of built-in games (instead of using the User ROMs section), you have to edit these files - hence FROGTOOL, you should really check it out.
@@ -368,6 +404,8 @@ All of these are linked above already in their relevant sections, but just in ca
 ---
 
 ## Version History
+- `20230525 - 1.12`: Added a section about the internals of the `Foldername.ini` file. Added a note to the Arcade section about the "inrom" column in `adcockm#8175`'s metadata document. Added a small firmware note for the May 22nd about community-spotted GBA performance improvements.
+
 - `20230524 - 1.11`: Added my new [Generic Image Tool](https://vonmillhausen.github.io/sf2000/tools/genericImageTool.htm). Added more exceptional information from `adcockm#8175` in regards to arcade emulation on the SF2000, and cleaned up the old info accordingly. Corrected some typos related to `bisrv.asd` (thanks `Luke#4448`!). Usage of `nvinf.hsp` was tracked down to the numbers of games available on the main menu pages (thanks `kid_sinn#9691`!).
 
 - `20230522 - 1.10`: Updated resource tables for the new `05.22` firmware (no changes); added a table with details about known firmware versions. Added a "Tools & Links" section.

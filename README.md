@@ -370,6 +370,24 @@ Credit for this section goes to `taizou#9644`, author of [FROGTOOL](https://gith
 ### Sounds
 There are several sound files in the `20230420` firmware, stored in raw signed 16-bit PCM format (mono, little-endian at 22050 Hz). The SF2000 seems to play the files back at an incorrect sample rate vs. the raw data; if you want to customise the background music, resample your audio to 21543 Hz, and then speed the audio up to 22050 Hz, using the resulting audio as the raw data (credit to `notv37#4200` in Discord for doing the math on that).
 
+If you want to do it using [Audacity](https://www.audacityteam.org/) , the steps are:
+
+1. Open your audio file
+2. In lower left corner of Audacity window, set "Project Rate (Hz)" to "22050"
+3. If your track is stereo, downmix to mono: "Tracks" menu > "Mix" > "Mix Stereo Down to Mono"
+4. "Tracks" menu > "Resample..."
+    * Set "New sample rate (Hz)" to "22050"
+    * Click "OK"
+5. Press "Ctrl-A" to select the full audio range
+"Effect" menu > "Change Speed..."
+    * Set "Speed Multiplier" to "1.023"
+    * Click "OK" (your audio will now sound slightly too high-pitched if you play it back, but don't worry - the SF2000 plays everything slightly slow/low-pitched, so we speed/pitch things up before exporting so it plays back correctly)
+6. "File" menu > "Export" > "Export Audio..."
+    * Set "Save as type" to "Other uncompressed files"
+    * In "Format Options", set "Header" to "RAW (header-less)"; set "Encoding" to "Signed 16-bit PCM"
+    * Enter your "File name", and click "Save"
+    * If the "Edit Metadata Tags" window appears, just leave everything blank and click "OK"
+
 | Filename | 03.15 | 04.20 | 05.15 | 05.22 | Description | Listen |
 | -------- | ----- | ----- | ----- | ----- | ----------- | ------ |
 | `c2fkec.pgt` | ✨ | ✅ | 🚩 | ✅ | "Popping" sound that is played when moving around the search keyboard | [listen](/sounds/c2fkec.pgt.mp3) |
@@ -404,7 +422,7 @@ All of these are linked above already in their relevant sections, but just in ca
 ---
 
 ## Version History
-- `20230525 - 1.12`: Added a section about the internals of the `Foldername.ini` file. Added a note to the Arcade section about the "inrom" column in `adcockm#8175`'s metadata document. Added a small firmware note for the May 22nd about community-spotted GBA performance improvements. Added specific emulator versions and Git commit links for each emulator (thanks `osaka#9664` and `notv37#4200`!).
+- `20230525 - 1.12`: Added a section about the internals of the `Foldername.ini` file. Added a note to the Arcade section about the "inrom" column in `adcockm#8175`'s metadata document. Added a small firmware note for the May 22nd about community-spotted GBA performance improvements. Added specific emulator versions and Git commit links for each emulator (thanks `osaka#9664` and `notv37#4200`!). Added specific steps for producting SF2000-format audio files using Audacity.
 
 - `20230524 - 1.11`: Added my new [Generic Image Tool](https://vonmillhausen.github.io/sf2000/tools/genericImageTool.htm). Added more exceptional information from `adcockm#8175` in regards to arcade emulation on the SF2000, and cleaned up the old info accordingly. Corrected some typos related to `bisrv.asd` (thanks `Luke#4448`!). Usage of `nvinf.hsp` was tracked down to the numbers of games available on the main menu pages (thanks `kid_sinn#9691`!).
 

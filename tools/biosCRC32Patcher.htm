@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <title>Data Frog SF2000 BIOS CRC32 Patcher</title>
+    <meta name="viewport" content="width=device-width">
+    <style type="text/css">
+      :root {
+        --background: rgb(240, 235, 220);
+        --text: rgb(50, 40, 20);
+        --errorBackground: rgb(200, 65, 65);
+        --errorText: rgb(255, 255, 255);
+        --mappingBox: rgba(50, 40, 20, 0.1);
+      }
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --background: rgb(70, 75, 100);
+          --text: rgb(190, 190, 200);
+          --errorBackground: rgb(130, 85, 75);
+          --errorText: rgb(245, 200, 200);
+          --mappingBox: rgba(190, 190, 200, 0.1);
+        }
+      }
+      body {
+        background-color: var(--background);
+        color: var(--text);
+        font-family: -apple-system, BlinkMacSystemFont, avenir next, avenir, segoe ui, helvetica neue, helvetica, Cantarell, Ubuntu, roboto, noto, arial, sans-serif;
+      }
+      a, a:visited, a:hover, a:active { color: var(--text); }
+      hr {
+        border: 1px solid var(--text);
+        margin: 2em 0;
+      }
+      p.errorMessage{
+        background-color: var(--errorBackground);
+        border: 1px dashed var(--errorText);
+        color: var(--errorText);
+        border-radius: 10px;
+        padding: 10px;
+        margin: 20px;
+      }
+      h1:first-child { text-align: center; }
+      p:last-child { text-align: center; }
+      .controlContainer {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+      }
+      .control {
+        display: inline;
+        background-color: var(--mappingBox);
+        padding: 1em;
+        border-radius: 1em;
+        margin: 0.5em;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Data Frog SF2000 BIOS CRC32 Patcher</h1>
+    <p>This tool will recalculate and patch the CRC32 check bits for a modified <code>bisrv.asd</code> BIOS file for the SF2000; only really useful if you've manually modified data outside of the "safe" areas covered by my other tools. If you haven't done your own hex editing of the BIOS, then this tool probably isn't for you! 🙂</p>
+    <p><strong><em>IMPORTANT NOTE:</em></strong> This tool will just blindly modify bytes <code>0x18c</code> to <code>0x18f</code> of whatever input file you provide; correct usage of this tool is therefore up to you, not me! 🤣</p>
+    <hr>
+    <div id="steps">
+      <section id="bisrvSection">
+        <h2>Step 1: Select Your <code>bisrv.asd</code></h2>
+        <p>Select your <code>bisrv.asd</code> file. You should probably make a backup of the file first, just in case!</p>
+        <div id="bisrvOutput"></div>
+        <div class="controlContainer">
+          <label class="control">Open <code>bisrv.asd</code>: <input id="bisrvSelector" type="file" accept=".asd,application/octet-stream" onchange="bisrvLoad(event.target.files[0])"></label>
+        </div>
+      </section>
+    </div>
+    <script type="text/javascript">
+      // Global variables...
+      var bisrvData;    // Used to store the binary data from the bisrv.asd file
+
+      function bisrvLoad(file) {
+        // We've got a new file - clear any old error messages and any HTML after
+        // Step 1...
+        document.getElementById("bisrvOutput").innerHTML = "";
+        while(document.getElementById("bisrvSection").nextSibling) {
+          document.getElementById("bisrvSection").nextSibling.remove();
+        }
+
+        // Check to make sure the file is at least ~512-bytes-ish long (CRC32 for
+        // bisrv.asd is calculated for bytes 512 onwards)...
+        if (file.size < 520) {
+          document.getElementById("bisrvOutput").innerHTML = "<p class=\"errorMessage\">ERROR: Provided file is too small!</p>";
+          return;
+        }
+
+        // If we're here then we should be good - read in our file and store its
+        // contents in bisrvData...
+        var frBisrv = new FileReader();
+        frBisrv.readAsArrayBuffer(file);
+        frBisrv.onload = function(event) {
+
+          // Read the provided file's data into an array...
+          bisrvData = new Uint8Array(event.target.result);
+
+          // And display Step 2...
+          stepTwo();
+        };
+      }
+
+      function stepTwo() {
+        // Start building our HTML...
+        var html = "<section id=\"downloadSection\"><h2>Step 2: Download Patched <code>bisrv.asd</code></h2><p>Click the download button for the patched <code>bisrv.asd</code> file; use it to replace the one in the <code>bios</code> folder on your SF2000's microSD card.</p><div id=\"downloadSectionMessages\"></div>";
+
+        // Add our download button...
+        html += "<div class=\"controlContainer\"><div class=\"control\"><input id=\"downloadButton\" type=\"button\" value=\"Download\"></div></div>";
+
+        // Finally, add a <hr> separator after the last step, and append the new step...
+        document.getElementById("steps").insertAdjacentHTML("beforeend", "<hr>");
+        document.getElementById("steps").insertAdjacentHTML("beforeend", html);
+
+        // Attach our event handler to our download button...
+        var dButton = document.getElementById("downloadButton");
+        dButton.addEventListener("click", function() {
+          download();
+        });
+      }
+
+      function download() {
+        // Easy peasy - we're going to recalculate the CRC32 check bytes for our binary
+        // data, plonk them into the data in the right place, and then send it to the
+        // user's browser...
+
+        // Calculate a new CRC32 for the updated bisrv.asd and apply it; credit to
+        // osaka#9664 for this code!
+        var c;
+        var tabCRC32 = new Int32Array(256);
+        for (var i = 0; i < 256; i++) {
+          c = i << 24;
+          for (var j = 0; j < 8; j++) {
+            c = c & (1 << 31) ? c << 1 ^ 0x4c11db7 : c << 1;
+          }
+          tabCRC32[i] = c;
+        }
+        c = ~0;
+        for (var i = 512; i < bisrvData.length; i++) {
+          c = c << 8 ^ tabCRC32[c >>> 24 ^ bisrvData[i]];
+        }
+        bisrvData[0x18c] = c & 255;
+        bisrvData[0x18d] = c >>> 8 & 255;
+        bisrvData[0x18e] = c >>> 16 & 255;
+        bisrvData[0x18f] = c >>> 24;
+
+        // Send the data to the user's browser as a file download...
+        var link = document.createElement("a");
+        link.href = window.URL.createObjectURL(new Blob([bisrvData], {type: "application/octet-stream"}));
+        link.download = "bisrv.asd";
+        link.style.display = "none";
+        document.body.appendChild(link);
+        link.click();
+        window.URL.revokeObjectURL(link.href);
+        document.body.removeChild(link);
+      }
+    </script>
+    <hr>
+    <p><a rel="license" href="http://creativecommons.org/publicdomain/zero/1.0/">CC0</a>: public domain. Version 1.0, 20230526.1</p>
+  </body>
+</html>

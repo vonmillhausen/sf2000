@@ -150,7 +150,7 @@ When the device is powered on, a "Welcome" image is displayed for a short time b
 
 ![Boot Logo](/images/bootlogo.png)
 
-The image is _actually_ displayed at half-resolution on the internal display though, `256x100`, centred in the middle of the screen. The boot logo can be changed to an arbitrary `256x100` image using a web-based tool I wrote, which you can [find here](https://vonmillhausen.github.io/sf2000/tools/bootLogoChanger.html).
+The image is _actually_ displayed at half-resolution on the internal display though, `256x100`, centred in the middle of the screen. The boot logo can be changed to an arbitrary `256x100` image using a web-based tool I wrote, which you can [find here](https://vonmillhausen.github.io/sf2000/tools/bootLogoChanger.htm).
 
 ---
 
@@ -355,6 +355,8 @@ And here's my current understanding of what each line is used for:
 - `24 184 144 208`: These numbers control the position and size of the game artwork in each system's game-list. The first two numbers are the X and Y coordinates from the top-left corner of the screen for where to start drawing the artwork; the second two numbers are the width and height of the artwork to draw. Note that the SF2000 doesn't do any image scaling; the dimensions are for the rectangular area the device will begin adding each pixel of the source artwork to. If the artwork's dimensions don't exactly match the dimensions specified here, the artwork will not display properly
 - `40 24`: The width and height of the icon shown beside the currently selected/highlighted game in a game-list. Again, these are the dimensions of the rectangular area the SF2000 draws the pixel data into, so if these numbers don't match the dimensions of the list indicator image, the image will not display properly
 
+NOTE: While the text colours above work just fine with the SF2000 _first_ boots up, after loading a game and returning to the menu some text colours revert to default, and are likely being pulled from inside the BIOS somewhere.
+
 
 ### ROM Lists
 Credit for this section goes to `taizou#9644`, author of [FROGTOOL](https://github.com/tzlion/frogtool). These files relate to the built-in game-lists under each main system; the list of games is pulled from these files instead of being built at runtime - annoying, but presumably for performance reasons. It means if you want to change the list of built-in games (instead of using the User ROMs section), you have to edit these files - hence FROGTOOL, you should really check it out.
@@ -373,16 +375,18 @@ There are several sound files in the `20230420` firmware, stored in raw signed 1
 If you want to do it using [Audacity](https://www.audacityteam.org/) , the steps are:
 
 1. Open your audio file
-2. In lower left corner of Audacity window, set "Project Rate (Hz)" to "22050"
-3. If your track is stereo, downmix to mono: "Tracks" menu > "Mix" > "Mix Stereo Down to Mono"
-4. "Tracks" menu > "Resample..."
+2. Click the "Audio Setup" button on the top toolbar, choose "Audio Settings..."
+    * Set "Project Sample Rate" to "22050 Hz"
+    * Click "OK"
+3. Click the "Select" button in the lower-left corner of your audio track area to select all the audio
+4. If your track is stereo, downmix to mono: "Tracks" menu > "Mix" > "Mix Stereo Down to Mono"
+5. "Tracks" menu > "Resample..."
     * Set "New sample rate (Hz)" to "22050"
     * Click "OK"
-5. Press "Ctrl-A" to select the full audio range
-"Effect" menu > "Change Speed..."
+6. "Effect" menu > "Pitch and Tempo" > "Change Speed..."
     * Set "Speed Multiplier" to "1.023"
-    * Click "OK" (your audio will now sound slightly too high-pitched if you play it back, but don't worry - the SF2000 plays everything slightly slow/low-pitched, so we speed/pitch things up before exporting so it plays back correctly)
-6. "File" menu > "Export" > "Export Audio..."
+    * Click "Apply" (your audio will now sound slightly too high-pitched if you play it back, but don't worry - the SF2000 plays everything slightly slow/low-pitched, so we speed/pitch things up before exporting so it plays back correctly)
+7. "File" menu > "Export" > "Export Audio..."
     * Set "Save as type" to "Other uncompressed files"
     * In "Format Options", set "Header" to "RAW (header-less)"; set "Encoding" to "Signed 16-bit PCM"
     * Enter your "File name", and click "Save"
@@ -412,7 +416,8 @@ These are files that I have not yet determined what they do; if anyone has any i
 ## Tools and Links
 All of these are linked above already in their relevant sections, but just in case you prefer to see them as a pulled-out list, here they are again:
 
-- [Boot Logo Changer](https://vonmillhausen.github.io/sf2000/tools/bootLogoChanger.html)
+- [BIOS CRC32 Patcher](https://vonmillhausen.github.io/sf2000/tools/biosCRC32Patcher.htm)
+- [Boot Logo Changer](https://vonmillhausen.github.io/sf2000/tools/bootLogoChanger.htm)
 - [Button Mapping Tool](https://vonmillhausen.github.io/sf2000/tools/buttonMappingChanger.htm)
 - [Data Frog's firmware update tutorial](https://www.youtube.com/watch?v=j8dT2fdGfck)
 - [FROGTOOL](https://github.com/tzlion/frogtool) (for updating the built-in game lists)
@@ -422,6 +427,8 @@ All of these are linked above already in their relevant sections, but just in ca
 ---
 
 ## Version History
+- `20230526 - 1.13`: Updated Audacity instructions to support latest version of Audacity. Added a BIOS CRC32 patcher tool for the reckless and brave. Added a note about `Foldername.ini` text colours reverting after loading a game (thanks `Zerter#4954`!)
+
 - `20230525 - 1.12`: Added a section about the internals of the `Foldername.ini` file. Added a note to the Arcade section about the "inrom" column in `adcockm#8175`'s metadata document. Added a small firmware note for the May 22nd about community-spotted GBA performance improvements. Added specific emulator versions and Git commit links for each emulator (thanks `osaka#9664` and `notv37#4200`!). Added specific steps for producting SF2000-format audio files using Audacity.
 
 - `20230524 - 1.11`: Added my new [Generic Image Tool](https://vonmillhausen.github.io/sf2000/tools/genericImageTool.htm). Added more exceptional information from `adcockm#8175` in regards to arcade emulation on the SF2000, and cleaned up the old info accordingly. Corrected some typos related to `bisrv.asd` (thanks `Luke#4448`!). Usage of `nvinf.hsp` was tracked down to the numbers of games available on the main menu pages (thanks `kid_sinn#9691`!).

@@ -41,6 +41,7 @@ So is the "Data Frog" any good? Only you can answer that question for yourself. 
     - [ROM Lists](#rom-lists)
     - [Sounds](#sounds)
     - [Unknown Files](#unknown-files)
+    - [Notes For Theme Creators](#notes-for-theme-creators)
   - [Tools and Links](#tools-and-links)
   - [Version History](#version-history)
 
@@ -413,6 +414,16 @@ These are files that I have not yet determined what they do; if anyone has any i
 | -------- | ----- | ----- | ----- | ----- | ----------- |
 | `kcnuv.lit` | ✨ | ✅ | ✅ | ✅ | UNKNOWN; a bunch of 4-byte binary chunks (e.g., `0xC4 0x00 0x00 0x00`), followed by a list of .NES ROM file names. Very similar to the `.bvs`/`.nec`/`.tax` files detailed above, but doesn't have the same type of "header" they have |
 
+### Notes For Theme Creators
+This section isn't really about the `Resources` files per-se, but it's tangentally related. The fact that the SF2000's UI resources are pulled from the microSD card opens up the door to "theming" the device, which is great. However, if you do decide you want to make a theme for the SF2000, here's a few things I've found that you may want to bear in mind:
+
+- If you're including background music in your theme, note that when the SF2000 starts up it fails to output about the first 1 second of audio; therefore, if you'd like the person using your theme to hear your background music from the start, cut one second off the end of your background music loop, and move it to the start of the loop instead.
+- If you're creating custom system logos (`sfcdr.cpl`), make sure the logos don't overlap the "Games Exist" image's screen area (`exaxz.hsp`, top-left coordinate `456, 88`, width and height `152, 72`); the main menu compositor clips an area of the section's _background_ image behind where the "Games Exist" artwork will be drawn, renders the "Games Exist" artwork into that clipped section, and then draws the result _on top_ of the system logo. As a result, any pixels of the system logo that should be visible in that area will be replaced by the background image, even if you make the "Games Exist" image fully transparent. Removing the `exaxz.hsp` file entirely doesn't work either, as you get garbage drawn on the screen in the same area instead. The only section not impacted by this is the "User ROMs and Settings" section, as on that screen the "Games Exist" artwork is not drawn.
+- When designing your theme, think carefully about the use case in which you want your theme to look best. Although the SF2000 uses many different UI images at many different scales, internally the screen area it draws to is `640 x 480` pixels in size. However, the actual physical display is only `320 x 240`; as the SF2000's OS does not do any image resampling when downscaling its UI output to the screen, what essentially happens is every second row and column of pixels is thrown away - and as a result, a theme designed for the internal `640 x 480` resolution can look a bit aliased or "jagged" on the internal display. If you want your theme to look pixel-perfect on the internal display, design it for `320 x 240` instead (i.e., for any image asset you create, design and create it at half of the original resolution of the same file in the stock SF2000 theme), and perform a nearest-neighbour upscale of the image back to the original resolution when converting it to an SF2000 data format. The resulting images will be pixel perfect on the internal display. _HOWEVER... there is one major downside to do thing this_: AV output. When using the AV output of the SF2000, it does so at 576i - higher than the resolution of the internal display. If you're using a theme that was scaled up from a `320 x 240` design base, you can clearly see pixelisation of the UI assets on the external display; a `640 x 480` based theme displays smooth assets. So what if you want to design a theme that looks decently sharp (not aliased) on the internal display, _and_ looks decently smooth on an external display, then design your theme for three-quarters resolution (`480 x 360` design base), and do a bilinear upscale to `640 x 480` based resolutions during final data conversion. To summarise:
+  - If you only care about how your theme looks on the internal display, and don't care about how it looks on AV output, design for a `320 x 240` base resolution and do a **nearest-neighbour** 2x upscale when converting to SF2000 formats
+  - If you only care about how your theme looks via AV out, and don't care about it looking alised/jagged on the internal display, design for the regular `640 x 480` base
+  - If you care about both display types, and want your theme to look great (but not perfect) on both, design for a three-quarters `480 x 360` base, and do a **bilinear** upscale to regular `640 x 480` base resolutions when converting to SF2000 formats
+
 ---
 
 ## Tools and Links
@@ -421,6 +432,7 @@ All of these are linked above already in their relevant sections, but just in ca
 - [BIOS CRC32 Patcher](https://vonmillhausen.github.io/sf2000/tools/biosCRC32Patcher.htm)
 - [Boot Logo Changer](https://vonmillhausen.github.io/sf2000/tools/bootLogoChanger.htm)
 - [Button Mapping Tool](https://vonmillhausen.github.io/sf2000/tools/buttonMappingChanger.htm)
+- [Community DataFrog SF2000 Compatibility List](https://docs.google.com/spreadsheets/d/19TCedWEKFXlnS2dlmLxk1BcnlHrX-MSVrKwEURuiU0E/edit#gid=1327539659)
 - [Data Frog's firmware update tutorial](https://www.youtube.com/watch?v=j8dT2fdGfck)
 - [FROGTOOL](https://github.com/tzlion/frogtool) (for updating the built-in game lists)
 - [Generic Image Tool](https://vonmillhausen.github.io/sf2000/tools/genericImageTool.htm)
@@ -429,6 +441,8 @@ All of these are linked above already in their relevant sections, but just in ca
 ---
 
 ## Version History
+- `20230530 - 1.15`: Added link to the community ROM compatibility list. Added some personal notes for theme creators.
+
 - `20230529 - 1.14`: Updated the main menu BGM sample rate details with the latest findings from `osaka#9664`. Clarified which menu text colour resets after exiting a game. Added a note about charging safety (thanks for your sacrifices, `Zerter#4954`! 🫡)
 
 - `20230526 - 1.13`: Updated Audacity instructions to support latest version of Audacity. Added a BIOS CRC32 patcher tool for the reckless and brave. Added a note about `Foldername.ini` text colours reverting after loading a game (thanks `Zerter#4954`!)

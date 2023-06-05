@@ -40,6 +40,7 @@ So is the "Data Frog" any good? Only you can answer that question for yourself. 
     - [Images (Unused)](#images-unused)
     - [Other Files](#other-files)
       - [Foldername.ini](#foldernameini)
+      - [Favourites and History](#favourites-and-history)
     - [ROM Lists](#rom-lists)
     - [Sounds](#sounds)
     - [Unknown Files](#unknown-files)
@@ -329,6 +330,7 @@ These are other files that have been identified, which don't fit into the other 
 | `bxvtb.sby` |  | ✨ | 🚩 | ✅ | UI strings in Thai |
 | `dufdr.cwr` |  | ✨ | 🚩 | ✅ | UI strings in Turkish |
 | `eknjo.ofd` |  | ✨ | 🚩 | ✅ | UI strings in Spanish |
+| `Favorites.bin` |  |  | ✨ | ✅ | Used to store the list of ROMs added to the Favorites list; only appears after the first game is favourited after installing the 05.15 or later firmware. User ROMs cannot be added to favourites, only built-in games |
 | `fhshl.skb` | ✨ | ✅ | 🚩 | ✅ | UI strings in English |
 | `Foldername.ini` | ✨ | 🚩 | 🚩 | ✅ | Used to control menu rotation for the main menu; see below for more notes on this |
 | `History.bin` |  |  | ✨ | ✅ | Used to store the history of played ROMs; only appears after the first game is played after installing the 05.15 or later firmware. User ROMs are not added to history, only built-in games. If a built-in game that is referenced in history is removed from the device, the device will crash when trying to view the History screen. You can delete the History.bin file to clear the device's history; there is no built-in functionality to do so |
@@ -384,6 +386,27 @@ And here's my current understanding of what each line is used for:
 
 NOTE: While the text colours above work just fine with the SF2000 _first_ boots up, after loading a game and returning to the menu the general game-list/game count colour reverts to an off-white colour, and is likely being pulled from inside the BIOS somewhere. Also note that currently there is no way to choose a highlight colour for the Favourites or History sections - those are fixed at the stock orange colour (FF8000), and are almost certainly hardcoded in the BIOS as well.
 
+#### Favourites and History
+The `Favorites.bin` and `History.bin` files above both share the same file structure:
+
+* The first 4 bytes are a little-endian Uint32 storing the number of entries in the list
+* The rest of the file is composed of pairs of 2 byte little-endian Uint16s - the first byte pair is a number indicating which ROM list the entry belongs to (more on that below); the second number is the 0-based game number within that list
+
+The ROM lists are numbered as follows:
+
+| Number | ROM List | List File |
+| ------ | -------- | --------- |
+| 1 | NES | `rdbui.tax` |
+| 2 | SNES | `urefs.tax` |
+| 3 | Genesis/Mega Drive | `scksp.tax` |
+| 4 | Game Boy | `vdsdc.tax` |
+| 5 | Game Boy Color | `pnpui.tax` |
+| 6 | Game Boy Advance | `vfnet.tax` |
+| 7 | Arcade | `mswb7.tax` |
+
+So, for example: if your most recently played game (first in the history list) was "Batman - The Video Game" for Game Boy, and that game happened to be the ninth game listed in the Game Boy section on your device, the fifth and sixth bytes in your `History.bin` would be `0x04 0x00` (which is `4` in decimal, i.e. the "Game Boy" ROM list), and the seventh and eighth bytes would be `0x08 0x00` (which is `8` in decimal, i.e. the 9th game in the 0-based list of Game Boy games). The `Favorites.bin` file works exactly the same way, just with games you've favourited rather than played recently.
+
+For more information on the ROM lists in general, see the next section.
 
 ### ROM Lists
 Credit for this section goes to `taizou#9644`, author of [FROGTOOL](https://github.com/tzlion/frogtool). These files relate to the built-in game-lists under each main system; the list of games is pulled from these files instead of being built at runtime - annoying, but presumably for performance reasons. It means if you want to change the list of built-in games (instead of using the User ROMs section), you have to edit these files - hence FROGTOOL, you should really check it out.
@@ -468,7 +491,7 @@ All of these are linked above already in their relevant sections, but just in ca
 ---
 
 ## Version History
-- `20230605 - 1.16`: Added my new [Save State Tool](https://vonmillhausen.github.io/sf2000/tools/saveStateTool.htm). Added documentation to the Emulators section about the save state files and their format. Also added a note specifically to the Arcade section about the `.skp` files (which are secretly just save state files with a different extension).
+- `20230605 - 1.16`: Added my new [Save State Tool](https://vonmillhausen.github.io/sf2000/tools/saveStateTool.htm). Added documentation to the Emulators section about the save state files and their format. Also added a note specifically to the Arcade section about the `.skp` files (which are secretly just save state files with a different extension). Added a "Favourites and History" section detailing the format of the `Favorites.bin` and `History.bin` files.
 
 - `20230530 - 1.15`: Added link to the community ROM compatibility list. Added some personal notes for theme creators.
 

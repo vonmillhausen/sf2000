@@ -1,0 +1,749 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <title>Data Frog SF2000 Save State Tool</title>
+    <meta name="viewport" content="width=device-width">
+    <style>
+      :root {
+        --background: rgb(240, 235, 220);
+        --text: rgb(50, 40, 20);
+        --errorBackground: rgb(200, 65, 65);
+        --errorText: rgb(255, 255, 255);
+        --warningBackground: rgb(200, 128, 64);
+        --warningText: rgb(255, 255, 255);
+        --mappingBox: rgba(50, 40, 20, 0.1);
+      }
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --background: rgb(70, 75, 100);
+          --text: rgb(190, 190, 200);
+          --errorBackground: rgb(130, 85, 75);
+          --errorText: rgb(245, 200, 200);
+          --warningBackground: rgb(130, 110, 75);
+          --warningText: rgb(255, 240, 214);
+          --mappingBox: rgba(190, 190, 200, 0.1);
+        }
+      }
+      body {
+        background-color: var(--background);
+        color: var(--text);
+        font-family: -apple-system, BlinkMacSystemFont, avenir next, avenir, segoe ui, helvetica neue, helvetica, Cantarell, Ubuntu, roboto, noto, arial, sans-serif;
+      }
+      a, a:visited, a:hover, a:active { color: inherit; }
+      hr {
+        border: 1px solid var(--text);
+        margin: 2em 0;
+      }
+      .icon {
+        position: relative;
+        top: 0.15em;
+        left: -0.2em;
+        height: 1em;
+      }
+      p.warning, p.error {
+        border: 1px dashed;
+        border-radius: 10px;
+        padding: 10px;
+        margin: 20px;
+      }
+      p.warning {
+        background-color: var(--warningBackground);
+        border-color: var(--warningText);
+        color: var(--warningText);
+      }
+      p.error {
+        background-color: var(--errorBackground);
+        border-color: var(--errorText);
+        color: var(--errorText);
+      }
+      h1:first-child { text-align: center; }
+      p:last-child { text-align: center; }
+      .controlContainer {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+      }
+      .control {
+        display: inline;
+        background-color: var(--mappingBox);
+        padding: 1em;
+        border-radius: 1em;
+        margin: 0.5em;
+      }
+      #thumbnailPreview {
+        border: 1px white dashed;
+      }
+      #slotSelector label:not(:last-child) {
+        margin-right: 1em;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Data Frog SF2000 Save State Tool</h1>
+    <p>The SF2000 supports save states for games, but it bundles the save state data into a custom format including a thumbnail and metadata; this bundle can't be directly used as save state data for other emulator platforms (e.g., Retroarch). This tool allows you to extract raw save-state data and thumbnails from SF2000 save-state bundles, in case you want to use them with the same emulator on another device; it also allows you to take save states from another device, and convert them to a format the SF2000 can parse. Please note this tool is provided as-is; make sure you have backups of anything you care about before potentially replacing any files on your SF2000's microSD card! 🙂</p>
+    <p>This tool makes use of the <a href="https://github.com/nodeca/pako">pako</a> JavaScript library.</p>
+    <p class="warning"><img class="icon" alt="An icon of a yellow triangle with a dark orange exclamation point, indicating a warning or notice" aria-hidden="true" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHhtbG5zOnhsaW5rPSdodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rJyB2aWV3Qm94PScwIDAgNjQgNjQnPjxkZWZzPjxsaW5lYXJHcmFkaWVudCBpZD0nYSc+PHN0b3Agb2Zmc2V0PScwJyBzdG9wLWNvbG9yPScjZTliYjNhJy8+PHN0b3Agb2Zmc2V0PScxJyBzdG9wLWNvbG9yPScjYzE2ODAzJy8+PC9saW5lYXJHcmFkaWVudD48bGluZWFyR3JhZGllbnQgeGxpbms6aHJlZj0nI2EnIGlkPSdiJyB4MT0nMjAnIHgyPSc1NicgeTE9JzEyJyB5Mj0nNjAnIGdyYWRpZW50VW5pdHM9J3VzZXJTcGFjZU9uVXNlJy8+PC9kZWZzPjxwYXRoIGZpbGw9JyNmZmYnIHN0cm9rZT0ndXJsKCNiKScgc3Ryb2tlLWxpbmVqb2luPSdyb3VuZCcgc3Ryb2tlLXdpZHRoPSc4JyBkPSdNNCA1Nmg1NkwzMiA4WicgcGFpbnQtb3JkZXI9J3N0cm9rZSBtYXJrZXJzIGZpbGwnLz48cGF0aCBmaWxsPScjZjVkODUyJyBkPSdNMTIgNTJoNDBMMzIgMThaJyBwYWludC1vcmRlcj0nbWFya2VycyBmaWxsIHN0cm9rZScvPjxwYXRoIGZpbGw9JyNjNTg3MTEnIGQ9J00yOSA0M3Y2aDZ2LTZ6TTI5IDQwaDZWMjZoLTZ6JyBwYWludC1vcmRlcj0nc3Ryb2tlIG1hcmtlcnMgZmlsbCcvPjwvc3ZnPg=="><strong><em>NOTE:</em></strong> This tool will <em>not</em> convert save states from one emulator's format to another; it <em>only</em> gives you either the raw save state data the SF2000 generated (when converting <em>from</em> the SF2000), or allows you to take any random file and shove it into the container format the SF2000 uses for save states (when converting <em>to</em> the SF2000)… whether or not the SF2000 is able to understand the file you give it is up to the SF2000, not to me! If you're converting save states to the SF2000, and the SF2000 doesn't work with whatever kind of save state you provided, there's nothing I can do about that.<br><br>You can <a href="https://vonmillhausen.github.io/sf2000/#emulators" target="_blank" rel="noreferrer noopener">find a reference to all the specific emulators and versions used by the SF2000 here</a>; you'll probably only have success if you're using at least the same emulator, if not also the same version. Also, to have any chance of success, you must be using the exact same ROM on both devices!</p>
+    <hr>
+    <div id="steps">
+      <section id="modeSection">
+        <h2>Step 1: Select Operating Mode</h2>
+        <p>This tool can operate in two main modes - you can use it to convert save states <em>from</em> the SF2000 format <em>to</em> raw save-state data (and optionally download the thumbnail), or you can use it to convert raw save state data <em>from</em> another emulator <em>to</em> the SF2000 format. Choose the mode you want, and follow the next instruction that appears.</p>
+        <div class="controlContainer">
+          <label class="control"><input type="radio" id="radioFrom" name="toolMode" value="fromSF2000" autocomplete="off"> Convert <em>from</em> SF2000</label><br>
+          <label class="control"><input type="radio" id="radioTo" name="toolMode" value="toSF2000" autocomplete="off"> Convert <em>to</em> SF2000</label>
+        </div>
+      </section>
+    </div>
+    <script src="pako.js"></script>
+    <script>
+
+      // Global Variables
+      // ================
+      var previewCanvasData;  // Binary data used for drawing to our preview canvas
+      var saveFileName;       // Name of the save state file chosen by the user
+      var downloadName;       // Name we're going to give any download being sent to the user
+      var saveData;           // Binary data of a save state file
+      var thumbData;          // Binary data of a save state thumbnail
+      var thumbWidth;         // Integer width of a save state thumbnail
+      var thumbHeight;        // Integer height of a save state thumbnail
+      var romFileGood;        // Boolean indicating if a chosen save state file appears to be binary or not
+
+      // The following variable contains a definition for an SVG image to be used
+      // in any error messages shown to the user; defining it once so it can be
+      // reused more easily...
+      var errorIcon = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHhtbG5zOnhsaW5rPSdodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rJyB2aWV3Qm94PScwIDAgNjQgNjQnPjxkZWZzPjxsaW5lYXJHcmFkaWVudCBpZD0nYic+PHN0b3Agb2Zmc2V0PScwJyBzdG9wLWNvbG9yPScjZjU4MTYyJy8+PHN0b3Agb2Zmc2V0PScxJyBzdG9wLWNvbG9yPScjZTI1ZjUzJy8+PC9saW5lYXJHcmFkaWVudD48bGluZWFyR3JhZGllbnQgaWQ9J2EnPjxzdG9wIG9mZnNldD0nMCcgc3RvcC1jb2xvcj0nI2VjODE2YycvPjxzdG9wIG9mZnNldD0nMScgc3RvcC1jb2xvcj0nI2JmNDMyOScvPjwvbGluZWFyR3JhZGllbnQ+PGxpbmVhckdyYWRpZW50IHhsaW5rOmhyZWY9JyNhJyBpZD0nYycgeDE9JzEyJyB4Mj0nNTInIHkxPScxMicgeTI9JzUyJyBncmFkaWVudFVuaXRzPSd1c2VyU3BhY2VPblVzZScvPjxsaW5lYXJHcmFkaWVudCB4bGluazpocmVmPScjYicgaWQ9J2QnIHgxPScyMCcgeDI9JzQ4JyB5MT0nMTYnIHkyPSc0NCcgZ3JhZGllbnRVbml0cz0ndXNlclNwYWNlT25Vc2UnLz48L2RlZnM+PGNpcmNsZSBjeD0nMzInIGN5PSczMicgcj0nMjgnIGZpbGw9J3VybCgjYyknIHBhaW50LW9yZGVyPSdtYXJrZXJzIHN0cm9rZSBmaWxsJy8+PGNpcmNsZSBjeD0nMzInIGN5PSczMicgcj0nMjQnIGZpbGw9JyNmOWQzY2MnIHBhaW50LW9yZGVyPSdtYXJrZXJzIHN0cm9rZSBmaWxsJy8+PGNpcmNsZSBjeD0nMzInIGN5PSczMicgcj0nMjAnIGZpbGw9J3VybCgjZCknIHBhaW50LW9yZGVyPSdtYXJrZXJzIHN0cm9rZSBmaWxsJy8+PHBhdGggZmlsbD0nI2ZmZicgZD0nTTI5IDE2djIwaDZWMTZaTTI5IDQwdjZoNnYtNnonIHBhaW50LW9yZGVyPSdmaWxsIG1hcmtlcnMgc3Ryb2tlJy8+PC9zdmc+";
+
+      // When the tool loads, add some event watchers for when the Step 1 radio
+      // buttons change; and depending on which mode the user selects, begin
+      // rewriting the rest of the page...
+      var modes = document.getElementsByName("toolMode");
+      for (var i = 0; i < modes.length; i++) {
+        modes[i].addEventListener("change", function() {
+
+          // Clear out any HTML that might already exist after Step 1, just so
+          // things are nice and clean for Step 2 to load into...
+          while(document.getElementById("modeSection").nextSibling) {
+            document.getElementById("modeSection").nextSibling.remove();
+          }
+
+          // Add the appropriate Step 2 depending on what was selected...
+          if (this.value == "fromSF2000") {
+            setupStepTwo_From();
+          }
+          else if (this.value == "toSF2000") {
+            setupStepTwo_To();
+          }
+
+        });
+      }
+
+      // This function sets up the HTML for "Convert from SF2000 > Step 2", selecting
+      // a save state file from the SF2000's microSD card that the user wants to
+      // convert to raw save state data and/or a thumbnail...
+      function setupStepTwo_From() {
+
+        // Create the new section, add our heading and our instruction paragraph...
+        var html = "<section id=\"selectSF2000File\"><h2>Step 2: Select SF2000 Save State File</h2><p>Select the SF2000 save state file you want to convert from. The save states are usually stored in the <code>save</code> subfolder where the ROM for the game is located. There can be up to four saves states per game, with the extensions <code>.sa0</code>, <code>.sa1</code>, <code>.sa2</code> and <code>.sa3</code> respectively.</p><div id=\"step2Messages\"></div>";
+
+        // Add our file chooser...
+        html += "<div class=\"controlContainer\"><label class=\"control\"><input id=\"inputSAFile\" type=\"file\" accept=\".sa0,.sa1,.sa2,.sa3,.skp,application/octet-stream\"></label></div>";
+
+        // Close off our section...
+        html += "</section>";
+
+        // Finally, add a <hr> separator after the last step, and append the new step...
+        document.getElementById("steps").insertAdjacentHTML("beforeend", "<hr>");
+        document.getElementById("steps").insertAdjacentHTML("beforeend", html);
+
+        // Attach our event handler to our new file input control...
+        var sf2000SaveInput = document.getElementById("inputSAFile");
+        sf2000SaveInput.addEventListener("change", function() {
+
+          // The user has chosen a new file; it should be a binary blob we can try
+          // to interpret as a save state file. First let's clear any old messages...
+          document.getElementById("step2Messages").innerHTML = "";
+
+          // And also remove any old HTML after the current section...
+          while(document.getElementById("selectSF2000File").nextSibling) {
+            document.getElementById("selectSF2000File").nextSibling.remove();
+          }
+
+          // Now let's read in our file data as a binary stream...
+          var frSave = new FileReader();
+          saveFileName = event.target.files[0].name;
+          frSave.readAsArrayBuffer(event.target.files[0]);
+          frSave.onload = function(event) {
+
+            // Let's run the file's data through our validation function; if the
+            // function returns true, then the file was a valid SF2000 save
+            // state file, and our global variables have been updated with the
+            // save and thumbnail data... otherwise, it returns false and we let
+            // the user know the file didn't appear to be valid...
+            if (validateSave(new Uint8Array(event.target.result))) {
+              // Great, the user selected a valid SF2000 format save state file!
+              // On to Step 3!
+              setupStepThree_From();
+            }
+            else {
+              // Whoops, the file doesn't looke like it was an SF2000 save state file.
+              // Let the user know and return...
+              document.getElementById("step2Messages").innerHTML = "<p class=\"error\"><img class=\"icon\" alt=\"An icon of a red circle with a white exclamation point, indicating an error has occurred\" aria-hidden=\"true\" src=\"" + errorIcon + "\"> ERROR: The selected file does not appear to be a valid SF2000 save state file.</p>";
+              return;
+            }
+          }
+        });
+      }
+
+      // This function sets up the HTML for "Convert to SF2000 > Step 2", selecting
+      // the non-SF2000 save state file the user wants to convert to an SF2000 save
+      // state bundle...
+      function setupStepTwo_To() {
+
+        // Start our new section, add our header and our instructions...
+        var html = "<section id=\"selectStateFile\"><h2>Step 2: Save State File</h2><p>Select the save state file from your non-SF2000 emulator that you want to convert to an SF2000-compatible save state bundle.</p><div id=\"step2Messages\"></div>";
+
+        // Add our file chooser...
+        html += "<div class=\"controlContainer\"><label class=\"control\"><input id=\"inputStateFile\" type=\"file\"></label></div>";
+
+        // Close our section...
+        html += "</section>";
+
+        // Finally, add a <hr> separator after the last step, and append the new step...
+        document.getElementById("steps").insertAdjacentHTML("beforeend", "<hr>");
+        document.getElementById("steps").insertAdjacentHTML("beforeend", html);
+
+        // Attach our event handler to our new file input control...
+        var userFileInput = document.getElementById("inputStateFile");
+        userFileInput.addEventListener("change", function() {
+
+          // First let's clear any old messages...
+          document.getElementById("step2Messages").innerHTML = "";
+
+          // And also remove any old HTML after the current section...
+          while(document.getElementById("selectStateFile").nextSibling) {
+            document.getElementById("selectStateFile").nextSibling.remove();
+          }
+
+          // Now let's read in the file...
+          var frImage = new FileReader();
+          frImage.readAsDataURL(event.target.files[0]);
+          frImage.onload = function(event) {
+
+            // The file is loaded; let's check to make sure we got a binary file (can't
+            // really do much more validation than that, alas)...
+            if (!event.target.result.includes("application/octet-stream")) {
+              // Whoops! Doesn't look like the user provided a binary file, so can't be
+              // a save state!
+              document.getElementById("step2Messages").innerHTML = "<p class=\"error\"><img class=\"icon\" alt=\"An icon of a red circle with a white exclamation point, indicating an error has occurred\" aria-hidden=\"true\" src=\"" + errorIcon + "\"> ERROR: The selected file does not appear to be a binary file, and therefore can't be a save state file; please make sure you're selecting a valid emulator save state file.</p>";
+              return;
+            }
+            
+            // If we're here then it was a binary file; read the data into our global
+            // saveData buffer...
+            var base64Data = event.target.result.substring(event.target.result.indexOf(",") + 1);
+            var binaryData = atob(base64Data);
+            saveData = new Uint8Array(binaryData.length);
+            for (var i = 0; i < binaryData.length; i++) {
+              saveData[i] = binaryData.charCodeAt(i);
+            }
+
+            // On to Step 3!
+            setupStepThree_To();
+          }
+        })
+      }
+
+      // This function sets up the HTML for "Convert from SF2000 > Step 2 > Step 3"...
+      function setupStepThree_From() {
+
+        // In this section, we'll be presenting the user with the thumbnail of
+        // their save state, and a download button for downloading the save
+        // state data itself. Let's start building our HTML...
+        var html = "<section id=\"sf2000StateDownload\"><h2>Step 3: Download Save State Data</h2><p>Below you'll find the thumbnail for your chosen save state file, as well as a download button which will let you download the raw save state data for use with other emulators/devices. If you want to save the thumbnail as well, just right-click or tap-and-hold on it like any other image, and save it that way.</p>";
+
+        // Next, we'll add the image preview...
+        html += "<div class=\"controlContainer\"><div class=\"control\"><canvas id=\"thumbnailPreview\"></canvas></div></div>";
+
+        // ... and the Download button...
+        html += "<div class=\"controlContainer\"><div class=\"control\"><input id=\"saveStateDownload\" type=\"button\" value=\"Download\"></div></div>";
+
+        // ... and lastly we'll close off our section...
+        html += "</section>";
+
+        // Add a <hr> separator after the previous step, and append the new step...
+        document.getElementById("steps").insertAdjacentHTML("beforeend", "<hr>");
+        document.getElementById("steps").insertAdjacentHTML("beforeend", html);
+
+        // Now, add our interactivity by attaching our event handler to the download
+        // button...
+        var downloadButton = document.getElementById("saveStateDownload");
+        downloadButton.addEventListener("click", function() {
+
+          // Before we kick-off our download function, let's determine the file
+          // name for the download. We'll default to just adding ".state" to the
+          // end, but we'll check specifically for the SF2000 double-extension
+          // naming convention (e.g., "Game.zgb.sa0"), and in that case we'll
+          // strip off both extensions and *then* add .state (Retroarch save
+          // state naming convention)...
+          downloadName = saveFileName + ".state";
+          var match = saveFileName.match(/(.+)\.([^.]+)\.([^.]+)/);
+          if (match) {
+            downloadName = match[1] + ".state";
+          }
+          downloadSaveState();
+
+        });
+
+        // We're nearly ready to wrap up Step 3; all that's left is to set up
+        // our initial preview canvas state, and perform our initial conversion
+        // and rendering...
+        var canvas = document.getElementById("thumbnailPreview");
+        var context = canvas.getContext("2d");
+        canvas.width = thumbWidth;
+        canvas.height = thumbHeight;
+        convertImageFromSF2000();
+        renderImageToCanvas();
+      }
+
+      // This function sets up the HTML for "Convert to SF2000 > Step 2 > Step 3"...
+      function setupStepThree_To() {
+
+        // In this section, we'll be rendering the HTML for some controls - the
+        // user needs to select the ROM file their new save state is for (so we
+        // can name the save state file correctly), and choose whether their new
+        // save state should be stored in slot 1, 2, 3 or 4 (again, required for
+        // the file name). Let's start by creating our new section, and add its
+        // heading and instruction paragraph...
+        html = "<section id=\"processUserFile\"><h2>Step 3: Select Game ROM And Slot Number</h2><p>To name your new SF2000 save state properly, this tool needs to know two things - the name of the game ROM file the save state is for, and which save slot (1, 2, 3 or 4) the save state should take up. Use the controls below to select your game ROM file from your SF2000's microSD card, and to choose which save slot you want.</p><p>When you've chosen a ROM file and a slot number, the Download button will become enabled, and can be used to download your new save state file. Put it in the <code>save</code> subfolder along-side wherever your ROM file is stored on the SF2000's microSD card (e.g., if your ROM file is <code>sd:/ROMS/Apotris.gba</code>, and you chose save slot 1, you'd put the resulting save state in <code>sd:/ROMS/save/Apotris.gba.sa0</code>).</p><p>The one special case is with arcade games; the ROM you need to select is one of the ones in the <code>sd:/ARCADE/bin/</code> folder, and the resulting save state bundle goes into <code>sd:/ARCADE/save/</code>. As an example, if you wanted to transfer a save state to the SF2000 for the game \"Metal Slug\" in slot 3, you'd select <code>sd:/ARCADE/bin/mslug.zip</code> and Slot 3, and the final location to put the save state would be <code>sd:/ARCADE/save/mslug.zip.sa2</code> - I hope that makes sense! You can <a href=\"https://vonmillhausen.github.io/sf2000/arcade/DataFrog_SF2000_FBA.html\" target=\"_blank\" rel=\"noreferrer noopener\">find a list of all potential arcade zip-file names and the full name of the game they represent here</a>, if it helps - the first column (\"rom\") is the name of the zip-file without the <code>.zip</code> part, and the second column (\"fullname\") is the full name of the game/romset.</p><div id=\"step3Messages\"></div>";
+
+        // Now let's add our controls (file browser for the game ROM, and four
+        // radio button inputs for the save state slot number); we'll group them
+        // in one of our control containers for neatness...
+        html += "<div class=\"controlContainer\">";
+        // ROM file browser...
+        html += "<div class=\"control\"><label>Select game ROM: <input id=\"inputROMFile\" type=\"file\"></label></div>";
+        // Save state slot number...
+        html += "<div id=\"slotSelector\" class=\"control\"><label><input type=\"radio\" name=\"saveSlot\" value=\"0\"> Save Slot 1</label><label><input type=\"radio\" name=\"saveSlot\" value=\"1\"> Save Slot 2</label><label><input type=\"radio\" name=\"saveSlot\" value=\"2\"> Save Slot 3</label><label><input type=\"radio\" name=\"saveSlot\" value=\"3\"> Save Slot 4</label></div>";
+        html += "</div>";
+
+        // ... and our Download button...
+        html += "<div class=\"controlContainer\"><div class=\"control\"><input id=\"saveStateDownload\" type=\"button\" value=\"Download\" disabled></div></div>";
+
+        // ... and lastly we'll close off our section...
+        html += "</section>";
+
+        // Add a <hr> separator after the previous step, and append the new step...
+        document.getElementById("steps").insertAdjacentHTML("beforeend", "<hr>");
+        document.getElementById("steps").insertAdjacentHTML("beforeend", html);
+
+        // Now we'll attach event listeners for all of the interactive elements in
+        // this step. Mostly this will just be for storing the provided details;
+        // we'll also call a little helper function for each one which'll determine
+        // if the Download button should be enabled or not...
+
+        // Let's start with the ROM file select...
+        var romFileInput = document.getElementById("inputROMFile");
+        romFileInput.addEventListener("change", function() {
+
+          // First let's clear any old messages...
+          document.getElementById("step3Messages").innerHTML = "";
+
+          // We're using a cheeky global variable to store whether this event
+          // listener thinks the chosen file is "good" (i.e., a binary file);
+          // a separate function then uses this information as part of a check
+          // to determine if the Download button should be enabled or not. We
+          // default to "false", and only set to true if the newly chosen file
+          // appears to be a binary file...
+          romFileGood = false;
+
+          // Now let's read in the file; we don't really care about its contents
+          // per-se (we only need it for its file name), but we may as well confirm
+          // it's a binary file while we're here...
+          var frImage = new FileReader();
+          saveFileName = event.target.files[0].name;
+          frImage.readAsDataURL(event.target.files[0]);
+          frImage.onload = function(event) {
+
+            // Check to make sure it's binary...
+            if (!event.target.result.includes("application/octet-stream")) {
+
+              // It's not! Our romFileGood variable is already set to false, so
+              // run our Download button state-checking function to make sure
+              // the button is disabled...
+              userStateDownloadCheck();
+
+              // Display a message to the user and return...
+              document.getElementById("step3Messages").innerHTML = "<p class=\"error\"><img class=\"icon\" alt=\"An icon of a red circle with a white exclamation point, indicating an error has occurred\" aria-hidden=\"true\" src=\"" + errorIcon + "\"> ERROR: The selected file does not appear to be a binary file, and therefore can't be a game ROM file; please make sure you're selecting a valid game ROM file.</p>";
+              return;
+            }
+            else {
+
+              // The file appears to be binary, at least! Update our romFileGood
+              // global to true, and run our Download button state-checking
+              // function (button may still be disabled if a save state slot
+              // hasn't been selected)...
+              romFileGood = true;
+              userStateDownloadCheck();
+            }
+          }
+
+        })
+
+        // Next up, our radio buttons...
+        var slots = document.getElementsByName("saveSlot");
+        for (var i = 0; i < slots.length; i++) {
+          slots[i].addEventListener("change", function() {
+            // The only thing we'll do here is run our Download button
+            // state-checking function; we'll pull the actual data from the
+            // selected radio button at run time during the download process...
+            userStateDownloadCheck();
+          })
+        }
+
+        // And last but not least, our Download button...
+        var dButton = document.getElementById("saveStateDownload");
+        dButton.addEventListener("click", function() {
+
+          // We're actually going to be doing quite a bit here - we'll assemble
+          // the binary blob of the new save state bundle before handing it off
+          // to our download function. First, let's try zlib-deflating the user's
+          // save state data...
+          var compressedSaveState = compressZlib(saveData);
+          if (!(compressedSaveState instanceof Uint8Array)) {
+            // Oh! We failed to compress the save state data using the pako
+            // library for some reason... display a message to the user and
+            // return...
+            document.getElementById("step3Messages").innerHTML = "<p class=\"error\"><img class=\"icon\" alt=\"An icon of a red circle with a white exclamation point, indicating an error has occurred\" aria-hidden=\"true\" src=\"" + errorIcon + "\"> ERROR: Failed to compress the chosen save state file's data!</p>";
+            return;
+          }
+
+          // We also need to check our compressed data is of an appropriate size...
+          if (compressedSaveState.length < 0 || compressedSaveState.length > 4294967295) {
+            document.getElementById("step3Messages").innerHTML = "<p class=\"error\"><img class=\"icon\" alt=\"An icon of a red circle with a white exclamation point, indicating an error has occurred\" aria-hidden=\"true\" src=\"" + errorIcon + "\"> ERROR: Compressed save state data is not valid (either it was 0 bytes in length, or was larger than 4 GB)!</p>";
+            return false;
+          }
+
+          // Great! We have enough data now to start assembling our final binary
+          // blob; we'll just re-use our saveData global for convenience...
+          saveData = new Uint8Array(4 + compressedSaveState.length + 4 + 4 + 4 + 15979 + 4);
+
+          // We'll also use a little "offset" variable, to help keep track of
+          // where we are in the array as we go...
+          var offset = 0;
+
+          // The first four bytes are a little-endian Uint32 version of our
+          // compressed save state data's length...
+          saveData[offset + 0] = compressedSaveState.length & 0xFF;
+          saveData[offset + 1] = (compressedSaveState.length >> 8) & 0xFF;
+          saveData[offset + 2] = (compressedSaveState.length >> 16) & 0xFF;
+          saveData[offset + 3] = (compressedSaveState.length >> 24) & 0xFF;
+          offset += 4;
+
+          // The next sequence of bytes are all of our compressed save state data,
+          // so let's just copy it in...
+          for (var i = 0; i < compressedSaveState.length; i++) {
+            saveData[offset] = compressedSaveState[i];
+            offset += 1;
+          }
+
+          // For reasons, we'll need our current offset a little later on, so
+          // let's make a note of it now...
+          var thumbnailStart = offset;
+
+          // The next three sets of four bytes are little-endian Uint32 versions
+          // of our thumbnail image's width, height and compressed data length;
+          // I've got all of those numbers pre-calculated, so I'll just add them
+          // in...
+          // Width...
+          saveData[offset + 0] = 64;
+          saveData[offset + 1] = 1;
+          saveData[offset + 2] = 0;
+          saveData[offset + 3] = 0;
+          offset += 4;
+          // Height...
+          saveData[offset + 0] = 240;
+          saveData[offset + 1] = 0;
+          saveData[offset + 2] = 0;
+          saveData[offset + 3] = 0;
+          offset += 4;
+          // Length...
+          saveData[offset + 0] = 107;
+          saveData[offset + 1] = 62;
+          saveData[offset + 2] = 0;
+          saveData[offset + 3] = 0;
+          offset += 4;
+
+          // Next comes the zlib compressed thumbnail data itself; I've already
+          // got that too :)
+          thumbData = atob("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");
+          for (var i = 0; i < thumbData.length; i++) {
+            saveData[offset] = thumbData.charCodeAt(i);
+            offset += 1;
+          }
+
+          // And lastly, our final 4 bytes are a little-endian Uint32 version of
+          // the offset within the file where the thumbnail stuff starts...
+          saveData[offset + 0] = thumbnailStart & 0xFF;
+          saveData[offset + 1] = (thumbnailStart >> 8) & 0xFF;
+          saveData[offset + 2] = (thumbnailStart >> 16) & 0xFF;
+          saveData[offset + 3] = (thumbnailStart >> 24) & 0xFF;
+          offset += 4;
+
+          // Just as a final sanity check, offset should now be equal to
+          // saveData.length... let's confirm!
+          if (offset !== saveData.length) {
+            document.getElementById("step3Messages").innerHTML = "<p class=\"error\"><img class=\"icon\" alt=\"An icon of a red circle with a white exclamation point, indicating an error has occurred\" aria-hidden=\"true\" src=\"" + errorIcon + "\"> ERROR: Inconsistent data length when building save state bundle!</p>";
+            return false;
+          }
+
+          // Before we kick-off our download function, let's determine the file
+          // name for the download. The SF2000 uses a slightly odd naming
+          // convention for its save state files. If the ROM is in the "USER"
+          // folder on the microSD card, then the extension of the ROM file
+          // gets capitalised in the save state name (e.g., "Apotris.sfc" would
+          // become "Apotris.SFC.sa0")... but this *only* happens in the "USER"
+          // folder from what I can tell. There's no way for me to know what
+          // folder the user's selected ROM is stored in, so I'm not going to
+          // bother matching that same convention here (and the SF2000 doesn't
+          // seem to care about the capitalisation when it comes to loading
+          // save states)... just thought I'd mention it! So all we're going to
+          // do here is just stick the appropriate ".sa#" extension on the end
+          // of whatever's store in saveFileName...
+          downloadName = saveFileName + ".sa" + document.querySelector('input[name="saveSlot"]:checked').value;
+
+          // Right, that should be everything we need... to the Downloadmobile!
+          downloadSaveState();
+
+        });
+      }
+
+      // This function takes in a Uint8Array object, and attempts to inflate it using
+      // the pako library; returns a Uint8Array object containing the inflated data
+      // on success, or null on failure...
+      function decompressZlib(data) {
+        if (!(data instanceof Uint8Array)) {
+          return null;
+        }
+        try {
+          let decompressed = pako.inflate(data);
+          return decompressed;
+        } catch (error) {
+          return null;
+        }
+      }
+
+      // This function takes in a Uint8Array object, and attempts to deflate it
+      // using the pako library; returns a Uint8Array object containing the defalated
+      // data on success, or null on failure...
+      function compressZlib(data) {
+        if (!(data instanceof Uint8Array)) {
+          return null;
+        }
+        try {
+          let compressed = pako.deflate(data);
+          return compressed;
+        } catch (error) {
+          return null;
+        }
+      }
+
+      // This function validates that a provided Uint8Array object matches the format
+      // of an SF2000 save state file, and assigns the state data, thumbnail data and
+      // thumbnail dimensions to our global storage variables. The function returns
+      // true when successfully processing the array, or false otherwise...
+      function validateSave(data) {
+
+        // First check if data is a Uint8Array object...
+        if (!(data instanceof Uint8Array)) {
+          return false;
+        }
+
+        // Check if data has at least 20 bytes...
+        if (data.length < 20) {
+          return false;
+        }
+
+        // Read the first four bytes as a little-endian number and store it in saveLength...
+        let saveLength = data[0] + (data[1] << 8) + (data[2] << 16) + (data[3] << 24);
+
+        // Check if saveLength is positive and does not exceed the remaining bytes...
+        if (saveLength <= 0 || saveLength > data.length - 16) {
+          return false;
+        }
+
+        // Check if the next two bytes are [120, 156] (zlib header used by SF2000)...
+        if (data[4] !== 120 || data[5] !== 156) {
+          return false;
+        }
+
+        // Attempt to inflate the zlib data and store it in saveData...
+        saveData = decompressZlib(data.slice(4, 4 + saveLength));
+        if (!(saveData instanceof Uint8Array)) {
+          return false;
+        }
+
+        // Read the next four bytes as a little-endian number and store it in thumbWidth...
+        thumbWidth = data[4 + saveLength] + (data[5 + saveLength] << 8) + (data[6 + saveLength] << 16) + (data[7 + saveLength] << 24);
+
+        // Check if thumbWidth is positive...
+        if (thumbWidth <= 0) {
+          return false;
+        }
+
+        // Read the next four bytes as a little-endian number and store it in thumbHeight...
+        thumbHeight = data[8 + saveLength] + (data[9 + saveLength] << 8) + (data[10 + saveLength] << 16) + (data[11 + saveLength] << 24);
+
+        // Check if thumbHeight is positive...
+        if (thumbHeight <= 0) {
+          return false;
+        }
+
+        // Read the next four bytes as a little-endian number and store it in thumbLength...
+        let thumbLength = data[12 + saveLength] + (data[13 + saveLength] << 8) + (data[14 + saveLength] << 16) + (data[15 + saveLength] << 24);
+
+        // Check if thumbLength is positive and does not exceed the remaining bytes...
+        if (thumbLength <= 0 || thumbLength > data.length - (16 + saveLength)) {
+          return false;
+        }
+
+        // Check if the next two bytes are [120, 156] (zlib header used by SF2000)...
+        if (data[16 + saveLength] !== 120 || data[17 + saveLength] !== 156) {
+          return false;
+        }
+
+        // Store the next thumbLength bytes in thumbData, and attempt to inflate it...
+        thumbData = decompressZlib(data.slice(16 + saveLength, 16 + saveLength + thumbLength));
+        if (!(thumbData instanceof Uint8Array)) {
+          return false;
+        }
+
+        // Check to make sure there's only four remaining bytes...
+        if (data.length - (16 + saveLength + thumbLength) !== 4) {
+          return false;
+        }
+
+        // Store the last four bytes in lastFour...
+        let lastFour = data[data.length - 4] + (data[data.length -3 ] <<8 )+ (data[data.length -2 ]<<16 )+ (data[data.length -1 ]<<24 );
+
+        // Confirm the last four bytes equal the offset within the data of thumbWidth,
+        // i.e., first zlib stream length + 4...
+        if (lastFour !== saveLength + 4) {
+          return false;
+        }
+
+        // Provided data seems good, so return true...
+        return true;
+      }
+
+      // This function checks if we're both happy that the user-selected ROM file
+      // is binary, AND that a save state slot radio button has been selected; if
+      // both are true, it enables the download button, otherwise it makes sure
+      // the button is disabled...
+      function userStateDownloadCheck() {
+        if (romFileGood === true && document.querySelector('input[name="saveSlot"]:checked'))
+        {
+          // Looks good - enable Download button!
+          var dButton = document.getElementById("saveStateDownload");
+          dButton.removeAttribute("disabled");
+        }
+        else {
+          // No good - disable Download button!
+          var dButton = document.getElementById("saveStateDownload");
+          dButton.setAttribute("disabled", "");
+        }
+      }
+
+      // This function takes the SF2000-format binary image data stored in our
+      // thumbData global variable, and converts it to 8-bit RGB(A) format,
+      // storing the result in our previewCanvasData global. This is then used
+      // for drawing the image data to our preview canvas...
+      function convertImageFromSF2000() {
+
+        // We're converting RGB565-little-endian data (no alpha); size our
+        // output buffer accordingly...
+        previewCanvasData = new Uint8Array((thumbData.length / 2) * 3);
+        offset = 0;
+        for (var i = 0; i < thumbData.length; i += 2) {
+          // Read in two bytes, representing one RGB565 pixel in little-endian format
+          var byte1 = thumbData[i];
+          var byte2 = thumbData[i + 1];
+          // Extract the red, green and blue components. The first five bits of byte2
+          // are red...
+          var red = (byte2 & 0b11111000) >> 3;
+          // ... the first three bits of byte1 and the last three bits of byte2 are
+          // green...
+          var green = ((byte1 & 0b11100000) >> 5) | ((byte2 & 0b00000111) << 3);
+          // ... and the last five bits of byte1 are blue...
+          var blue = byte1 & 0b00011111;
+          // These values are in 5-bit/6-bit ranges - we need to scale them to 8-bit
+          // ranges for the colours to look right...
+          red = Math.round(red * 255 / 31);
+          green = Math.round(green * 255 / 63);
+          blue = Math.round(blue * 255 / 31);
+          // Finally store the RGB components in-order in our rgb888 buffer...
+          previewCanvasData[offset] = red;
+          previewCanvasData[offset + 1] = green;
+          previewCanvasData[offset + 2] = blue;
+          offset += 3;
+        }
+
+      }
+
+      // This function takes the current stream of SF2000 image data and renders
+      // it to our preview canvas...
+      function renderImageToCanvas() {
+
+        // Get our preview canvas...
+        var canvas = document.getElementById("thumbnailPreview");
+        var context = canvas.getContext("2d");
+
+        // Now, let's start drawing stuff to our canvas; we'll loop through
+        // every row and column...
+        for (var y = 0; y < canvas.height; y++) {
+          for (var x = 0; x < canvas.width; x++) {
+
+            // Calculate the offset of our current pixel within our input data
+            // stream...
+            var pixel = ((canvas.width * y) * 3) + (x * 3);
+
+            // Before we try and draw anything, let's make sure we actually have
+            // enough data in our stream to match this pixel location...
+            if (previewCanvasData.length >= (pixel + 2)) {
+
+              // OK, we're good - we've stream data for this pixel. Get its
+              // colour (and possibly alpha) values, and set them up for
+              // our next canvas draw call...
+              context.fillStyle = "rgb("+ previewCanvasData[pixel] +", " + previewCanvasData[pixel + 1] + ", " + previewCanvasData[pixel + 2] + ")";
+            }
+            else {
+              // Oops! We've reached the end of our data stream, but not the
+              // end of our canvas... so just set up a solid white pixel
+              // instead...
+              context.fillStyle = "rgb(255, 255, 255)";
+            }
+
+            // Draw the actual pixel to the canvas...
+            context.fillRect(x, y, 1, 1);
+          }
+        }
+      }
+
+      // This function takes our save state data (be it in raw, non-SF2000
+      // format, or in SF2000 save state bundle format) and sends it to the
+      // user's browser as a download...
+      function downloadSaveState() {
+        var link = document.createElement("a");
+        link.href = window.URL.createObjectURL(new Blob([saveData], {type: "application/octet-stream"}));
+        link.download = downloadName;
+        link.style.display = "none";
+        document.body.appendChild(link);
+        link.click();
+        window.URL.revokeObjectURL(link.href);
+        document.body.removeChild(link);
+      }
+    </script>
+    <hr>
+    <p><a rel="license" href="http://creativecommons.org/publicdomain/zero/1.0/">CC0</a>: public domain. Version 1.0, 20230605.1</p>
+  </body>
+</html>

@@ -23,12 +23,14 @@ So is the "Data Frog" any good? Only you can answer that question for yourself. 
     - [A/V Output](#av-output)
   - [Emulators](#emulators)
     - [Arcade](#arcade)
+      - [`.skp` Files](#skp-files)
     - [NES](#nes)
     - [SNES](#snes)
     - [Genesis/Mega Drive](#genesismega-drive)
     - [Game Boy](#game-boy)
     - [Game Boy Color](#game-boy-color)
     - [Game Boy Advance](#game-boy-advance)
+    - [Save States](#save-states)
   - [Firmware/BIOS (bisrv.asd)](#firmwarebios-bisrvasd)
     - [Button Mappings/Key Bindings](#button-mappingskey-bindings)
     - [Boot Logo](#boot-logo)
@@ -109,6 +111,13 @@ The device is running Final Burn Alpha v0.2.97.42 (Git commit [`621e371`](https:
 - Playable set total size: `3.10 GB` (3,336,344,502 bytes)
 - Full set total size: `11.4 GB` (12,245,306,389 bytes)
 
+#### `.skp` Files
+Another thing worth mentioning about arcade emulation on the SF2000; in the `ARCADE` folder on the microSD card is a sub-folder called `skp`. This folder contains (by default) 167 `.skp` files, each named after one of the zipped ROM sets in the `ARCADE/bin` folder (e.g., `mslug.zip.skp`). These files are actually save state bundle files, just like the ones you can save yourself using the save state feature - the only difference is that these have the `.skp` extension instead of `.sa#`, and these are loaded automatically when the game itself is loaded. Many of these files start their respective arcade game up with a credit already inserted. One speculative possibility for why these files exist is that some arcade games will start to a dip-switch screen, or some other ROM-check screen, which may be difficult to bypass with the SF2000's limited controls - a save state that automatically loads _past_ such a screen is therefore very useful to have.
+
+As the `.skp` files are just save states under a different name, if you want to mess around with them you can [use my Save State Tool](https://vonmillhausen.github.io/sf2000/tools/saveStateTool.htm) to do so - if you're creating a new `.skp` file, just pick any save state slot, and change the downloaded SF2000 save state bundle extension from `.sa#` to `.skp`.
+
+You can [learn more about save states below](#save-states).
+
 ### NES
 Emulator is FCEUmm (Git commit [`7cdfc7e`](https://github.com/libretro/libretro-fceumm/commit/7cdfc7e)). There are references in the firmware to different NES palettes, but there's no interface or configuration for the emulator itself to choose one. On the original firmware, the A and B buttons were swapped. See "[Button Mappings/Key Bindings](#button-mappingskey-bindings)" section below.
 
@@ -126,6 +135,21 @@ Emulator is TGB Dual v0.8.3 (Git commit [`9be31d3`](https://github.com/libretro/
 
 ### Game Boy Advance
 Emulator is gpSP v0.91 (Git commit [`261b2db`](https://github.com/libretro/gpsp/commit/261b2db)). Performance is fairly poor. On the original firmware, A and B buttons are mapped correctly, but the GBA shoulder buttons are mapped to X and Y for some reason. See "[Button Mappings/Key Bindings](#button-mappingskey-bindings)" section below.
+
+### Save States
+All of the above emulators support stave sates natively through an interface that is accessed by pressing SELECT + START simultaneously in-game. Four save state slots are provided per-game; the files have the extensions `.sa0`, `.sa1`, `.sa2` and `.sa3` depending on which slot they're for. The extension is appended to the name of the ROM file the save state is for; for example, if the ROM is called `Apotris.gba`, and the save state is for slot 2, then the save state file name will be `Apotris.GBA.sa1`. One weird note is that save states created for ROMs stored in the user `ROMS` folder on the device get their ROM file extension capitalised when a save state is created (as per the previous example with `Apotris`, where `.gba` became `.GBA`); this does _not_ happen with save states created in the other ROM folders. The capitalisation doesn't appear to matter - the SF2000 successfully loads save states with any extension capitalisation in any folder.
+
+The save state files themselves contain two zlib-compressed data blobs, plus associated metadata - one blob for the raw save state data created by the emulator itself, and one blob for the thumbnail used for the save state in the UI. The exact format is as follows
+
+* The first four bytes are a little-endian Uint32 storing the length of the zlib-compressed raw save state data
+* The next N bytes are the zlib-compressed raw save state data
+* The next four bytes are a little-endian Uint32 storing the width of the thumbnail image in pixels
+* The next four bytes are a little-endian Uint32 storing the height of the thumbnail image in pixels
+* The next four bytes are a little-endian Uint32 storing the length of the zlib-compressed thumbnail data
+* The next N bytes are the zlib-compressed thumbnail data (deflates to a raw RGB565 image, much like many of the other images used by the SF2000 UI)
+* The last four bytes are a little-endian Uint32 storing the offset within the file of where the thumbnail metadata starts (i.e., the offset of the first byte of width data)
+
+If you want to mess around with SF2000 save states, you can [do so using my SF2000 Save State Tool, which you can find here](https://vonmillhausen.github.io/sf2000/tools/saveStateTool.htm).
 
 ---
 
@@ -443,6 +467,8 @@ All of these are linked above already in their relevant sections, but just in ca
 ---
 
 ## Version History
+- `20230605 - 1.16`: Added my new [Save State Tool](https://vonmillhausen.github.io/sf2000/tools/saveStateTool.htm). Added documentation to the Emulators section about the save state files and their format. Also added a note specifically to the Arcade section about the `.skp` files (which are secretly just save state files with a different extension).
+
 - `20230530 - 1.15`: Added link to the community ROM compatibility list. Added some personal notes for theme creators.
 
 - `20230529 - 1.14`: Updated the main menu BGM sample rate details with the latest findings from `osaka#9664`. Clarified which menu text colour resets after exiting a game. Added a note about charging safety (thanks for your sacrifices, `Zerter#4954`! 🫡)

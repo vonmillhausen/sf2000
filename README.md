@@ -462,6 +462,7 @@ All of these are linked above already in their relevant sections, but just in ca
 - [Data Frog's firmware update tutorial](https://www.youtube.com/watch?v=j8dT2fdGfck)
 - [FROGTOOL](https://github.com/tzlion/frogtool) (for updating the built-in game lists)
 - [Generic Image Tool](https://vonmillhausen.github.io/sf2000/tools/genericImageTool.htm)
+- [Save State Tool](https://vonmillhausen.github.io/sf2000/tools/saveStateTool.htm)
 - [Silent background music file](/sounds/silentMusic/pagefile.sys) (replace the file in the `Resources` folder on the microSD card)
 
 ---

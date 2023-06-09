@@ -31,6 +31,7 @@ So is the "Data Frog" any good? Only you can answer that question for yourself. 
     - [Game Boy Color](#game-boy-color)
     - [Game Boy Advance](#game-boy-advance)
     - [Save States](#save-states)
+    - [Default ROMs](#default-roms)
   - [Firmware/BIOS (bisrv.asd)](#firmwarebios-bisrvasd)
     - [Button Mappings/Key Bindings](#button-mappingskey-bindings)
     - [Boot Logo](#boot-logo)
@@ -151,6 +152,11 @@ The save state files themselves contain two zlib-compressed data blobs, plus ass
 * The last four bytes are a little-endian Uint32 storing the offset within the file of where the thumbnail metadata starts (i.e., the offset of the first byte of width data)
 
 If you want to mess around with SF2000 save states, you can [do so using my SF2000 Save State Tool, which you can find here](https://vonmillhausen.github.io/sf2000/tools/saveStateTool.htm).
+
+### Default ROMs
+The default full firmware for the SF2000 comes with over 6000 ROMs across the seven supported systems. The manual suggests these are for "demonstration purposes" only, and should be deleted by the owner (with any failure to do so not being their responsibility) - despite the fact that the SF2000's menus are hard-coded for this specific list of ROMs. The ROM files themselves are a custom bundle format; the first `59,904 bytes` are an RGB565 image shown as a thumbnail beside the game when selected in a game-list, and the remainder of the file is a slightly mangled/obfuscated ZIP file containing the game's single ROM file. The only exception to this format are the arcade ROMs, which consist of a plain-old Final Burn Alpha ROM zip file, coupled with a `.zfb` file containing the thumbnail image and a pointer to the ROM zip file name.
+
+I was curious to see how the included ROMs matched up against the current "[No-Intro](https://no-intro.org/)" catalogue for each of the non-arcade systems, so I wrote a small script to extract the ROMs from the SF2000's bundles (`05.22` firmware), and compare the hashes against the current (June 9th, 2023) set of No-Intro DAT files. You can [find a big HTML file with all of the results here](/defaultRoms/defaultRomsNoIntroCheck.htm), and [a raw CSV file of the same data here](/defaultRoms/defaultRomsNoIntroCheck.csv). You can click most of the column headers in the HTML version to sort the table by that column.
 
 ---
 
@@ -491,6 +497,8 @@ All of these are linked above already in their relevant sections, but just in ca
 ---
 
 ## Version History
+- `20230609 - 1.17`: Added a section about the default ROMs that come with the SF2000, including a HTML file and a CSV file that have the SHA256/SHA1/MD5/CRC32 hashes for all non-arcade ROMs, and details about which ROMs match the current No-Intro database.
+
 - `20230605 - 1.16`: Added my new [Save State Tool](https://vonmillhausen.github.io/sf2000/tools/saveStateTool.htm). Added documentation to the Emulators section about the save state files and their format. Also added a note specifically to the Arcade section about the `.skp` files (which are secretly just save state files with a different extension). Added a "Favourites and History" section detailing the format of the `Favorites.bin` and `History.bin` files.
 
 - `20230530 - 1.15`: Added link to the community ROM compatibility list. Added some personal notes for theme creators.

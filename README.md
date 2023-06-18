@@ -16,6 +16,7 @@ So is the "Data Frog" any good? Only you can answer that question for yourself. 
     - [Is this thing any good?](#is-this-thing-any-good)
     - [Is there any custom firmware?](#is-there-any-custom-firmware)
     - [I just got my SF2000; what modding can I do with it?](#i-just-got-my-sf2000-what-modding-can-i-do-with-it)
+    - [How do I change the four shortcuts/games listed on each system's main menu page?](#how-do-i-change-the-four-shortcutsgames-listed-on-each-systems-main-menu-page)
     - [Help! I was doing stuff in the `bios` folder or trying to install a new firmware, and now my SF2000 won't turn on, or is stuck at a black screen!](#help-i-was-doing-stuff-in-the-bios-folder-or-trying-to-install-a-new-firmware-and-now-my-sf2000-wont-turn-on-or-is-stuck-at-a-black-screen)
   - [Hardware](#hardware)
     - [CPU](#cpu)
@@ -79,6 +80,9 @@ In no particular order, some of the current customisation options available are:
 * You can replace the default menu theme with a custom one
 
 There's no centralised repository for boot logos or custom themes, but you can find many of them linked in the ["The Frog's Best Bits 🐸" thread](https://discord.com/channels/741895796315914271/1110397766074638397) in the [Retro Handhelds Discord server](https://discord.gg/retrohandhelds).
+
+### How do I change the four shortcuts/games listed on each system's main menu page?
+Answer: with a fair bit of work! The _images_ for the shortcuts are baked into each system's main menu background image - check out the ["Images (Used)"](#images-used) section below, and use your browser's search feature to search for `main menu background`, and you'll see what I mean. The _text_ under each shortcut is stored in a separate image - in the May 22nd firmware, the files are `gkavc.ers` if the device's language is set to Chinese, or `gakne.ctp` for all other languages (again, check the details in the ["Images (Used)"](#images-used) section below). Finally, the actual roms that are launched for each shortcut are stored in the `xfgle.hgp` file, which is plain text - you can learn more about it in the ["ROM Lists"](#rom-lists) section below.
 
 ### Help! I was doing stuff in the `bios` folder or trying to install a new firmware, and now my SF2000 won't turn on, or is stuck at a black screen!
 You've probably run into the bootloader bug - you can [find the two fixes to it below](#bootloader-bug). Alternatively, [follow Data Frog's instructions](https://www.youtube.com/watch?v=j8dT2fdGfck) to wipe your microSD card and flash a clean firmware image.
@@ -479,7 +483,7 @@ Credit for this section goes to `taizou`, author of [FROGTOOL](https://github.co
 | `mfpmp.bvs` (Arcade), `mgdel.bvs` (Game Boy Color), `nethn.bvs` (NES), `qdvd6.bvs` (Game Boy), `sppnp.bvs` (Game Boy Advance), `wmiui.bvs` (Genesis/Mega Drive), `xvb6c.bvs` (SNES) | Pinyin translations of the English ROM names, used for Chinese language searching. Not all game names are translated |
 | `adsnt.nec` (SNES), `fhcfg.nec` (NES), `htuiw.nec` (Game Boy Advance), `msdtc.nec` (Arcade), `setxa.nec` (Genesis/Mega Drive), `umboa.nec` (Game Boy), `wjere.nec` (Game Boy Color) | Chinese translations of the English ROM names, used to display the game-lists when the UI language is set to Chinese. Not all game names are translated |
 | `mswb7.tax` (Arcade), `pnpui.tax` (Game Boy Color), `rdbui.tax` (NES), `scksp.tax` (Genesis/Mega Drive), `urefs.tax` (SNES), `vdsdc.tax` (Game Boy), `vfnet.tax` (Game Boy Advance) | English ROM Names, used to display the game-lists when the UI language is set to English |
-| `xfgle.hgp`, `xfgle.hgp.bak` | The `xfgle.hgp` file contains the ROM "shortcuts" on the main menu for each game system. The `xfgle.hgp.bak` file appears to be a test version of this file that was not removed from the firmware before being sent to production |
+| `xfgle.hgp`, `xfgle.hgp.bak` | The `xfgle.hgp` file is a plain-text file containing the ROM "shortcuts" on the main menu for each game system. The `xfgle.hgp.bak` file appears to be a test version of this file that was not removed from the firmware before being sent to production |
 | `TSMFK.TAX` | This is a ROM list file similar to the other `.tax` files, except it is built at run-time from the ROM files in the user roms folder. The file is regenerated each time the device boots |
 
 ### Sounds
@@ -556,6 +560,8 @@ All of these are linked above already in their relevant sections, but just in ca
 ---
 
 ## Version History
+- `20230618 - 1.19`: Added a question to the FAQ regarding how to change the main menu shortcuts.
+
 - `20230617 - 1.18`: Added an FAQ. Added a section about the bootloader bug, along with steps for installing `bnister`'s patch. Added a link to `ignatzdraconis`'s Gitlab Repo. Some folks have updated their Discord handles to Discord's new naming convention, and those handles have been updated throughout.
 
 - `20230609 - 1.17`: Added a section about the default ROMs that come with the SF2000, including a HTML file and a CSV file that have the SHA256/SHA1/MD5/CRC32 hashes for all non-arcade ROMs, and details about which ROMs match the current No-Intro database.

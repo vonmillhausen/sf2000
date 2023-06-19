@@ -333,7 +333,7 @@ As far as I am aware, all of the below images are actively used by the `20230515
 | `pwsso.occ` | 640x480 | RGB565 Little Endian | ✨ | ✅ | ✅ | ✅ | In-game menu (position 4) | [view](/images/pwsso.png) |
 | `qasf.bel` | 640x480 | RGB565 Little Endian | ✨ | ✅ | 🚩 | ✅ | User game-list background | [view](/images/qasf.bel.png) |
 | `qwave.bke` | 640x480 | RGB565 Little Endian | ✨ | ✅ | ✅ | ✅ | Game Boy Color main menu background | [view](/images/qwave.png) |
-| `rmapi.tax` | 1008x164 | BRGA |  | ✨ | 🚩 | ✅ | User settings screen icons and labels in German | [view](/images/rmapi.png) |
+| `rmapi.tax` | 1008x164 | BRGA |  | ✨ | 🚩 | ✅ | User settings screen icons and labels in German | [view](/images/rmapi.tax.png) |
 | `sdclt.occ` | 120x240 | RGB565 Little Endian | ✨ | 🚩 | 🚩 | ✅ | TV system selection icons | [view](/images/sdclt.occ.png) |
 | `sensc.bvs` | 1008x164 | BRGA |  | ✨ | 🚩 | ✅ | User settings screen icons and labels in French | [view](/images/sensc.bvs.png) |
 | `sfcdr.cpl` | 576x1344 | BRGA | ✨ | 🚩 | ✅ | ✅ | Main menu system logos | [view](/images/sfcdr.png) |

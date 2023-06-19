@@ -72,7 +72,7 @@ In no particular order, some of the current customisation options available are:
 * You can [fix an annoying bug in the device's bootloader](#bootloader-bug)
 * You can [upgrade the firmware to the latest version](https://www.youtube.com/watch?v=j8dT2fdGfck)
 * You can swap out the [buttons](#buttons) and [d-pad](#d-pad) (and their membranes) for ones from original SNES controllers (not SNES Classic), which gives a more retro "mushy" feel (if your replacement buttons have 3 "pins", you may need to file or clip one of the pins off)
-* You can swap the [battery](#battery) for a higher-capacity `3500 mAh` 18630, which will give you longer playtime (at the cost of longer charging time). If you do decide to replace the battery, make sure you use one with a built-in protection circuit, as the SF2000 has no under-charge protection.
+* You can swap the [battery](#battery) for a higher-capacity `3500 mAh` 18650, which will give you longer playtime (at the cost of longer charging time). If you do decide to replace the battery, make sure you use one with a built-in protection circuit, as the SF2000 has no under-charge protection.
 * You can [replace the boot logo](https://vonmillhausen.github.io/sf2000/tools/bootLogoChanger.htm) with a custom one
 * You can [replace the main menu music, or remove it entirely](#sounds)
 * You can [change the default button mappings](https://vonmillhausen.github.io/sf2000/tools/buttonMappingChanger.htm) for each emulator (newer firmwares have this feature built-in, but the built-in implementation is buggy)

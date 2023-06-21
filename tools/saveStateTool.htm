@@ -248,6 +248,10 @@
               saveData[i] = binaryData.charCodeAt(i);
             }
 
+            // Let's check the provided data for Retroarch's save-state headers, and
+            // strip them out if we find them...
+            saveData = stripRetroarchHeaders(saveData);
+
             // On to Step 3!
             setupStepThree_To();
           }
@@ -636,6 +640,87 @@
         return true;
       }
 
+
+      // This function runs through our binary save state data, and checks it for any
+      // of Retroarch's save state headers. If it finds them, it strips them out...
+      // See https://github.com/libretro/RetroArch/blob/master/tasks/task_save.c
+      function stripRetroarchHeaders(input) {
+
+        // Define an array of the possible Retroarch headers that we're looking for...
+        let headers = ["RASTATE" + String.fromCharCode([1]), "MEM ", "RPLY", "ACHV", "END "];
+
+        // Define a helper function that checks if a header starts at the provided
+        // index in the data stream...
+        function isHeader(array, i) {
+
+          // Starting at an index of i, convert the next 8 bytes to a string...
+          let str = String.fromCharCode(...array.slice(i, i + 8));
+
+          // Check if the string includes any of our defined headers...
+          for (let i = 0; i < headers.length; i++) {
+            if (str.includes(headers[i])) {
+
+              // It does! A header has been found, return true...
+              return true;
+            }
+          }
+
+          // If we're here, we didn't find a matching header, so return false...
+          return false;
+        }
+
+        // Create an intermediate storage array with the same length as input; we
+        // don't know how long our output length will be yet, but it won't be any
+        // longer than input, and this array will hold our modified data while we
+        // work...
+        let intermediate = new Uint8Array(input.length);
+
+        // Now, it's on to the meat of this function. We're going to loop through
+        // all of our current save state data, byte by byte, and check to see if
+        // we find a Retroarch save state header starting at the current byte. If
+        // we don't, we just copy the current byte to our intermediate storage
+        // array. If we *do* find a Retroarch header, we skip forward 8 bytes (all
+        // the Retroarch save state header blocks are 8 bytes long)...
+        let index = 0;
+        let intermediateIndex = 0;
+        while (index < input.length && !isNaN(input[index])) {
+
+          // Check if we have a header starting at the current index in our data...
+          if (isHeader(input, index)) {
+            
+            // We do! Don't write any data, and just skip forward 8 bytes...
+            index += 8;
+          }
+          else {
+
+            // No header here, so write the current byte to our intermediate
+            // storage array...
+            intermediate[intermediateIndex] = input[index];
+
+            // ... and increment our indexes...
+            index++;
+            intermediateIndex++;
+          }
+        }
+
+        // If we're here, intermediate should contain our final output data.
+        // If the output data length is the same as the input data lenth, then
+        // we didn't change anything and can just return the input. Otherwise,
+        // we stripped *something* from the input data... so we'll copy our
+        // new, shorter intermediate data to a correctly sized Uint8Array
+        // object, and return that instead...
+        if (intermediateIndex == input.length) {
+          return input;
+        }
+        else {
+          let output = new Uint8Array(intermediateIndex);
+          for (let i = 0; i < intermediateIndex; i++) {
+            output[i] = intermediate[i];
+          }
+          return output;
+        }
+      }
+
       // This function checks if we're both happy that the user-selected ROM file
       // is binary, AND that a save state slot radio button has been selected; if
       // both are true, it enables the download button, otherwise it makes sure
@@ -744,6 +829,6 @@
       }
     </script>
     <hr>
-    <p><a rel="license" href="http://creativecommons.org/publicdomain/zero/1.0/">CC0</a>: public domain. Version 1.0, 20230605.1</p>
+    <p><a rel="license" href="http://creativecommons.org/publicdomain/zero/1.0/">CC0</a>: public domain. Version 1.1, 20230621.1</p>
   </body>
 </html>

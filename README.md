@@ -64,7 +64,7 @@ So is the "Data Frog" any good? Only you can answer that question for yourself. 
 [Read my introductory section above :)](#sf2000)
 
 ### Is there any custom firmware?
-As of June 17th 2023, **no**, not yet. However efforts are underway; an SDK for the CPU has been identified, which may allow for the development of a custom in the future. [A GitLab repo](https://git.maschath.de/ignatz/hcrtos) has been set up by `ignatzdraconis` for the work, and you can [follow along with discussion in the `Retro Handhelds` Discord](https://discord.com/channels/741895796315914271/1092831839955193987).
+As of June 21st 2023, **no**, not yet. However efforts are underway; an SDK for the CPU has been identified, which may allow for the development of a custom in the future (currently, custom code execution and audio playback is confirmed). [A GitLab repo](https://git.maschath.de/ignatz/hcrtos) has been set up by `ignatzdraconis` for the work, and you can [follow along with discussion in the `Retro Handhelds` Discord](https://discord.com/channels/741895796315914271/1092831839955193987).
 
 ### I just got my SF2000; what modding can I do with it?
 In no particular order, some of the current customisation options available are:

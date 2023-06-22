@@ -176,6 +176,11 @@ Emulator is TGB Dual v0.8.3 (Git commit [`9be31d3`](https://github.com/libretro/
 ### Game Boy Advance
 Emulator is gpSP v0.91 (Git commit [`261b2db`](https://github.com/libretro/gpsp/commit/261b2db)). Performance is fairly poor. On the original firmware, A and B buttons are mapped correctly, but the GBA shoulder buttons are mapped to X and Y for some reason. See "[Button Mappings/Key Bindings](#button-mappingskey-bindings)" section below.
 
+While the SF2000 does include a copy of the real GBA BIOS file in the `bios` folder, there's a bug in the `05.22` firmware (and possibly earlier firmwares) that prevents that BIOS from ever actually being loaded. As such, gpSP _always_ falls back to the built-in "NORMMATT" BIOS instead (a reverse-engineered BIOS that is not identical to Nintendo's one). This has been noted to have some compatibility issues - for example, the main menu on "The Legend of Zelda - The Minish Cap" is broken on a stock SF2000 using the `05.22` firmware due to the NORMATT BIOS. You can correct for this bug by copying the `gba_bios.bin` file from the `bios` folder to the two following locations (create any folders as needed):
+
+- `GBA/mnt/sda1/bios/gba_bios.bin` (this fixes it for the main GBA game list)
+- `ROMS/mnt/sda1/bios/gba_bios.bin` (this fixes it for GBA games added to the user `ROMS` folder)
+
 ### Save States
 All of the above emulators support stave sates natively through an interface that is accessed by pressing SELECT + START simultaneously in-game. Four save state slots are provided per-game; the files have the extensions `.sa0`, `.sa1`, `.sa2` and `.sa3` depending on which slot they're for. The extension is appended to the name of the ROM file the save state is for; for example, if the ROM is called `Apotris.gba`, and the save state is for slot 2, then the save state file name will be `Apotris.GBA.sa1`. One weird note is that save states created for ROMs stored in the user `ROMS` folder on the device get their ROM file extension capitalised when a save state is created (as per the previous example with `Apotris`, where `.gba` became `.GBA`); this does _not_ happen with save states created in the other ROM folders. The capitalisation doesn't appear to matter - the SF2000 successfully loads save states with any extension capitalisation in any folder.
 
@@ -560,6 +565,8 @@ All of these are linked above already in their relevant sections, but just in ca
 ---
 
 ## Version History
+- `20230622 - 1.20`: Added a note to the Game Boy Advance section about the newly discovered `gba_bios.bin` loading bug, and how to work around it (thanks `bnister`!)
+
 - `20230618 - 1.19`: Added a question to the FAQ regarding how to change the main menu shortcuts.
 
 - `20230617 - 1.18`: Added an FAQ. Added a section about the bootloader bug, along with steps for installing `bnister`'s patch. Added a link to `ignatzdraconis`'s Gitlab Repo. Some folks have updated their Discord handles to Discord's new naming convention, and those handles have been updated throughout.

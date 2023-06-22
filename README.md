@@ -82,7 +82,7 @@ In no particular order, some of the current customisation options available are:
 There's no centralised repository for boot logos or custom themes, but you can find many of them linked in the ["The Frog's Best Bits 🐸" thread](https://discord.com/channels/741895796315914271/1110397766074638397) in the [Retro Handhelds Discord server](https://discord.gg/retrohandhelds).
 
 ### How do I change the four shortcuts/games listed on each system's main menu page?
-Answer: with a fair bit of work! The _images_ for the shortcuts are baked into each system's main menu background image - check out the ["Images (Used)"](#images-used) section below, and use your browser's search feature to search for `main menu background`, and you'll see what I mean. The _text_ under each shortcut is stored in a separate image - in the May 22nd firmware, the files are `gkavc.ers` if the device's language is set to Chinese, or `gakne.ctp` for all other languages (again, check the details in the ["Images (Used)"](#images-used) section below). Finally, the actual roms that are launched for each shortcut are stored in the `xfgle.hgp` file, which is plain text - you can learn more about it in the ["ROM Lists"](#rom-lists) section below.
+Answer: with a fair bit of work! The _images_ for the shortcuts are baked into each system's main menu background image - check out the ["Images (Used)"](#images-used) section below, and use your browser's search feature to search for `main menu background`, and you'll see what I mean. The _text_ under each shortcut is stored in a separate image - in the `05.22` firmware, the files are `gkavc.ers` if the device's language is set to Chinese, or `gakne.ctp` for all other languages (again, check the details in the ["Images (Used)"](#images-used) section below). Finally, the actual roms that are launched for each shortcut are stored in the `xfgle.hgp` file, which is plain text - you can learn more about it in the ["ROM Lists"](#rom-lists) section below.
 
 ### Help! I was doing stuff in the `bios` folder or trying to install a new firmware, and now my SF2000 won't turn on, or is stuck at a black screen!
 You've probably run into the bootloader bug - you can [find the two fixes to it below](#bootloader-bug). Alternatively, [follow Data Frog's instructions](https://www.youtube.com/watch?v=j8dT2fdGfck) to wipe your microSD card and flash a clean firmware image.
@@ -423,7 +423,7 @@ These are other files that have been identified, which don't fit into the other 
 | `xjebd.clq` |  | ✨ | 🚩 | ✅ | UI strings in Hebrew |
 
 #### Foldername.ini
-This file controls some of the UI settings for the main menu. It's a plain-text file, but not an actual INI file. It's contents from the May 22nd firmware (just as an example) are as follows:
+This file controls some of the UI settings for the main menu. It's a plain-text file, but not an actual INI file. It's contents from the `05.22` firmware (just as an example) are as follows:
 
 ```
 SF2000
@@ -581,7 +581,7 @@ All of these are linked above already in their relevant sections, but just in ca
 
 - `20230526 - 1.13`: Updated Audacity instructions to support latest version of Audacity. Added a BIOS CRC32 patcher tool for the reckless and brave. Added a note about `Foldername.ini` text colours reverting after loading a game (thanks `Zerter#4954`!)
 
-- `20230525 - 1.12`: Added a section about the internals of the `Foldername.ini` file. Added a note to the Arcade section about the "inrom" column in `adcockm`'s metadata document. Added a small firmware note for the May 22nd about community-spotted GBA performance improvements. Added specific emulator versions and Git commit links for each emulator (thanks `bnister` and `notv37`!). Added specific steps for producting SF2000-format audio files using Audacity.
+- `20230525 - 1.12`: Added a section about the internals of the `Foldername.ini` file. Added a note to the Arcade section about the "inrom" column in `adcockm`'s metadata document. Added a small firmware note for the `05.22` about community-spotted GBA performance improvements. Added specific emulator versions and Git commit links for each emulator (thanks `bnister` and `notv37`!). Added specific steps for producting SF2000-format audio files using Audacity.
 
 - `20230524 - 1.11`: Added my new [Generic Image Tool](https://vonmillhausen.github.io/sf2000/tools/genericImageTool.htm). Added more exceptional information from `adcockm` in regards to arcade emulation on the SF2000, and cleaned up the old info accordingly. Corrected some typos related to `bisrv.asd` (thanks `luke7352`!). Usage of `nvinf.hsp` was tracked down to the numbers of games available on the main menu pages (thanks `kid_sinn#9691`!).
 

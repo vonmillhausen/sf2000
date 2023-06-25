@@ -18,6 +18,7 @@ So is the "Data Frog" any good? Only you can answer that question for yourself. 
     - [I just got my SF2000; what modding can I do with it?](#i-just-got-my-sf2000-what-modding-can-i-do-with-it)
     - [How do I change the four shortcuts/games listed on each system's main menu page?](#how-do-i-change-the-four-shortcutsgames-listed-on-each-systems-main-menu-page)
     - [Help! I was doing stuff in the `bios` folder or trying to install a new firmware, and now my SF2000 won't turn on, or is stuck at a black screen!](#help-i-was-doing-stuff-in-the-bios-folder-or-trying-to-install-a-new-firmware-and-now-my-sf2000-wont-turn-on-or-is-stuck-at-a-black-screen)
+    - [When I connect the SF2000 to a TV via the A/V cable, the sound is very quiet/low - is that normal?](#when-i-connect-the-sf2000-to-a-tv-via-the-av-cable-the-sound-is-very-quietlow---is-that-normal)
   - [Hardware](#hardware)
     - [CPU](#cpu)
     - [Display](#display)
@@ -86,6 +87,13 @@ Answer: with a fair bit of work! The _images_ for the shortcuts are baked into e
 
 ### Help! I was doing stuff in the `bios` folder or trying to install a new firmware, and now my SF2000 won't turn on, or is stuck at a black screen!
 You've probably run into the bootloader bug - you can [find the two fixes to it below](#bootloader-bug). Alternatively, [follow Data Frog's instructions](https://www.youtube.com/watch?v=j8dT2fdGfck) to wipe your microSD card and flash a clean firmware image.
+
+### When I connect the SF2000 to a TV via the A/V cable, the sound is very quiet/low - is that normal?
+It's "normal" for newer versions of the firmware, anyway! Older firmware versions had no issues with audio volume via A/V, but at least the `05.22` version does. `Zerter#4954` from Discord found a workaround:
+
+> when I did this the AV audio work normally: I had to load the game first then plug-in the 2.5mm to rca jack. [...] but when I quit then exit then tried the game again it returns to very low audio. [...] will need to do the work around again
+
+So you can try launching the game first, and _then_ plug in the A/V cable to get full volume on the TV.
 
 ---
 

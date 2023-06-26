@@ -572,9 +572,9 @@ All of these are linked above already in their relevant sections, but just in ca
 - [Generic Image Tool](https://vonmillhausen.github.io/sf2000/tools/genericImageTool.htm)
 - [`ignatzdraconis`'s Gitlab Repo](https://git.maschath.de/ignatz/hcrtos)
 - [Save State Tool](https://vonmillhausen.github.io/sf2000/tools/saveStateTool.htm)
+- [SF2000 Theme Compilation Page](https://zerter555.github.io/sf2000-collection/)
 - [Silent background music file](/sounds/silentMusic/pagefile.sys) (replace the file in the `Resources` folder on the microSD card)
 - [Tadpole](https://github.com/EricGoldsteinNz/tadpole) (a GUI and additional features for FROGTOOL)
-- [Zerter's SF2000 Theme Collection](https://zerter555.github.io/sf2000-collection/)
 
 ---
 

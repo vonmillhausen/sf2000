@@ -16,17 +16,19 @@
       <section id="fileSection">
         <h2>Step 1: Select <code>bisrv.asd</code> or a game ROM</h2>
         <p>Select the <code>bisrv.asd</code> (for global device mappings) or game ROM file (for per-game mappings) whose button mappings you want to modify. You can find the <code>bisrv.asd</code> file in the <code>bios</code> folder on your device's microSD card.</p>
-        <form id="fileForm" action="#">
-          <label>Open file: <input id="fileSelector" type="file" onchange="fileLoad(event.target.files[0])"></label>
-        </form>
-        <div id="fileOutput"></div>
+        <div id="fileMessages"></div>
+        <div class="controlContainer">
+          <label class="control">Open file: <input id="fileSelector" type="file" onchange="fileLoad(event.target.files[0])"></label>
+        </div>
       </section>
     </div>
+    <script src="tools.js"></script>
     <script>
 
       // Global variables...
       var mappingTableOffset;   // Will contain the offset of the button mappings within the data file
       var mappingConsoles;      // Will contain a list of the specific game consoles we'll be setting up mappings for
+      var firmwareVersion;      // Will contain the firmware version if the user selects a bisrv.asd file
       var mappingData;          // Used to store the binary data that will eventually be written to the downloadable file
       var fileName;             // Will hold the name of the selected file, used for naming ROM .kmp files
 
@@ -47,108 +49,6 @@
           return { 'A': 8, 'B': 0, 'L': 10, 'R': 11, 'X': 9, 'Y': 1 };
       }
 
-      // Define a function that takes a Uint8Array and an optional offset and returns the index
-      // of the first match or -1 if not found...
-      function findSequence(needle, haystack, offset) {
-
-        // If offset is not provided, default to 0
-        offset = offset || 0;
-
-        // Loop through the data array starting from the offset
-        for (var i = offset; i < haystack.length - needle.length + 1; i++) {
-
-          // Assume a match until proven otherwise
-          var match = true;
-
-          // Loop through the target sequence and compare each byte
-          for (var j = 0; j < needle.length; j++) {
-
-            if (haystack[i + j] !== needle[j]) {
-              // Mismatch found, break the inner loop and continue the outer loop
-              match = false;
-              break;
-            }
-
-          }
-
-          // If match is still true after the inner loop, we have found a match
-          if (match) {
-
-            // Return the index of the first byte of the match
-            return i;
-
-          }
-        }
-
-        // If we reach this point, no match was found
-        return -1;
-        }
-
-      // Returns an SHA-256 hash of a given firmware (ignoring common user changes), or returns
-      // false on failure...
-      function getFirmwareHash(data) {
-
-        // Data should be a Uint8Array, which as an object is passed by reference... we're going
-        // to be manipulating that data before generating our hash, but we don't want to modify
-        // the original object at all... so we'll create a copy, and work only on the copy...
-        var dataCopy = data.slice();
-
-        // Only really worthwhile doing this for big bisrv.asd files...
-        if (dataCopy.length > 12640000) {
-          // First, replace CRC32 bits with 00...
-          dataCopy[396] = 0x00;
-          dataCopy[397] = 0x00;
-          dataCopy[398] = 0x00;
-          dataCopy[399] = 0x00;
-
-          // Next identify the boot logo position, and blank it out too...
-          var badExceptionOffset = findSequence([0x62, 0x61, 0x64, 0x5F, 0x65, 0x78, 0x63, 0x65, 0x70, 0x74, 0x69, 0x6F, 0x6E, 0x00, 0x00, 0x00], dataCopy);
-          if (badExceptionOffset > -1) {
-            var bootLogoStart = badExceptionOffset + 16;
-            for (var i = bootLogoStart; i < (bootLogoStart + 204800); i++) {
-              dataCopy[i] = 0x00;
-            }
-          }
-          else {
-            return false;
-          }
-
-          // Next identify the emulator button mappings (if they exist), and blank them out too...
-          var preButtonMapOffset = findSequence([0x00, 0x00, 0x00, 0x71, 0xDB, 0x8E, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00], dataCopy);
-          if (preButtonMapOffset > -1) {
-            var postButtonMapOffset = findSequence([0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x02, 0x00, 0x00, 0x00, 0x02, 0x00, 0x00, 0x00], dataCopy, preButtonMapOffset);
-            if (postButtonMapOffset > -1) {
-              for (var i = preButtonMapOffset + 16; i < postButtonMapOffset; i++) {
-                dataCopy[i] = 0x00;
-              }
-            }
-            else {
-              return false;
-            }
-          }
-          else {
-            return false;
-          }
-
-          // If we're here, we've zeroed-out all of the bits of the firmware that are
-          // semi-user modifiable (boot logo, button mappings and the CRC32 bits); now
-          // we can generate a hash of what's left and compare it against some known
-          // values...
-          return crypto.subtle.digest("SHA-256", dataCopy.buffer)
-          .then(function(digest) {
-            var array = Array.from(new Uint8Array(digest));
-            var hash = array.map(byte => ("00" + byte.toString(16)).slice(-2)).join("");
-            return hash;
-          })
-          .catch(function(error) {
-            return false;
-          });
-        }
-        else {
-          return false;
-        }
-      }
-
       // This function is called whenever a file is selected in Step 1...
       function fileLoad(file) {
 
@@ -156,20 +56,18 @@
         // an array buffer...
         var fr = new FileReader();
         fr.readAsArrayBuffer(file);
-
-        // Triggered when the FileReader reads the file's contents...
         fr.onload = function(event) {
-
-          // First, reset our global variables...
-          mappingTableOffset = undefined;
-          mappingConsoles = undefined;
-          mappingData = undefined;
-          fileName = undefined;
 
           // Clear out any HTML that might already exist after Step 1...
           while(document.getElementById("fileSection").nextSibling) {
             document.getElementById("fileSection").nextSibling.remove();
           }
+
+          // Clear any old messages...
+          document.getElementById("fileMessages").innerHTML = "";
+
+          // We'll also reset the firmwareVersion global variable...
+          firmwareVersion = null;
 
           // Read the provided file's data from the buffer array into an unsigned 8-bit int array...
           var data = new Uint8Array(event.target.result);
@@ -180,49 +78,52 @@
           // The result could be either a Promise if it had a bisrv.asd-like structure and we got
           // a hash, or false otherwise... let's check!
           if (hashResult instanceof Promise) {
+
             // We got a Promise! Wait for it to finish so we get our bisrv.asd hash...
             hashResult.then(function(dataHash) {
+
               // If we have a newer bisrv.asd that stores button mappings in an external KeyMapInfo.kmp,
               // we'll need a Step 1b to load that file as well...
               var step1BRequired = false;
 
               // Check the hash against all the known good ones...
-              switch (dataHash) {
+              firmwareVersion = knownHash(dataHash);
+              switch (firmwareVersion) {
                 // Mid-March BIOS...
-                case "4411143d3030adc442e99f7ac4e7772f300c844bbe10d639702fb3ba049a4ee1":
+                case "03.15":
                   mappingTableOffset = 0x8DBC0C;
                   mappingConsoles = ["Arcade", "Game Boy Advance", "SNES", "Genesis/Mega Drive, Master System", "NES, Game Boy, Game Boy Color"];
-                  document.getElementById("fileOutput").innerHTML = "<p class=\"infoMessage\">INFO: Mid-March <code>bisrv.asd</code> detected</p>";
+                  setMessage("info", "fileMessages", "INFO: Mid-March <code>bisrv.asd</code> detected.");
                   break;
 
                 // April 20th BIOS...
-                case "b50e50aa4b1b1d41489586e989f09d47c4e2bc27c072cb0112f83e6bc04e2cca":
+                case "04.20":
                   mappingTableOffset = 0x8DBC9C;
                   mappingConsoles = ["Arcade", "Game Boy Advance", "Game Boy, Game Boy Color", "SNES", "Genesis/Mega Drive, Master System", "NES"];
-                  document.getElementById("fileOutput").innerHTML = "<p class=\"infoMessage\">INFO: April 20th <code>bisrv.asd</code> detected</p>";
+                  setMessage("info", "fileMessages", "INFO: April 20th <code>bisrv.asd</code> detected.");
                   break;
 
                 // May 15th BIOS...
-                case "d878a99d26242836178b452814e916bef532d05acfcc24d71baa31b8b6f38ffd":
+                case "05.15":
                   mappingTableOffset = 0;
                   mappingConsoles = ["NES", "Genesis/Mega Drive, Master System", "SNES", "Game Boy, Game Boy Color", "Game Boy Advance", "Arcade"];
                   step1BRequired = true;
-                  document.getElementById("fileOutput").innerHTML = "<p class=\"infoMessage\">INFO: May 15th <code>bisrv.asd</code> detected</p>";
+                  setMessage("info", "fileMessages", "INFO: May 15th <code>bisrv.asd</code> detected.");
                   break;
 
                 // May 22nd BIOS...
-                case "6aebab0e4da39e0a997df255ad6a1bd12fdd356cdf51a85c614d47109a0d7d07":
+                case "05.22":
                   mappingTableOffset = 0;
                   mappingConsoles = ["NES", "SNES", "Genesis/Mega Drive, Master System", "Game Boy, Game Boy Color", "Game Boy Advance", "Arcade"];
                   step1BRequired = true;
-                  document.getElementById("fileOutput").innerHTML = "<p class=\"infoMessage\">INFO: May 22nd <code>bisrv.asd</code> detected</p>";
+                  setMessage("info", "fileMessages", "INFO: May 22nd <code>bisrv.asd</code> detected.");
                   break;
 
                 default:
                   // Huh... wasn't false so had bisrv.asd structure, but didn't return
                   // a known hash... a new BIOS version? Unknown anyway!
                   console.log(dataHash);
-                  document.getElementById("fileOutput").innerHTML = "<p class=\"errorMessage\">ERROR: While the file you've selected does appear to be generally structured like the SF2000's <code>bisrv.asd</code> BIOS file, the specifics of your file don't match any known SF2000 BIOS version. As such, this tool cannot modify the selected file.</p>";
+                  setMessage("error", "fileMessages", "ERROR: While the file you've selected does appear to be generally structured like the SF2000's <code>bisrv.asd</code> BIOS file, the specifics of your file don't match any known SF2000 BIOS version. As such, this tool cannot safely modify the selected file.");
                   return;
                   break;
               }
@@ -252,7 +153,7 @@
             if (data.length == 288) {
               // That's the correct length for a KeyMapInfo.kmp file, however we must know the host
               // BIOS version before we can correctly process those files. Let the user know...
-              document.getElementById("fileOutput").innerHTML = "<p class=\"errorMessage\">ERROR: The file you've provided may be a <code>KeyMapInfo.kmp</code> button map file; however as the internal data structure of these files varies depending on the version of the host BIOS, you must select your device's <code>bisrv.asd</code> file first. You can find this file in the <code>bios</code> folder on your device's microSD card.";
+              setMessage("error", "fileMessages", "ERROR: The file you've provided may be a <code>KeyMapInfo.kmp</code> button map file; however as the internal data structure of these files varies depending on the version of the host BIOS, you must select your device's <code>bisrv.asd</code> file first. You can find this file in the <code>bios</code> folder on your device's microSD card.");
               return;
             }
             // If we're still checking, next test the file extensions for the individual console's ROMs...
@@ -283,7 +184,7 @@
             else {
               // Oh dear, the provided file didn't match any of the above rules! Display an error
               // to the user...
-              document.getElementById("fileOutput").innerHTML = "<p class=\"errorMessage\">ERROR: The selected file does not appear to be a known <code>bisrv.asd</code> file, a <code>KeyMapInfo.kmp</code> file, or a game ROM with a known extension!</p>";
+              setMessage("error", "fileMessages", "ERROR: The selected file does not appear to be a known <code>bisrv.asd</code> file, a <code>KeyMapInfo.kmp</code> file, or a game ROM with a known extension!");
               return;
             }
 
@@ -293,11 +194,13 @@
             // and we'll set mappingData to it's full contents instead...
             if (mappingConsoles.length == 1) {
               mappingData = new Uint8Array(48);
-              mappingTableOffset = 0;
             }
             else {
               mappingData = data;
             }
+
+            // In both cases, the mapping data begins at the very start of our data stream...
+            mappingTableOffset = 0;
 
             // Keep a record of the input file's name as well...
             fileName = file.name;
@@ -308,91 +211,123 @@
         }
       }
 
+      // This function is called if the file selected in Step 1 is a bisrv.asd
+      // version that relies on an external KeyMapInfo.kmp file - so we also
+      // need the user to supply that...
       function stepOneB() {
-        var html = "<section id=\"stepOneB\"><h2>Step 1b: Select <code>KeyMapInfo.kmp</code></h2><p>This version of the SF2000 BIOS reads its button mappings from an external file called <code>KeyMapInfo.kmp</code>, stored in the <code>Resources</code> folder on the microSD card. Please select your device's <code>KeyMapInfo.kmp</code> file now.</p><label>Open <code>KeyMapInfo.kmp</code>: <input id=\"keyMapInfoSelector\" type=\"file\"></label><div id=\"stepOneBOutput\"></div></section>";
 
-        // Finally, add a <hr> separator after the last step, and append the new step...
+        // Build our HTML...
+        var html = "<section id=\"stepOneB\"><h2>Step 1b: Select <code>KeyMapInfo.kmp</code></h2><p>This version of the SF2000 BIOS reads its button mappings from an external file called <code>KeyMapInfo.kmp</code>, stored in the <code>Resources</code> folder on the microSD card. Please select your device's <code>KeyMapInfo.kmp</code> file now.</p><div id=\"stepOneBMessages\"></div><div class=\"controlContainer\"><label class=\"control\">Open <code>KeyMapInfo.kmp</code>: <input id=\"keyMapInfoSelector\" type=\"file\" accept=\".kmp\"></label></div></section>";
+
+        // Add a <hr> separator after the last step, and append the new step...
         document.getElementById("steps").insertAdjacentHTML("beforeend", "<hr>");
         document.getElementById("steps").insertAdjacentHTML("beforeend", html);
 
         // Attach our event handler to our new file input control...
         var keyMapInfoInput = document.getElementById("keyMapInfoSelector");
         keyMapInfoInput.addEventListener("change", function() {
+
           // The user has chosen a new file; it should be a KeyMapInfo.kmp file,
           // so let's do our best to check!
+
+          // First, clear out any HTML that might already exist after Step 1b...
+          while(document.getElementById("stepOneB").nextSibling) {
+            document.getElementById("stepOneB").nextSibling.remove();
+          }
+
+          // Clear any old messages...
+          document.getElementById("stepOneBMessages").innerHTML = "";
+
+          // Next, read in the contents of the user-provided file...
           var frKMI = new FileReader();
           fileName = event.target.files[0].name;
           frKMI.readAsDataURL(event.target.files[0]);
           frKMI.onload = function(event) {
+
+            // Get the file's data and data type...
             var fileData = event.target.result;
             var dataType = fileData.substring(5, fileData.indexOf(";"));
+
+            // Check to make sure the data type is binary...
             if (dataType === "application/octet-stream") {
+
               // The user selected a file that appears to contain binary data; it's
               // a good candidate! Let's check its length next...
               var base64Data = fileData.substring(fileData.indexOf(",") + 1);
               var binaryData = atob(base64Data);
               if (binaryData.length == 288) {
+
                 // It's the right length - let's assume it's a KeyMapInfo.kmp!
+                // We'll assign it to our global mappingData variable, and
+                // we'll proceed to Step 2...
                 mappingData = new Uint8Array(binaryData.length);
                 for (var i = 0; i < binaryData.length; i++) {
                   mappingData[i] = binaryData.charCodeAt(i);
                 }
-                while(document.getElementById("stepOneB").nextSibling) {
-                  document.getElementById("stepOneB").nextSibling.remove();
-                }
                 stepTwo();
+
               }
               else {
+
                 // Wrong length for a KeyMapInfo.kmp file!
-                document.getElementById("stepOneBOutput").innerHTML = "<p class=\"errorMessage\">ERROR: The selected file does not appear to be a valid <code>KeyMapInfo.kmp</code> file.</p>";
+                setMessage("error", "stepOneBMessages", "ERROR: The selected file does not appear to be a valid <code>KeyMapInfo.kmp</code> file.");
                 return;
               }
             }
             else {
+
               // The file the user selected doesn't appear to be binary data, so
               // highly unlikely to be a KeyMapInfo.kmp file...
-              document.getElementById("stepOneBOutput").innerHTML = "<p class=\"errorMessage\">ERROR: The selected file does not appear to be a valid <code>KeyMapInfo.kmp</code> file.</p>";
+              setMessage("error", "stepOneBMessages", "ERROR: The selected file does not appear to be a valid <code>KeyMapInfo.kmp</code> file.");
               return;
             }
           }
         });
       }
 
+      // This function triggers automatically when the user selects a valid
+      // file (or files) in Step 1...
       function stepTwo() {
-        // We're going to be creating a bunch of HTML here; we want to display banks of mapping
-        // controls to the user, one bank per console. Each bank will have a heading specifying
-        // which console it's for, and then a section each for Player 1 and Player 2. Each
-        // player section will have a list of the six SF2000 buttons that are available to be
-        // mapped, and for each a selection box of the target console's buttons for the mapping.
-        // There'll also be a checkbox per button, which can be checked to enable "autofire" on
-        // that button.
+
+        // We're going to be creating a bunch of HTML here; we want to display
+        // banks of mapping controls to the user, one bank per console. Each
+        // bank will have a heading specifying which console it's for, and then
+        // a section each for Player 1 and Player 2. Each player section will
+        // have a list of the six SF2000 buttons that are available to be
+        // mapped, and for each a selection box of the target console's buttons
+        // for the mapping. There'll also be a checkbox per button, which can
+        // be checked to enable "autofire" on that button.
         var html = "<section id=\"mappingSection\"><h2>Step 2: Choose your button mappings</h2>";
 
-        // First, we need to update Step 2's instructions, depending on whether or not the user
-        // supplied a bisrv.asd file or KeyMapInfo.kmp (multiple consoles) or a ROM (one console)...
+        // First, we need to update Step 2's instructions, depending on whether
+        // or not the user supplied a bisrv.asd file or KeyMapInfo.kmp
+        // (multiple consoles) or a ROM (one console)...
         if (mappingConsoles.length > 1) {
+
           // They provided a bisrv.asd or a KeyMapInfo.kmp file!
           html += "<p>Below you will see the current global button mappings for the file you provided. Each tile covers the button mappings for a different game console - the physical SF2000 buttons are on the left, and the virtual console buttons are in the middle. On the right are some \"autofire\" checkboxes - if the box for a button is checked, it means holding that button down will trigger multiple repeated button presses in the virtual console automatically. As the SF2000 supports local multiplayer via the use of a second wireless controller, there are <i>two</i> sets of button mappings per console - one for Player 1 and one for Player 2. When you have finished tweaking your button mappings, proceed to Step 3.</p>";
         }
         else {
+
           // They provided a ROM file!
           html += "<p>Below you will see an empty \"" + mappingConsoles[0] + "\" button mapping table, which will be used to create a unique button mapping profile for \"" + fileName + "\". In the table, the physical SF2000 buttons are on the left, and the virtual console buttons are in the middle. On the right are some \"autofire\" checkboxes - if the box for a button is checked, it means holding that button down will trigger multiple repeated button presses in the virtual console automatically. As the SF2000 supports local multiplayer via the use of a second wireless controller, there are <i>two</i> sets of button mappings per console - one for Player 1 and one for Player 2. When you have finished tweaking your button mappings, proceed to Step 3.</p>";
         }
-        html += "<div id=\"mappingControls\">";
+        html += "<div class=\"controlContainer\">";
 
-        // Next we'll be looping through all of the consoles we'll be setting up mappings for...
+        // Next we'll be looping through all of the consoles we'll be setting
+        // up mappings for...
         var presentationButtonOrder = ['A', 'B' ,'X', 'Y', 'L', 'R'];
         for (var currentConsole = 0; currentConsole < mappingConsoles.length; currentConsole++) {
 
-          // This console's bank of mapping controls will be stored in a <div>, and we'll add
-          // a <h3> header for good measure as well...
-          html += "<div class=\"mappingConsole\"><h3>" + mappingConsoles[currentConsole] + "</h3>";
+          // This console's bank of mapping controls will be stored in a <div>,
+          // and we'll add a <h3> header for good measure as well...
+          html += "<div class=\"control\"><h3>" + mappingConsoles[currentConsole] + "</h3>";
 
           // Get the button mapping for this console...
           var buttonMap = getButtonMap(currentConsole);
 
-          // We'll add two tables of control mappings to the <div>, one each for Player 1 and
-          // Player 2...
+          // We'll add two tables of control mappings to the <div>, one each
+          // for Player 1 and Player 2...
           for (var player = 0; player < 2; player++) {
 
             // Start creating our table HTML...
@@ -400,19 +335,22 @@
             html += "<thead><tr><th class=\"alignL\">SF2000</th><th>Console</th><th>Autofire</th></tr></thead>";
             html += "<tbody>";
 
-            // Loop through all the SF2000's buttons (well, the ones that can be mapped, anyway)...
+            // Loop through all the SF2000's buttons (well, the ones that can
+            // be mapped, anyway)...
             for (var button = 0; button < 6; button++) {
 
-              // By default, the SF2000 stores its button maps in XYLABR order... except for
-              // GBA under the May 15th's firmware where the order is LRXABY for some reason.
-              // We specify the order the bytes are specified in here. If they do other weird
-              // stuff in the future, it'll probably be here that needs to change!
+              // By default, the SF2000 stores its button maps in XYLABR
+              // order... except for GBA under newer firmware versions where
+              // the order is LRXABY for some reason. We specify the order the
+              // bytes are in here. If they do other weird stuff in the future,
+              // it'll probably be here that needs to change!
               var buttonByteOrder = ['X', 'Y' ,'L', 'A', 'B', 'R'];
-              if (mappingConsoles[currentConsole] == "Game Boy Advance" && fileName == "KeyMapInfo.kmp") {
+              if (mappingConsoles[currentConsole] == "Game Boy Advance" && ["05.15", "05.22"].includes(firmwareVersion)) {
                 buttonByteOrder = ['L', 'R', 'X', 'A', 'B', 'Y'];
               }
 
-              // Calculate our offset within our mapping data for the current button...
+              // Calculate our offset within our mapping data for the current
+              // button...
               var offset = mappingTableOffset + (currentConsole * 48) + (player * 24) + (buttonByteOrder.indexOf(presentationButtonOrder[button]) * 4);
 
               // Start creating the HTML data for this row in the table...
@@ -458,135 +396,132 @@
         // OK, we're all done displaying our mapping table HTML; trigger Step 3's setup...
         document.getElementById("steps").insertAdjacentHTML("beforeend", "<hr>");
         document.getElementById("steps").insertAdjacentHTML("beforeend", html);
-        while(document.getElementById("mappingSection").nextSibling) {
-          document.getElementById("mappingSection").nextSibling.remove();
-        }
         stepThreeSetup();
       }
 
       function stepThreeSetup() {
-        // More HTML in this function! We'll display the appropriate instructions to the
-        // user (either how to replace the bisrv.asd/KeyMapInfo.kmp file, or where to put
-        // the per-rom .kmp file), as well as generate a button that (when clicked) will
+
+        // More HTML in this function! We'll display the appropriate
+        // instructions to the user (either how to replace the
+        // bisrv.asd/KeyMapInfo.kmp file, or where to put the per-rom .kmp
+        // file), as well as generate a button that (when clicked) will
         // download the appropriate file to their device...
+
+        // First, let's clear any HTML that might already exist after Step 2...
+        while(document.getElementById("mappingSection").nextSibling) {
+          document.getElementById("mappingSection").nextSibling.remove();
+        }
+
+        // Now let's start building our HTML...
         var html = "<section id=\"saveSection\"><h2>Step 3: Save your mapping changes</h2>";
 
-        // First up, instructions! These will depend on whether they provided a bisrv.asd,
-        // a KeyMapInfo.kmp, or a game ROM...
+        // First up, instructions! These will depend on whether they provided a
+        // bisrv.asd, a KeyMapInfo.kmp, or a game ROM...
         if (mappingConsoles.length > 1) {
           if (fileName == "bisrv.asd") {
+
             // They provided a bisrv.asd file!
             html += "<p>Click the Download button below to download a new <code>bisrv.asd</code> BIOS file for the SF2000, with your updated global button mappings baked into it. Use it to replace the existing <code>bisrv.asd</code> file in the <code>bios</code> folder on your device's microSD card.</p>";
           }
           else if (fileName == "KeyMapInfo.kmp") {
+
             // They provided a KeyMapInfo.kmp file!
             html += "<p>Click the Download button below to download a new <code>KeyMapInfo.kmp</code> keymap file for the SF2000, with your updated global button mappings baked into it. Use it to replace the existing <code>KeyMapInfo.kmp</code> file in the <code>Resources</code> folder on your device's microSD card.</p>";
           }
           else {
+
             // They provided a... something!
             html += "<p>Click the Download button below to download an updated version of your file, with your updated global button mappings baked into it. Use it to replace the existing file on your device's microSD card.</p>";
           }
         }
         else {
-          // They provided a ROM file! To make the instructions clearer, let's calculate
-          // the name of the keymap file we're generating...
+
+          // They provided a ROM file! To make the instructions clearer, let's
+          // calculate the name of the keymap file we're generating...
           var kmpFileName = fileName.replace(/($|\.[^.]*$)/, function(m, p1) {return p1.toUpperCase() + '.kmp';});
 
           // Now the instructions themselves...
           html += "<p>Click the Download button below to download \"" + kmpFileName + "\", a game-specific keymap file for \"" + fileName + "\". Once downloaded, place it in the <code>save</code> subfolder of the folder where the ROM itself is stored. So for example, if \"" + fileName + "\" is in the <code>ROMS</code> folder on your SF2000's microSD card, place the \"" + kmpFileName + "\" file in <code>ROMS/save/</code>. If the <code>save</code> subfolder does not already exist, create it yourself first.</p>";
         }
 
-        // Now let's add the Download button with it's event...
-        html += "<form id=\"downloadForm\" action=\"#\"><input id=\"downloadButton\" type=\"button\" value=\"Download\" onclick=\"download()\"></form>";
+        // Add our download button...
+        html += "<div class=\"controlContainer\"><div class=\"control\"><input id=\"downloadButton\" type=\"button\" value=\"Download\"></div></div>";
 
-        // OK, we're all done; add our HTML to the page...
+        // Close our section...
+        html += "</section>";
+
+        // Finally, add a <hr> separator after the last step, and append the
+        // new step...
         document.getElementById("steps").insertAdjacentHTML("beforeend", "<hr>");
         document.getElementById("steps").insertAdjacentHTML("beforeend", html);
-        while(document.getElementById("saveSection").nextSibling) {
-          document.getElementById("saveSection").nextSibling.remove();
-        }
-      }
 
-      function download() {
-        // Here, we'll construct the file for the user to download (a modified
-        // bisrv.asd, a modified KeyMapInfo.kmp, or a .kmp keymap file), and send
-        // it to the user's browser...
+        // Let's add the event handler for our Download button...
+        var dButton = document.getElementById("downloadButton");
+        dButton.addEventListener("click", function() {
 
-        // We need to loop through all of the mapping form data, read its settings, and
-        // use those settings to build the binary data of our button mapping.  Loop
-        // through all of the consoles we're mapping for...
-        var presentationButtonOrder = ['A', 'B' ,'X', 'Y', 'L', 'R'];
-        for (var currentConsole = 0; currentConsole < mappingConsoles.length; currentConsole ++) {
+          // Here, we'll construct the file for the user to download (a
+          // modified bisrv.asd, a modified KeyMapInfo.kmp, or a .kmp keymap
+          // file), and send it to the user's browser...
 
-          // Get the button mapping for this console...
-          var buttonMap = getButtonMap(currentConsole);
+          // We need to loop through all of the mapping form data, read its
+          // settings, and use those settings to build the binary data of our
+          // button mapping.  Loop through all of the consoles we're mapping
+          // for...
+          var presentationButtonOrder = ['A', 'B' ,'X', 'Y', 'L', 'R'];
+          for (var currentConsole = 0; currentConsole < mappingConsoles.length; currentConsole ++) {
 
-          // For each player...
-          for (var player = 0; player < 2; player++) {
-            // ... and for each button...
-            for (var button = 0; button < 6; button++) {
-              // By default, the SF2000 stores its button maps in XYLABR order... except for
-              // GBA under the May 15th's firmware where the order is LRXABY for some reason.
-              // We specify the order the bytes are specified in here. If they do other weird
-              // stuff in the future, it'll probably be here that needs to change!
-              var buttonByteOrder = ['X', 'Y' ,'L', 'A', 'B', 'R'];
-              if (mappingConsoles[currentConsole] == "Game Boy Advance" && fileName == "KeyMapInfo.kmp") {
-                buttonByteOrder = ['L', 'R', 'X', 'A', 'B', 'Y'];
+            // Get the button mapping for this console...
+            var buttonMap = getButtonMap(currentConsole);
+
+            // For each player...
+            for (var player = 0; player < 2; player++) {
+
+              // ... and for each button...
+              for (var button = 0; button < 6; button++) {
+
+                // By default, the SF2000 stores its button maps in XYLABR
+                // order... except for GBA under newer firmware versions where
+                // the order is LRXABY for some reason. We specify the order
+                // the bytes are in here. If they do other weird stuff in the
+                // future, it'll probably be here that needs to change!
+                var buttonByteOrder = ['X', 'Y' ,'L', 'A', 'B', 'R'];
+                if (mappingConsoles[currentConsole] == "Game Boy Advance" && ["05.15", "05.22"].includes(firmwareVersion)) {
+                  buttonByteOrder = ['L', 'R', 'X', 'A', 'B', 'Y'];
+                }
+                
+                // Calculate the offset in our mapping data for the current
+                // button, read the button settings from the HTML controls, and
+                // assign the appropriate values to our binary mappingData...
+                var offset = mappingTableOffset + (currentConsole * 48) + (player * 24) + (buttonByteOrder.indexOf(presentationButtonOrder[button]) * 4);
+                mappingData[offset] = buttonMap[document.getElementById("sel" + offset.toString(16)).value];
+                mappingData[offset + 2] = document.getElementById("cb" + offset.toString(16)).checked ? 1 : 0;
               }
-              
-              // Calculate the offset in our mapping data for the current button, read
-              // the button settings from the HTML controls, and assign the appropriate
-              // values to our binary mappingData...
-              var offset = mappingTableOffset + (currentConsole * 48) + (player * 24) + (buttonByteOrder.indexOf(presentationButtonOrder[button]) * 4);
-              mappingData[offset] = buttonMap[document.getElementById("sel" + offset.toString(16)).value];
-              mappingData[offset + 2] = document.getElementById("cb" + offset.toString(16)).checked ? 1 : 0;
             }
           }
-        }
 
-        // Now that we've got our updated data, we'll need to check if it's an updated
-        // bisrv.asd or not - if it is, we'll need to update some CRC32 check-bits
-        // in the bisrv.asd data as well...
-        if (mappingConsoles.length > 1 && fileName == "bisrv.asd") {
-          // It's a bisrv.asd alright! Let's do the CRC32 update dance...
-          var c;
-          var tabCRC32 = new Int32Array(256);
-          for (var i = 0; i < 256; i++) {
-            c = i << 24;
-            for (var j = 0; j < 8; j++) {
-              c = c & (1 << 31) ? c << 1 ^ 0x4c11db7 : c << 1;
-            }
-            tabCRC32[i] = c;
+          // Now that we've got our updated data, we'll need to check if it's
+          // an updated bisrv.asd or not - if it is, we'll need to update some
+          // CRC32 check-bits in the bisrv.asd data as well...
+          if (mappingConsoles.length > 1 && fileName == "bisrv.asd") {
+
+            // It's a bisrv.asd alright! Let's do the CRC32 update dance...
+            patchCRC32(mappingData);
           }
-          c = ~0;
-          for (var i = 512; i < mappingData.length; i++) {
-            c = c << 8 ^ tabCRC32[c >>> 24 ^ mappingData[i]];
+
+          // Next, let's determine the name of the file we're going to send to
+          // the user's browser...
+          var downloadFileName = fileName;
+          if (mappingConsoles.length == 1) {
+            downloadFileName = downloadFileName.replace(/($|\.[^.]*$)/, function(m, p1) {return p1.toUpperCase() + '.kmp';});
           }
-          mappingData[0x18c] = c & 255;
-          mappingData[0x18d] = c >>> 8 & 255;
-          mappingData[0x18e] = c >>> 16 & 255;
-          mappingData[0x18f] = c >>> 24;
-        }
 
-        // Download time! First, let's determine the name of the file we're sending
-        // to the user's browser...
-        var downloadFileName = fileName;
-        if (mappingConsoles.length == 1) {
-          downloadFileName = downloadFileName.replace(/($|\.[^.]*$)/, function(m, p1) {return p1.toUpperCase() + '.kmp';});
-        }
+          // And finally, send the data to the user's browser as a download...
+          downloadToBrowser(mappingData, "application/octet-stream", downloadFileName);
 
-        // Finally, send the file!
-        var link = document.createElement("a");
-        link.href = window.URL.createObjectURL(new Blob([mappingData], {type: "application/octet-stream"}));
-        link.download = downloadFileName;
-        link.style.display = "none";
-        document.body.appendChild(link);
-        link.click();
-        window.URL.revokeObjectURL(link.href);
-        document.body.removeChild(link);
+        });
       }
     </script>
     <hr>
-    <p><a rel="license" href="https://creativecommons.org/publicdomain/zero/1.0/">CC0</a>: public domain. Version 1.2, 20230522.1</p>
+    <p><a rel="license" href="https://creativecommons.org/publicdomain/zero/1.0/">CC0</a>: public domain. Version 1.3, 20230626.1</p>
   </body>
 </html>

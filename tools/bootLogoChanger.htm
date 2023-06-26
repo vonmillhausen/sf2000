@@ -10,31 +10,17 @@
     <h1>Data Frog SF2000 Boot Logo Changer</h1>
     <p>This tool can be used to alter the boot logo on an SF2000 handheld gaming console. Please note this tool is provided as-is, and no support will be given if this corrupts your device's bios; make sure you have backups of anything you care about before messing with your device's critical files! 🙂</p>
     <hr>
-    <section id="bisrvSection">
-      <h2>Step 1: Select Original <code>bisrv.asd</code></h2>
-      <p>Select the <code>bisrv.asd</code> file whose boot logo you want to modify. You should probably make a backup of the file first, just in case! You can find the <code>bisrv.asd</code> file in the <code>bios</code> folder on your microSD card.</p>
-      <form id="bisrvForm" action="#">
-        <label>Open <code>bisrv.asd</code>: <input id="bisrvSelector" type="file" onchange="bisrvLoad(event.target.files[0])"></label>
-      </form>
-      <div id="bisrvOutput"></div>
-    </section>
-    <hr>
-    <section id="imageSection">
-      <h2>Step 2: Select New Logo Image File</h2>
-      <p>Select the image file you want to use as the new boot logo. It must be 256 pixels wide and 100 pixels tall. Only PNG and JPEG image types are supported. For PNG files, transparency is ignored; also, you might want to make sure your PNG image has any embedded gamma or colour profile information removed first using a metadata scrubbing tool, otherwise the colour output from <i>this</i> tool might be incorrect. The image is displayed centred on a black background, so you may want to factor that into your design as well.</p>
-      <form id="imageForm" action="#">
-        <label>Open image: <input id="imageSelector" type="file" onchange="imageLoad(event.target.files[0])" disabled></label>
-      </form>
-      <div id="imageOutput"></div>
-    </section>
-    <hr>
-    <section id="downloadSection">
-      <h2>Step 3: Download Updated <code>bisrv.asd</code></h2>
-      <p>Click the download button for the updated <code>bisrv.asd</code> file; use it to replace the one in the <code>bios</code> folder on your SF2000's microSD card.</p>
-      <form id="downloadForm" action="#">
-        <input id="downloadButton" type="button" value="Download" onclick="download()" disabled>
-      </form>
-    </section>
+    <div id="steps">
+      <section id="bisrvSection">
+        <h2>Step 1: Select Original <code>bisrv.asd</code></h2>
+        <p>Select the <code>bisrv.asd</code> file whose boot logo you want to modify. You should probably make a backup of the file first, just in case! You can find the <code>bisrv.asd</code> file in the <code>bios</code> folder on your microSD card.</p>
+        <div id="bisrvMessages"></div>
+        <div class="controlContainer">
+          <label class="control">Open <code>bisrv.asd</code>: <input id="bisrvSelector" type="file" accept=".asd" onchange="bisrvLoad(event.target.files[0])"></label>
+        </div>
+      </section>
+    </div>
+    <script src="tools.js"></script>
     <script type="text/javascript">
 
       // Global variables...
@@ -42,305 +28,198 @@
       var logoOffset;   // Will contain the offset of the boot logo within the bisrv.asd file
       var newLogoData;  // Used to store the little-endian RGB565 binary data of the new boot logo
 
-      // Define a function that takes a Uint8Array and an optional offset and returns the index
-      // of the first match or -1 if not found...
-      function findSequence(needle, haystack, offset) {
-
-        // If offset is not provided, default to 0
-        offset = offset || 0;
-
-        // Loop through the data array starting from the offset
-        for (var i = offset; i < haystack.length - needle.length + 1; i++) {
-
-          // Assume a match until proven otherwise
-          var match = true;
-
-          // Loop through the target sequence and compare each byte
-          for (var j = 0; j < needle.length; j++) {
-
-            if (haystack[i + j] !== needle[j]) {
-              // Mismatch found, break the inner loop and continue the outer loop
-              match = false;
-              break;
-            }
-
-          }
-
-          // If match is still true after the inner loop, we have found a match
-          if (match) {
-
-            // Return the index of the first byte of the match
-            return i;
-
-          }
-        }
-
-        // If we reach this point, no match was found
-        return -1;
-      }
-
-      // Returns an SHA-256 hash of a given firmware (ignoring common user changes), or returns
-      // false on failure...
-      function getFirmwareHash(data) {
-
-        // Data should be a Uint8Array, which as an object is passed by reference... we're going
-        // to be manipulating that data before generating our hash, but we don't want to modify
-        // the original object at all... so we'll create a copy, and work only on the copy...
-        var dataCopy = data.slice();
-
-        // Only really worthwhile doing this for big bisrv.asd files...
-        if (dataCopy.length > 12640000) {
-          // First, replace CRC32 bits with 00...
-          dataCopy[396] = 0x00;
-          dataCopy[397] = 0x00;
-          dataCopy[398] = 0x00;
-          dataCopy[399] = 0x00;
-
-          // Next identify the boot logo position, and blank it out too...
-          var badExceptionOffset = findSequence([0x62, 0x61, 0x64, 0x5F, 0x65, 0x78, 0x63, 0x65, 0x70, 0x74, 0x69, 0x6F, 0x6E, 0x00, 0x00, 0x00], dataCopy);
-          if (badExceptionOffset > -1) {
-            var bootLogoStart = badExceptionOffset + 16;
-            for (var i = bootLogoStart; i < (bootLogoStart + 204800); i++) {
-              dataCopy[i] = 0x00;
-            }
-          }
-          else {
-            return false;
-          }
-
-          // Next identify the emulator button mappings (if they exist), and blank them out too...
-          var preButtonMapOffset = findSequence([0x00, 0x00, 0x00, 0x71, 0xDB, 0x8E, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00], dataCopy);
-          if (preButtonMapOffset > -1) {
-            var postButtonMapOffset = findSequence([0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x02, 0x00, 0x00, 0x00, 0x02, 0x00, 0x00, 0x00], dataCopy, preButtonMapOffset);
-            if (postButtonMapOffset > -1) {
-              for (var i = preButtonMapOffset + 16; i < postButtonMapOffset; i++) {
-                dataCopy[i] = 0x00;
-              }
-            }
-            else {
-              return false;
-            }
-          }
-          else {
-            return false;
-          }
-
-          // If we're here, we've zeroed-out all of the bits of the firmware that are
-          // semi-user modifiable (boot logo, button mappings and the CRC32 bits); now
-          // we can generate a hash of what's left and compare it against some known
-          // values...
-          return crypto.subtle.digest("SHA-256", dataCopy.buffer)
-          .then(function(digest) {
-            var array = Array.from(new Uint8Array(digest));
-            var hash = array.map(byte => ("00" + byte.toString(16)).slice(-2)).join("");
-            return hash;
-          })
-          .catch(function(error) {
-            return false;
-          });
-        }
-        else {
-          return false;
-        }
-      }
-
+      // This function is triggered when the person selects a file in Step 1...
       function bisrvLoad(file) {
+
+        // Read in the contents of the selected file as array buffer...
         var frBisrv = new FileReader();
         frBisrv.readAsArrayBuffer(file);
-
         frBisrv.onload = function(event) {
 
+          // Clear out any HTML that might already exist after Step 1...
+          while(document.getElementById("bisrvSection").nextSibling) {
+            document.getElementById("bisrvSection").nextSibling.remove();
+          }
+
+          // Clear any old messages...
+          document.getElementById("bisrvMessages").innerHTML = "";
+
           // Read the provided file's data into an array...
-          var data = new Uint8Array(event.target.result);
+          bisrvData = new Uint8Array(event.target.result);
 
           // We'll do a hash-check against it...
-          hashResult = getFirmwareHash(data);
+          hashResult = getFirmwareHash(bisrvData);
 
           // The result could be either a Promise if it had a bisrv.asd-like structure and we got
           // a hash, or false otherwise... let's check!
           if (hashResult instanceof Promise) {
+
             // We got a Promise! Wait for it to finish so we get our bisrv.asd hash...
             hashResult.then(function(dataHash) {
+
               // Check the hash against all the known good ones...
-              switch (dataHash) {
+              switch (knownHash(dataHash)) {
+
                 // Mid-March BIOS...
-                case "4411143d3030adc442e99f7ac4e7772f300c844bbe10d639702fb3ba049a4ee1":
+                case "03.15":
                   logoOffset = 0x9B9030;
-                  bisrvData = data;
-                  document.getElementById("bisrvOutput").innerHTML = "<p class=\"infoMessage\">INFO: Mid-March <code>bisrv.asd</code> detected</p>";
+                  setMessage("info", "bisrvMessages", "INFO: Mid-March <code>bisrv.asd</code> detected.");
                   break;
 
                 // April 20th BIOS...
-                case "b50e50aa4b1b1d41489586e989f09d47c4e2bc27c072cb0112f83e6bc04e2cca":
+                case "04.20":
                   logoOffset = 0x9B91D8;
-                  bisrvData = data;
-                  document.getElementById("bisrvOutput").innerHTML = "<p class=\"infoMessage\">INFO: April 20th <code>bisrv.asd</code> detected</p>";
+                  setMessage("info", "bisrvMessages", "INFO: April 20th <code>bisrv.asd</code> detected.");
                   break;
 
                 // May 15th BIOS...
-                case "d878a99d26242836178b452814e916bef532d05acfcc24d71baa31b8b6f38ffd":
+                case "05.15":
                   logoOffset = 0x9BB0B8;
-                  bisrvData = data;
-                  document.getElementById("bisrvOutput").innerHTML = "<p class=\"infoMessage\">INFO: May 15th bisrv.asd detected</p>";
+                  setMessage("info", "bisrvMessages", "INFO: May 15th <code>bisrv.asd</code> detected.");
                   break;
 
                 // May 22nd BIOS...
-                case "6aebab0e4da39e0a997df255ad6a1bd12fdd356cdf51a85c614d47109a0d7d07":
+                case "05.22":
                   logoOffset = 0x9BB098;
-                  bisrvData = data;
-                  document.getElementById("bisrvOutput").innerHTML = "<p class=\"infoMessage\">INFO: May 22nd bisrv.asd detected</p>";
+                  setMessage("info", "bisrvMessages", "INFO: May 22nd <code>bisrv.asd</code> detected.");
                   break;
 
                 default:
                   // Huh... wasn't false so had bisrv.asd structure, but didn't return
                   // a known hash... a new BIOS version? Unknown anyway!
                   console.log(dataHash);
-                  document.getElementById("bisrvOutput").innerHTML = "<p class=\"errorMessage\">ERROR: While the file you've selected does appear to be generally structured like the SF2000's <code>bisrv.asd</code> BIOS file, the specifics of your file don't match any known SF2000 BIOS version. As such, this tool cannot modify the selected file.</p>";
+                  setMessage("error", "bisrvMessages", "ERROR: While the file you've selected does appear to be generally structured like the SF2000's <code>bisrv.asd</code> BIOS file, the specifics of your file don't match any known SF2000 BIOS version. As such, this tool cannot safely modify the selected file.");
                   return;
-                  break;
               }
 
-              // If we're here we've got a good file, so enable the input for step 2 (image selection)...
-              document.getElementById("imageSelector").removeAttribute("disabled");
+              // If we're here we've got a good file, so onwards to Step 2 (image selection)...
+              stepTwo();
             });
           }
           else {
+
             // We got false, so whatever it was, it wasn't a bisrv.asd...
-            document.getElementById("bisrvOutput").innerHTML = "<p class=\"errorMessage\">ERROR: The file you've selected doesn't appear to have the same data structure as expected for a <code>bisrv.asd</code> file.</p>";
+            setMessage("error", "bisrvMessages", "ERROR: The file you've selected doesn't appear to have the same data structure as expected for a <code>bisrv.asd</code> file.");
             return;
           }
         };
       }
 
-      function imageLoad(file) {
-        var frImage = new FileReader();
+      // This function triggers when the user has selected a known `bisrv.asd`
+      // variant...
+      function stepTwo() {
 
-        frImage.onload = function(event) {
+        // We're going to build up the HTML for Step 2, which has the user
+        // browse for a PNG or JPEG image file. We need to validate the chosen
+        // file is an image, and that it has the correct dimensions of 256x100
+        // pixels; if it is, we convert the image data to an SF2000 format and
+        // move on to Step 3. First, let's start building our HTML...
+        var html = "<section id=\"imageSection\"><h2>Step 2: Select New Logo Image File</h2><p>Select the image file you want to use as the new boot logo. It must be 256 pixels wide and 100 pixels tall. Only PNG and JPEG image types are supported. For PNG files, transparency is ignored; also, you might want to make sure your PNG image has any embedded gamma or colour profile information removed first using a metadata scrubbing tool, otherwise the colour output from <i>this</i> tool might be incorrect. The image is displayed centred on a black background, so you may want to factor that into your design as well.</p><div id=\"imageMessages\"></div>";
 
-          // First check to make sure the selected file's data URL includes a PNG or JPEG data type...
-          if (!event.target.result.includes("data:image/png;") && !event.target.result.includes("data:image/jpeg;")) {
-            document.getElementById("imageOutput").innerHTML = "<p class=\"errorMessage\">ERROR: The selected file does not appear to be a PNG or JPEG image file!</p>";
-            document.getElementById("downloadButton").setAttribute("disabled", "");
-            return;
+        // Add our file chooser...
+        html += "<div class=\"controlContainer\"><label class=\"control\"><input id=\"inputImage\" type=\"file\"></label></div>";
+
+        // Close our section...
+        html += "</section>";
+
+        // Finally, add a <hr> separator after the last step, and append the new step...
+        document.getElementById("steps").insertAdjacentHTML("beforeend", "<hr>");
+        document.getElementById("steps").insertAdjacentHTML("beforeend", html);
+
+        // Attach our event handler to our new file input control...
+        var userImageInput = document.getElementById("inputImage");
+        userImageInput.addEventListener("change", function() {
+
+          // The user has chosen a new file; it should be either a PNG or JPEG
+          // image for converting to an SF2000 binary image format...
+
+          // First let's clear any old messages...
+          document.getElementById("imageMessages").innerHTML = "";
+
+          // And clear up any HTML already added after the current step...
+          while(document.getElementById("imageSection").nextSibling) {
+            document.getElementById("imageSection").nextSibling.remove();
           }
 
-          // Create an image and set its src to our data URL; this triggers the onload event if
-          // it's a valid image file...
-          var img = new Image;
-          img.src = event.target.result;
-          img.onload = function() {
-            // Check to make sure the image has the right dimensions for the boot logo...
-            if (img.width != 256 || img.height != 100) {
-              document.getElementById("imageOutput").innerHTML = "<p class=\"errorMessage\">ERROR: The selected image does not have dimensions of 256x100px!</p>";
-              document.getElementById("downloadButton").setAttribute("disabled", "");
+          // Now let's read in the file...
+          var frImage = new FileReader();
+          frImage.readAsDataURL(event.target.files[0]);
+          frImage.onload = function(event) {
+
+            // The file is loaded; let's check to make sure we got a PNG or JPEG...
+            if (!event.target.result.includes("data:image/png;") && !event.target.result.includes("data:image/jpeg;")) {
+
+              // Whoops! Doesn't look like the user provided a PNG or a JPEG!
+              setMessage("error", "imageMessages", "ERROR: The selected file does not appear to be either a PNG or JPEG image; please make sure you're selecting an appropriate image file.");
               return;
             }
+            
+            // Now we're going to load the file's data into an Image object, so we can
+            // access the raw image data...
+            var img = new Image;
+            img.src = event.target.result;
+            img.onload = function(event) {
 
-            // Create a virtual canvas, and load it up with our image file...
-            var canv = document.createElement("canvas");
-            var cont = canv.getContext("2d");
-            cont.canvas.width = 512;
-            cont.canvas.height = 200;
-
-            // Draw our image to the canvas, which will allow us to get data about the image...
-            cont.drawImage(img, 0, 0, 256, 100);
-            var data = cont.getImageData(0, 0, 256, 100).data;
-
-            // Now we're going to scale up the image to 512x200 (the internal image size used
-            // within the bios); we do this manually to get "nearest neighbour" scaling...
-            for (var x = 0; x < img.width; ++x) {
-              for (var y = 0; y < img.height; ++y) {
-                var i = (y*img.width + x)*4;
-                var r = data[i];
-                var g = data[i+1];
-                var b = data[i+2];
-                cont.fillStyle = "rgb("+ r +", " + g + ", " + b + ")";
-                cont.fillRect(x*2, y*2, 2, 2);
+              // Check to make sure the image has the correct dimensions for a
+              // boot logo...
+              if (img.width != 256 || img.height != 100) {
+                setMessage("error", "imageMessages", "ERROR: The selected image does not have dimensions of 256x100px!");
+                return;
               }
+
+              // We need to scale the image to the internal resolution used by
+              // the SF2000 (512x200)...
+              var imageData = scaleImage(imageToImageData(img), 512, 200, "Nearest Neighbour");
+
+              // Next we'll convert the image data to little-endian RGB565
+              // format for the SF2000...
+              newLogoData = imageDataToRgb565(imageData);
+
+              // On to Step 3!
+              stepThree();
             }
-            data = cont.getImageData(0, 0, 512, 200).data;
-
-            // Loop through the image data, and convert it to little-endian RGB565. First,
-            // we'll store the raw RGB565-converted integers in an array, one entry per pixel...
-            var intArray = [];
-            var pixelCount = 0;
-            for (var i = 0; i < data.length; i += 4){
-              // Read in the raw source RGB colours from the image data stream...
-              var red = data[i];
-              var green = data[i+1];
-              var blue = data[i+2];
-              
-              // Use some shifting and masking to get a big-endian version of the RGB565 colour
-              // and store it in our array before moving on...
-              intArray[pixelCount] = ((red & 248)<<8) + ((green & 252)<<3) + (blue>>3);
-              pixelCount++;
-            }
-
-            // Create a data buffer and a data view; we'll use the view to convert our int
-            // array data to little-endian format (the "true" below) to be stored in the buffer...
-            var buffer = new ArrayBuffer(intArray.length * 2);
-            var dataView = new DataView(buffer);
-            for (var i = 0; i < intArray.length; i++) {
-              dataView.setInt16(i * 2, intArray[i], true);
-            }
-
-            // Use the buffer to fill a Uint8Array, which we'll assign to our global...
-            newLogoData = new Uint8Array(buffer);
-
-            // We should be all done with this step; enable the download button and give the
-            // user some UI feedback...
-            document.getElementById("imageOutput").innerHTML = "<p class=\"infoMessage\">INFO: Image successfully converted to RGB565 little-endian data stream.</p>";
-            document.getElementById("downloadButton").removeAttribute("disabled");
           }
-        };
-
-        frImage.readAsDataURL(file);
+        });
       }
 
-      function download() {
-        // So, we should have the original bisrv.asd data in bisrvData; and we should have
-        // the offset to the original logo data in logoOffset; and finally, we should have
-        // our new logo's binary data in newLogoData. All we need to do is replace the old
-        // data bytes with the new bytes, re-calculate the CRC32 bytes for the modified
-        // file and set them in the data, and send the data to the user's browser. Easy!
+      function stepThree() {
+        var html = "<section id=\"downloadSection\"><h2>Step 3: Download Updated <code>bisrv.asd</code></h2><p>Click the download button for the updated <code>bisrv.asd</code> file; use it to replace the one in the <code>bios</code> folder on your SF2000's microSD card.</p><div id=\"downloadMessages\"></div>";
 
-        // First, replace the logo data...
-        for (var i = 0; i < newLogoData.length; i++) {
-          bisrvData[logoOffset + i] = newLogoData[i];
-        }
+        // Add our download button...
+        html += "<div class=\"controlContainer\"><div class=\"control\"><input id=\"userDownload\" type=\"button\" value=\"Download\"></div></div>";
 
-        // Next, we calculate a new CRC32 for the updated bisrv.asd and apply it; credit
-        // to osaka#9664 for this code!
-        var c;
-        var tabCRC32 = new Int32Array(256);
-        for (var i = 0; i < 256; i++) {
-          c = i << 24;
-          for (var j = 0; j < 8; j++) {
-            c = c & (1 << 31) ? c << 1 ^ 0x4c11db7 : c << 1;
+        // Close our section...
+        html += "</section>";
+
+        // Finally, add a <hr> separator after the last step, and append the new step...
+        document.getElementById("steps").insertAdjacentHTML("beforeend", "<hr>");
+        document.getElementById("steps").insertAdjacentHTML("beforeend", html);
+
+        // Let's add the event handler for our Download button...
+        var dButton = document.getElementById("userDownload");
+        dButton.addEventListener("click", function() {
+
+          // So, we should have the original bisrv.asd data in bisrvData; and we should have
+          // the offset to the original logo data in logoOffset; and finally, we should have
+          // our new logo's binary data in newLogoData. All we need to do is replace the old
+          // data bytes with the new bytes, re-calculate the CRC32 bytes for the modified
+          // file and set them in the data, and send the data to the user's browser. Easy!
+
+          // First, replace the logo data...
+          for (var i = 0; i < newLogoData.length; i++) {
+            bisrvData[logoOffset + i] = newLogoData[i];
           }
-          tabCRC32[i] = c;
-        }
-        c = ~0;
-        for (var i = 512; i < bisrvData.length; i++) {
-          c = c << 8 ^ tabCRC32[c >>> 24 ^ bisrvData[i]];
-        }
-        bisrvData[0x18c] = c & 255;
-        bisrvData[0x18d] = c >>> 8 & 255;
-        bisrvData[0x18e] = c >>> 16 & 255;
-        bisrvData[0x18f] = c >>> 24;
 
-        // And finally, send the data to the user's browser as a file download...
-        var link = document.createElement("a");
-        link.href = window.URL.createObjectURL(new Blob([bisrvData], {type: "application/octet-stream"}));
-        link.download = "bisrv.asd";
-        link.style.display = "none";
-        document.body.appendChild(link);
-        link.click();
-        window.URL.revokeObjectURL(link.href);
-        document.body.removeChild(link);
+          // Next, we calculate a new CRC32 for the updated bisrv.asd and apply it...
+          patchCRC32(bisrvData);
+
+          // And finally, send the data to the user's browser as a file download...
+          downloadToBrowser(bisrvData, "application/octet-stream", "bisrv.asd");
+
+        });
       }
     </script>
     <hr>
-    <p><a rel="license" href="https://creativecommons.org/publicdomain/zero/1.0/">CC0</a>: public domain. Version 1.2, 20230522.1</p>
+    <p><a rel="license" href="https://creativecommons.org/publicdomain/zero/1.0/">CC0</a>: public domain. Version 1.3, 20230626.1</p>
   </body>
 </html>

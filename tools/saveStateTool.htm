@@ -10,7 +10,7 @@
     <h1>Data Frog SF2000 Save State Tool</h1>
     <p>The SF2000 supports save states for games, but it bundles the save state data into a custom format including a thumbnail and metadata; this bundle can't be directly used as save state data for other emulator platforms (e.g., Retroarch). This tool allows you to extract raw save-state data and thumbnails from SF2000 save-state bundles, in case you want to use them with the same emulator on another device; it also allows you to take save states from another device, and convert them to a format the SF2000 can parse. Please note this tool is provided as-is; make sure you have backups of anything you care about before potentially replacing any files on your SF2000's microSD card! 🙂</p>
     <p>This tool makes use of the <a href="https://github.com/nodeca/pako">pako</a> JavaScript library.</p>
-    <p class="warning"><img class="icon" alt="An icon of a yellow triangle with a dark orange exclamation point, indicating a warning or notice" aria-hidden="true" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHhtbG5zOnhsaW5rPSdodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rJyB2aWV3Qm94PScwIDAgNjQgNjQnPjxkZWZzPjxsaW5lYXJHcmFkaWVudCBpZD0nYSc+PHN0b3Agb2Zmc2V0PScwJyBzdG9wLWNvbG9yPScjZTliYjNhJy8+PHN0b3Agb2Zmc2V0PScxJyBzdG9wLWNvbG9yPScjYzE2ODAzJy8+PC9saW5lYXJHcmFkaWVudD48bGluZWFyR3JhZGllbnQgeGxpbms6aHJlZj0nI2EnIGlkPSdiJyB4MT0nMjAnIHgyPSc1NicgeTE9JzEyJyB5Mj0nNjAnIGdyYWRpZW50VW5pdHM9J3VzZXJTcGFjZU9uVXNlJy8+PC9kZWZzPjxwYXRoIGZpbGw9JyNmZmYnIHN0cm9rZT0ndXJsKCNiKScgc3Ryb2tlLWxpbmVqb2luPSdyb3VuZCcgc3Ryb2tlLXdpZHRoPSc4JyBkPSdNNCA1Nmg1NkwzMiA4WicgcGFpbnQtb3JkZXI9J3N0cm9rZSBtYXJrZXJzIGZpbGwnLz48cGF0aCBmaWxsPScjZjVkODUyJyBkPSdNMTIgNTJoNDBMMzIgMThaJyBwYWludC1vcmRlcj0nbWFya2VycyBmaWxsIHN0cm9rZScvPjxwYXRoIGZpbGw9JyNjNTg3MTEnIGQ9J00yOSA0M3Y2aDZ2LTZ6TTI5IDQwaDZWMjZoLTZ6JyBwYWludC1vcmRlcj0nc3Ryb2tlIG1hcmtlcnMgZmlsbCcvPjwvc3ZnPg=="><strong><em>NOTE:</em></strong> This tool will <em>not</em> convert save states from one emulator's format to another; it <em>only</em> gives you either the raw save state data the SF2000 generated (when converting <em>from</em> the SF2000), or allows you to take any random file and shove it into the container format the SF2000 uses for save states (when converting <em>to</em> the SF2000)… whether or not the SF2000 is able to understand the file you give it is up to the SF2000, not to me! If you're converting save states to the SF2000, and the SF2000 doesn't work with whatever kind of save state you provided, there's nothing I can do about that.<br><br>You can <a href="https://vonmillhausen.github.io/sf2000/#emulators" target="_blank" rel="noreferrer noopener">find a reference to all the specific emulators and versions used by the SF2000 here</a>; you'll probably only have success if you're using at least the same emulator, if not also the same version. Also, to have any chance of success, you must be using the exact same ROM on both devices!</p>
+    <div id="initialWarning"></div>
     <hr>
     <div id="steps">
       <section id="modeSection">
@@ -23,6 +23,7 @@
       </section>
     </div>
     <script src="pako.js"></script>
+    <script src="tools.js"></script>
     <script>
 
       // Global Variables
@@ -36,10 +37,8 @@
       var thumbHeight;        // Integer height of a save state thumbnail
       var romFileGood;        // Boolean indicating if a chosen save state file appears to be binary or not
 
-      // The following variable contains a definition for an SVG image to be used
-      // in any error messages shown to the user; defining it once so it can be
-      // reused more easily...
-      var errorIcon = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHhtbG5zOnhsaW5rPSdodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rJyB2aWV3Qm94PScwIDAgNjQgNjQnPjxkZWZzPjxsaW5lYXJHcmFkaWVudCBpZD0nYic+PHN0b3Agb2Zmc2V0PScwJyBzdG9wLWNvbG9yPScjZjU4MTYyJy8+PHN0b3Agb2Zmc2V0PScxJyBzdG9wLWNvbG9yPScjZTI1ZjUzJy8+PC9saW5lYXJHcmFkaWVudD48bGluZWFyR3JhZGllbnQgaWQ9J2EnPjxzdG9wIG9mZnNldD0nMCcgc3RvcC1jb2xvcj0nI2VjODE2YycvPjxzdG9wIG9mZnNldD0nMScgc3RvcC1jb2xvcj0nI2JmNDMyOScvPjwvbGluZWFyR3JhZGllbnQ+PGxpbmVhckdyYWRpZW50IHhsaW5rOmhyZWY9JyNhJyBpZD0nYycgeDE9JzEyJyB4Mj0nNTInIHkxPScxMicgeTI9JzUyJyBncmFkaWVudFVuaXRzPSd1c2VyU3BhY2VPblVzZScvPjxsaW5lYXJHcmFkaWVudCB4bGluazpocmVmPScjYicgaWQ9J2QnIHgxPScyMCcgeDI9JzQ4JyB5MT0nMTYnIHkyPSc0NCcgZ3JhZGllbnRVbml0cz0ndXNlclNwYWNlT25Vc2UnLz48L2RlZnM+PGNpcmNsZSBjeD0nMzInIGN5PSczMicgcj0nMjgnIGZpbGw9J3VybCgjYyknIHBhaW50LW9yZGVyPSdtYXJrZXJzIHN0cm9rZSBmaWxsJy8+PGNpcmNsZSBjeD0nMzInIGN5PSczMicgcj0nMjQnIGZpbGw9JyNmOWQzY2MnIHBhaW50LW9yZGVyPSdtYXJrZXJzIHN0cm9rZSBmaWxsJy8+PGNpcmNsZSBjeD0nMzInIGN5PSczMicgcj0nMjAnIGZpbGw9J3VybCgjZCknIHBhaW50LW9yZGVyPSdtYXJrZXJzIHN0cm9rZSBmaWxsJy8+PHBhdGggZmlsbD0nI2ZmZicgZD0nTTI5IDE2djIwaDZWMTZaTTI5IDQwdjZoNnYtNnonIHBhaW50LW9yZGVyPSdmaWxsIG1hcmtlcnMgc3Ryb2tlJy8+PC9zdmc+";
+      // Display our initial warning note...
+      setMessage("warning", "initialWarning", "<strong><em>NOTE:</em></strong> This tool will <em>not</em> convert save states from one emulator's format to another; it <em>only</em> gives you either the raw save state data the SF2000 generated (when converting <em>from</em> the SF2000), or allows you to take any random file and shove it into the container format the SF2000 uses for save states (when converting <em>to</em> the SF2000)… whether or not the SF2000 is able to understand the file you give it is up to the SF2000, not to me! If you're converting save states to the SF2000, and the SF2000 doesn't work with whatever kind of save state you provided, there's nothing I can do about that.<br><br>You can <a href=\"https://vonmillhausen.github.io/sf2000/#emulators\" target=\"_blank\" rel=\"noreferrer noopener\">find a reference to all the specific emulators and versions used by the SF2000 here</a>; you'll probably only have success if you're using at least the same emulator, if not also the same version. Also, to have any chance of success, you must be using the exact same ROM on both devices, and make sure save state compression is turned off if your save state is coming from Retroarch!");
 
       // When the tool loads, add some event watchers for when the Step 1 radio
       // buttons change; and depending on which mode the user selects, begin
@@ -108,14 +107,16 @@
             // save and thumbnail data... otherwise, it returns false and we let
             // the user know the file didn't appear to be valid...
             if (validateSave(new Uint8Array(event.target.result))) {
+
               // Great, the user selected a valid SF2000 format save state file!
               // On to Step 3!
               setupStepThree_From();
             }
             else {
+
               // Whoops, the file doesn't looke like it was an SF2000 save state file.
               // Let the user know and return...
-              document.getElementById("step2Messages").innerHTML = "<p class=\"error\"><img class=\"icon\" alt=\"An icon of a red circle with a white exclamation point, indicating an error has occurred\" aria-hidden=\"true\" src=\"" + errorIcon + "\"> ERROR: The selected file does not appear to be a valid SF2000 save state file.</p>";
+              setMessage("error", "step2Messages", "ERROR: The selected file does not appear to be a valid SF2000 save state file.");
               return;
             }
           }
@@ -160,9 +161,10 @@
             // The file is loaded; let's check to make sure we got a binary file (can't
             // really do much more validation than that, alas)...
             if (!event.target.result.includes("application/octet-stream")) {
+
               // Whoops! Doesn't look like the user provided a binary file, so can't be
               // a save state!
-              document.getElementById("step2Messages").innerHTML = "<p class=\"error\"><img class=\"icon\" alt=\"An icon of a red circle with a white exclamation point, indicating an error has occurred\" aria-hidden=\"true\" src=\"" + errorIcon + "\"> ERROR: The selected file does not appear to be a binary file, and therefore can't be a save state file; please make sure you're selecting a valid emulator save state file.</p>";
+              setMessage("error", "step2Messages", "ERROR: The selected file does not appear to be a binary file, and therefore can't be a save state file; please make sure you're selecting a valid emulator save state file.");
               return;
             }
             
@@ -182,7 +184,7 @@
             // On to Step 3!
             setupStepThree_To();
           }
-        })
+        });
       }
 
       // This function sets up the HTML for "Convert from SF2000 > Step 2 > Step 3"...
@@ -222,19 +224,13 @@
           if (match) {
             downloadName = match[1] + ".state";
           }
-          downloadSaveState();
+          downloadToBrowser(saveData, "application/octet-stream", downloadName);
 
         });
 
-        // We're nearly ready to wrap up Step 3; all that's left is to set up
-        // our initial preview canvas state, and perform our initial conversion
-        // and rendering...
-        var canvas = document.getElementById("thumbnailPreview");
-        var context = canvas.getContext("2d");
-        canvas.width = thumbWidth;
-        canvas.height = thumbHeight;
-        convertImageFromSF2000();
-        renderImageToCanvas();
+        // The last thing to do here in Step 3 is to perform our initial image
+        // data conversion and preview rendering... so let's do it!
+        convertFromSF2000AndRender();
       }
 
       // This function sets up the HTML for "Convert to SF2000 > Step 2 > Step 3"...
@@ -305,7 +301,7 @@
               userStateDownloadCheck();
 
               // Display a message to the user and return...
-              document.getElementById("step3Messages").innerHTML = "<p class=\"error\"><img class=\"icon\" alt=\"An icon of a red circle with a white exclamation point, indicating an error has occurred\" aria-hidden=\"true\" src=\"" + errorIcon + "\"> ERROR: The selected file does not appear to be a binary file, and therefore can't be a game ROM file; please make sure you're selecting a valid game ROM file.</p>";
+              setMessage("error", "step3Messages", "ERROR: The selected file does not appear to be a binary file, and therefore can't be a game ROM file; please make sure you're selecting a valid game ROM file.");
               return;
             }
             else {
@@ -319,7 +315,7 @@
             }
           }
 
-        })
+        });
 
         // Next up, our radio buttons...
         var slots = document.getElementsByName("saveSlot");
@@ -329,7 +325,7 @@
             // state-checking function; we'll pull the actual data from the
             // selected radio button at run time during the download process...
             userStateDownloadCheck();
-          })
+          });
         }
 
         // And last but not least, our Download button...
@@ -345,13 +341,13 @@
             // Oh! We failed to compress the save state data using the pako
             // library for some reason... display a message to the user and
             // return...
-            document.getElementById("step3Messages").innerHTML = "<p class=\"error\"><img class=\"icon\" alt=\"An icon of a red circle with a white exclamation point, indicating an error has occurred\" aria-hidden=\"true\" src=\"" + errorIcon + "\"> ERROR: Failed to compress the chosen save state file's data!</p>";
+            setMessage("error", "step3Messages", "ERROR: Failed to compress the chosen save state file's data!");
             return;
           }
 
           // We also need to check our compressed data is of an appropriate size...
           if (compressedSaveState.length < 0 || compressedSaveState.length > 4294967295) {
-            document.getElementById("step3Messages").innerHTML = "<p class=\"error\"><img class=\"icon\" alt=\"An icon of a red circle with a white exclamation point, indicating an error has occurred\" aria-hidden=\"true\" src=\"" + errorIcon + "\"> ERROR: Compressed save state data is not valid (either it was 0 bytes in length, or was larger than 4 GB)!</p>";
+            setMessage("error", "step3Messages", "ERROR: Compressed save state data is not valid (either it was 0 bytes in length, or was larger than 4 GB)!");
             return false;
           }
 
@@ -424,7 +420,7 @@
           // Just as a final sanity check, offset should now be equal to
           // saveData.length... let's confirm!
           if (offset !== saveData.length) {
-            document.getElementById("step3Messages").innerHTML = "<p class=\"error\"><img class=\"icon\" alt=\"An icon of a red circle with a white exclamation point, indicating an error has occurred\" aria-hidden=\"true\" src=\"" + errorIcon + "\"> ERROR: Inconsistent data length when building save state bundle!</p>";
+            setMessage("error", "step3Messages", "ERROR: Inconsistent data length when building save state bundle!");
             return false;
           }
 
@@ -444,7 +440,7 @@
           downloadName = saveFileName + ".sa" + document.querySelector('input[name="saveSlot"]:checked').value;
 
           // Right, that should be everything we need... to the Downloadmobile!
-          downloadSaveState();
+          downloadToBrowser(saveData, "application/octet-stream", downloadName);
 
         });
       }
@@ -567,7 +563,6 @@
         return true;
       }
 
-
       // This function runs through our binary save state data, and checks it for any
       // of Retroarch's save state headers. If it finds them, it strips them out...
       // See https://github.com/libretro/RetroArch/blob/master/tasks/task_save.c
@@ -653,8 +648,7 @@
       // both are true, it enables the download button, otherwise it makes sure
       // the button is disabled...
       function userStateDownloadCheck() {
-        if (romFileGood === true && document.querySelector('input[name="saveSlot"]:checked'))
-        {
+        if (romFileGood === true && document.querySelector('input[name="saveSlot"]:checked')) {
           // Looks good - enable Download button!
           var dButton = document.getElementById("saveStateDownload");
           dButton.removeAttribute("disabled");
@@ -666,96 +660,20 @@
         }
       }
 
-      // This function takes the SF2000-format binary image data stored in our
-      // thumbData global variable, and converts it to 8-bit RGB(A) format,
-      // storing the result in our previewCanvasData global. This is then used
-      // for drawing the image data to our preview canvas...
-      function convertImageFromSF2000() {
-
-        // We're converting RGB565-little-endian data (no alpha); size our
-        // output buffer accordingly...
-        previewCanvasData = new Uint8Array((thumbData.length / 2) * 3);
-        offset = 0;
-        for (var i = 0; i < thumbData.length; i += 2) {
-          // Read in two bytes, representing one RGB565 pixel in little-endian format
-          var byte1 = thumbData[i];
-          var byte2 = thumbData[i + 1];
-          // Extract the red, green and blue components. The first five bits of byte2
-          // are red...
-          var red = (byte2 & 0b11111000) >> 3;
-          // ... the first three bits of byte1 and the last three bits of byte2 are
-          // green...
-          var green = ((byte1 & 0b11100000) >> 5) | ((byte2 & 0b00000111) << 3);
-          // ... and the last five bits of byte1 are blue...
-          var blue = byte1 & 0b00011111;
-          // These values are in 5-bit/6-bit ranges - we need to scale them to 8-bit
-          // ranges for the colours to look right...
-          red = Math.round(red * 255 / 31);
-          green = Math.round(green * 255 / 63);
-          blue = Math.round(blue * 255 / 31);
-          // Finally store the RGB components in-order in our rgb888 buffer...
-          previewCanvasData[offset] = red;
-          previewCanvasData[offset + 1] = green;
-          previewCanvasData[offset + 2] = blue;
-          offset += 3;
-        }
-
-      }
-
-      // This function takes the current stream of SF2000 image data and renders
-      // it to our preview canvas...
-      function renderImageToCanvas() {
-
-        // Get our preview canvas...
+      // This function takes our global thumbData object (Uint8Array), converts
+      // it to an ImageData object and assigns it to our previewCanvasData
+      // global; it then renders that ImageData to our preview canvas...
+      function convertFromSF2000AndRender() {
+        previewCanvasData = rgb565ToImageData(thumbData, thumbWidth, thumbHeight);
         var canvas = document.getElementById("thumbnailPreview");
         var context = canvas.getContext("2d");
-
-        // Now, let's start drawing stuff to our canvas; we'll loop through
-        // every row and column...
-        for (var y = 0; y < canvas.height; y++) {
-          for (var x = 0; x < canvas.width; x++) {
-
-            // Calculate the offset of our current pixel within our input data
-            // stream...
-            var pixel = ((canvas.width * y) * 3) + (x * 3);
-
-            // Before we try and draw anything, let's make sure we actually have
-            // enough data in our stream to match this pixel location...
-            if (previewCanvasData.length >= (pixel + 2)) {
-
-              // OK, we're good - we've stream data for this pixel. Get its
-              // colour (and possibly alpha) values, and set them up for
-              // our next canvas draw call...
-              context.fillStyle = "rgb("+ previewCanvasData[pixel] +", " + previewCanvasData[pixel + 1] + ", " + previewCanvasData[pixel + 2] + ")";
-            }
-            else {
-              // Oops! We've reached the end of our data stream, but not the
-              // end of our canvas... so just set up a solid white pixel
-              // instead...
-              context.fillStyle = "rgb(255, 255, 255)";
-            }
-
-            // Draw the actual pixel to the canvas...
-            context.fillRect(x, y, 1, 1);
-          }
-        }
-      }
-
-      // This function takes our save state data (be it in raw, non-SF2000
-      // format, or in SF2000 save state bundle format) and sends it to the
-      // user's browser as a download...
-      function downloadSaveState() {
-        var link = document.createElement("a");
-        link.href = window.URL.createObjectURL(new Blob([saveData], {type: "application/octet-stream"}));
-        link.download = downloadName;
-        link.style.display = "none";
-        document.body.appendChild(link);
-        link.click();
-        window.URL.revokeObjectURL(link.href);
-        document.body.removeChild(link);
+        canvas.width = previewCanvasData.width;
+        canvas.height = previewCanvasData.height;
+        context.clearRect(0, 0, canvas.width, canvas.height);
+        context.putImageData(previewCanvasData, 0, 0);
       }
     </script>
     <hr>
-    <p><a rel="license" href="https://creativecommons.org/publicdomain/zero/1.0/">CC0</a>: public domain. Version 1.1, 20230621.1</p>
+    <p><a rel="license" href="https://creativecommons.org/publicdomain/zero/1.0/">CC0</a>: public domain. Version 1.2, 20230626.1</p>
   </body>
 </html>

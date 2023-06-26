@@ -20,6 +20,7 @@
         </div>
       </section>
     </div>
+    <script src="tools.js"></script>
     <script>
 
       // Global Variables
@@ -61,11 +62,13 @@
         });
       }
 
-      // This function sets up the HTML for "Convert from SF2000 > Step 2", selecting
-      // an image file from the SF2000's Resources folder that the user wants to
-      // convert to RGB888/RGBA...
+      // This function sets up the HTML for "Convert from SF2000 > Step 2",
+      // selecting an image file from the SF2000's Resources folder that the
+      // user wants to convert to RGB888/RGBA...
       function setupStepTwo_From() {
-        // Create the new section, add our heading and our instruction paragraph...
+
+        // Create the new section, add our heading and our instruction
+        // paragraph...
         var html = "<section id=\"selectSF2000File\"><h2>Step 2: Select SF2000 Image File</h2><p>Select the SF2000 image file you want to convert from. If you need help choosing the image you want to convert, you can <a href=\"https://vonmillhausen.github.io/sf2000/#images-used\" target=\"_blank\" rel=\"noreferrer noopener\">find a reference to all of the used UI images in my overview of the SF2000 here</a>.</p><div id=\"step2Messages\"></div>";
 
         // Add our file chooser...
@@ -74,18 +77,21 @@
         // Close off our section...
         html += "</section>";
 
-        // Finally, add a <hr> separator after the last step, and append the new step...
+        // Finally, add a <hr> separator after the last step, and append the new
+        // step...
         document.getElementById("steps").insertAdjacentHTML("beforeend", "<hr>");
         document.getElementById("steps").insertAdjacentHTML("beforeend", html);
 
         // Attach our event handler to our new file input control...
         var sf2000ImageInput = document.getElementById("inputImage");
         sf2000ImageInput.addEventListener("change", function() {
-          // The user has chosen a new file; it should be a binary blob we can try
-          // to interpret as an image. First let's clear any old messages...
+
+          // The user has chosen a new file; it should be a binary blob we can
+          // try to interpret as an image. First let's clear any old messages...
           document.getElementById("step2Messages").innerHTML = "";
 
-          // Now let's check to make sure the data URI indicates "application/octet-stream"...
+          // Now let's check to make sure the data URI indicates
+          // "application/octet-stream"...
           var frImage = new FileReader();
           fileName = event.target.files[0].name;
           frImage.readAsDataURL(event.target.files[0]);
@@ -94,10 +100,10 @@
             var dataType = fileData.substring(5, fileData.indexOf(";"));
             if (dataType === "application/octet-stream") {
 
-              // The user selected a file that appears to contain binary data; it's
-              // a good candidate for image interpretation so! Extract the binary
-              // data, store it in our sf2000ImageData global, and start setting
-              // up Step 3...
+              // The user selected a file that appears to contain binary data;
+              // it's a good candidate for image interpretation so! Extract the
+              // binary data, store it in our sf2000ImageData global, and start
+              // setting up Step 3...
               var base64Data = fileData.substring(fileData.indexOf(",") + 1);
               var binaryData = atob(base64Data);
               sf2000ImageData = new Uint8Array(binaryData.length);
@@ -105,9 +111,9 @@
                 sf2000ImageData[i] = binaryData.charCodeAt(i);
               }
 
-              // Just before we get to Step 3, remove any existing HTML that comes
-              // after the current section, just to make sure things are nice and
-              // neat for Step 3 to load into...
+              // Just before we get to Step 3, remove any existing HTML that
+              // comes after the current section, just to make sure things are
+              // nice and neat for Step 3 to load into...
               while(document.getElementById("selectSF2000File").nextSibling) {
                 document.getElementById("selectSF2000File").nextSibling.remove();
               }
@@ -118,17 +124,18 @@
             else {
               // The file the user selected doesn't appear to be binary data, so
               // it can't be an SF2000 image file; let the user know...
-              document.getElementById("step2Messages").innerHTML = "<p class=\"errorMessage\">ERROR: The selected file does not appear to be binary file; please make sure you're selecting an SF2000 encoded image file.</p>";
+              setMessage("error", "step2Messages", "ERROR: The selected file does not appear to be binary file; please make sure you're selecting an SF2000 encoded image file.");
               return;
             }
           }
         });
       }
 
-      // This function sets up the HTML for "Convert to SF2000 > Step 2", selecting
-      // the image file the user wants to convert to one of the SF2000's image
-      // formats...
+      // This function sets up the HTML for "Convert to SF2000 > Step 2",
+      // selecting the image file the user wants to convert to one of the
+      // SF2000's image formats...
       function setupStepTwo_To() {
+
         // Start our new section, add our header and our instructions...
         var html = "<section id=\"selectImageFile\"><h2>Step 2: Select RGB888/RGBA Image File</h2><p>Select the image file you want to convert to an SF2000 image format. You can select either a PNG or JPEG format image. Transparency is respected for PNGs, but only if outputting to the BGRA output format.</p><div id=\"step2Messages\"></div>";
 
@@ -138,7 +145,8 @@
         // Close our section...
         html += "</section>";
 
-        // Finally, add a <hr> separator after the last step, and append the new step...
+        // Finally, add a <hr> separator after the last step, and append the new
+        // step...
         document.getElementById("steps").insertAdjacentHTML("beforeend", "<hr>");
         document.getElementById("steps").insertAdjacentHTML("beforeend", html);
 
@@ -158,32 +166,28 @@
           frImage.readAsDataURL(event.target.files[0]);
           frImage.onload = function(event) {
 
-            // The file is loaded; let's check to make sure we got a PNG or JPEG...
+            // The file is loaded; let's check to make sure we got a PNG or
+            // JPEG...
             if (!event.target.result.includes("data:image/png;") && !event.target.result.includes("data:image/jpeg;")) {
+
               // Whoops! Doesn't look like the user provided a PNG or a JPEG!
-              document.getElementById("step2Messages").innerHTML = "<p class=\"errorMessage\">ERROR: The selected file does not appear to be either a PNG or JPEG image; please make sure you're selecting an appropriate image file.</p>";
+              setMessage("error", "step2Messages", "ERROR: The selected file does not appear to be either a PNG or JPEG image; please make sure you're selecting an appropriate image file.");
               return;
+
             }
             
-            // Now we're going to load the file's data into an Image object, so we can
-            // access the raw image data...
+            // Now we're going to load the file's data into an Image object, so
+            // we can access the raw image data...
             userImageData = new Image;
             userImageData.src = event.target.result;
             userImageData.onload = function(event) {
 
-              // To access the raw image data, we jam the image into a Canvas object,
-              // and then grab an ImageData object from the Canvas. This will give us
-              // access to the raw RGBA data for each pixel in the image...
-              var workingArea = document.createElement("canvas");
-              var contWA = workingArea.getContext("2d");
-              workingArea.width = userImageData.width;
-              workingArea.height = userImageData.height;
-              contWA.drawImage(userImageData, 0, 0, workingArea.width, workingArea.height);
-              userImageData = contWA.getImageData(0, 0, workingArea.width, workingArea.height)
+              // Convert the Image object to an ImageData object...
+              userImageData = imageToImageData(userImageData);
 
-              // Now we've got our data, we can move on to Step 3. First though, let's
-              // remove any existing HTML after the current step, so things are nice
-              // and clean for Step 3 to load into...
+              // Now we've got our data, we can move on to Step 3. First though,
+              // let's remove any existing HTML after the current step, so
+              // things are nice and clean for Step 3 to load into...
               while(document.getElementById("selectImageFile").nextSibling) {
                 document.getElementById("selectImageFile").nextSibling.remove();
               }
@@ -192,10 +196,11 @@
               setupStepThree_To_SF2000Image();
             }
           }
-        })
+        });
       }
 
-      // This function sets up the HTML for "Convert from SF2000 > Step 2 > Step 3"...
+      // This function sets up the HTML for "Convert from SF2000 > Step 2 >
+      // Step 3"...
       function setupStepThree_From_SF2000Image() {
 
         // In this section, we'll be rendering the HTML for the image processing
@@ -204,8 +209,11 @@
         // be set to for a given input image, based on its file size. As we'll
         // want to have these values ready-to-go by the time we generate the
         // HTML, let's start by checking the size of the input image in bytes,
-        // and set our data format, width and height automatically...
+        // and set our data format, width and height automatically (note, this
+        // doesn't cover *all* of the SF2000's UI images, just the most common
+        // ones in terms of file size)...
         switch (sf2000ImageData.length) {
+
           case 1843200:
             // Probably 640x1440 RGB565 - SF2000 button mapping images
             outputImageWidth = 640; outputImageHeight = 1440; imageFormat = "RGB565";
@@ -217,7 +225,8 @@
             break;
 
           case 744192:
-            // Probably 152x1224 BGRA - Main menu "Games Exist" and "Start: Open" labels for all languages
+            // Probably 152x1224 BGRA - Main menu "Games Exist" and "Start:
+            // Open" labels for all languages
             outputImageWidth = 152; outputImageHeight = 1224; imageFormat = "BGRA";
             break;
 
@@ -232,7 +241,8 @@
             break;
 
           case 589824:
-            // Probably 576x256 BGRA - English and Chinese menu labels used for shortcut ROM names
+            // Probably 576x256 BGRA - English and Chinese menu labels used for
+            // shortcut ROM names
             outputImageWidth = 576; outputImageHeight = 256; imageFormat = "BGRA";
             break;
 
@@ -252,7 +262,8 @@
               outputImageWidth = 400; outputImageHeight = 192; imageFormat = "RGB565";
             }
             else if (fileName == "werui.ioc") {
-              // Probably 320x240 RGB565 - Unused "NODATA" save state slot placeholder
+              // Probably 320x240 RGB565 - Unused "NODATA" save state slot
+              // placeholder
               outputImageWidth = 320; outputImageHeight = 240; imageFormat = "RGB565";
             }
             break;
@@ -278,12 +289,14 @@
             break;
 
           case 40960:
-            // Probably 64x320 RGB565 - Non-transparent labels for system button assignments
+            // Probably 64x320 RGB565 - Non-transparent labels for system button
+            // assignments
             outputImageWidth = 64; outputImageHeight = 320; imageFormat = "RGB565";
             break;
 
           case 39936:
-            // Probably 52x192 BGRA - Transparent labels for system button assignments
+            // Probably 52x192 BGRA - Transparent labels for system button
+            // assignments
             outputImageWidth = 52; outputImageHeight = 192; imageFormat = "BGRA";
             break;
 
@@ -293,7 +306,8 @@
             break;
 
           case 32116:
-            // Probably 217x37 BGRA - Yes and No labels when overwriting save games
+            // Probably 217x37 BGRA - Yes and No labels when overwriting save
+            // games
             outputImageWidth = 217; outputImageHeight = 37; imageFormat = "BGRA";
             break;
 
@@ -303,7 +317,8 @@
             break;
 
           case 7168:
-            // Probably 8x224 BGRA - Rounded ends for unknown warning prompt image
+            // Probably 8x224 BGRA - Rounded ends for unknown warning prompt
+            // image
             outputImageWidth = 8; outputImageHeight = 224; imageFormat = "BGRA";
             break;
 
@@ -318,11 +333,12 @@
             break;
         }
 
-        // Create the new section, add our heading and our instruction paragraph...
+        // Create the new section, add our heading and our instruction
+        // paragraph...
         var html = "<section id=\"processSF2000File\"><h2>Step 3: Set Data Interpretation Options</h2><p>As the image files on the SF2000 are raw binary blobs, there's no information stored in them to say what their width or height is, what format the pixel information is stored in, etc.. Therefore, it is up to <em>you</em> to specify those details yourself, which you can do using the options below.</p><p>A preview of the image will appear below the options, reflecting the current options; the preview has a white dash outline so you can better judge where the bounds of transparent images are. Below the preview image is a \"Download\" button you can use to download the image as a PNG.</p><p>Depending on the size of the file you selected, this tool may recognise it as a \"known\" file from the SF2000, and if so the options below will have been set automatically for you. If not, or if the options are automatically set incorrectly, here's a brief description of what each option does:</p><dl><dt>Image Format:</dt><dd>Specifies the data format for each pixel in the image. There are two image formats currently used by the SF2000 - RGB565 (used for most of the \"basic\" UI elements, including main backgrounds, etc.), and BGRA (used for anything that requires transparency, such as the system logos on the main menu, etc.).</dd><dt>Width:</dt><dd>Specifies the width of the image in pixels.</dd><dt>Height:</dt><dd>Specifies the height of the image in pixels.</dd></dl>";
 
-        // Next, let's add our image controls; a select list for the image format,
-        // and number inputs for the interpreted width and height...
+        // Next, let's add our image controls; a select list for the image
+        // format, and number inputs for the interpreted width and height...
         html += "<div class=\"controlContainer\">";
         html += "<div class=\"control\"><label>Image Format: <select id=\"imageFormat\"><option" + (imageFormat == "RGB565" ? " selected" : "") + ">RGB565</option><option" + (imageFormat == "BGRA" ? " selected" : "") + ">BGRA</option></select></label></div>";
         html += "<div class=\"control\"><label>Width: <input id=\"outputImageWidth\" type=\"number\" min=\"1\" step=\"1\" value=\"" + outputImageWidth + "\"></label></div>";
@@ -338,23 +354,25 @@
         // ... and lastly we'll close off our section...
         html += "</section>";
 
-        // Add a <hr> separator after the previous step, and append the new step...
+        // Add a <hr> separator after the previous step, and append the new
+        // step...
         document.getElementById("steps").insertAdjacentHTML("beforeend", "<hr>");
         document.getElementById("steps").insertAdjacentHTML("beforeend", html);
 
-        // Now, add our interactivity by attaching our event handlers; first up, our
-        // format selector...
+        // Now, add our interactivity by attaching our event handlers; first up,
+        // our format selector...
         var ifField = document.getElementById("imageFormat");
         ifField.addEventListener("change", function() {
-          // Set our global imageFormat to the new value, and update our preview...
+          // Set our global imageFormat to the new value, and update our
+          // preview...
           imageFormat = this.value;
-          convertImageFromSF2000();
-          renderImageToCanvas();
+          convertFromSF2000AndRender();
         });
 
         // Next our width and height fields...
         var whFields = [document.getElementById("outputImageWidth"), document.getElementById("outputImageHeight")];
         whFields.forEach(field => {
+
           // When a key is pressed, only allow the events through under certain
           // circumstances - prevents folks from being able to type or paste
           // non-integers into the field...
@@ -364,7 +382,8 @@
               return;
             }
             event.preventDefault();
-          })
+          });
+
           // And when the number is updated, update our global variables to
           // match, then update our preview...
           field.addEventListener("change", function() {
@@ -377,35 +396,33 @@
             else {
               outputImageHeight = this.value;
             }
-            renderImageToCanvas();
-          })
-        })
+            convertFromSF2000AndRender();
+          });
+        });
 
         // And attach the event handler for the download button...
         var downloadButton = document.getElementById("sf2000Download");
         downloadButton.addEventListener("click", function() {
-          downloadSF2000ConvertedImage();
+          var canvas = document.getElementById("processFilePreview");
+          canvas.toBlob(function(blob) {
+            downloadToBrowser(blob, "image/png", fileName + ".png");
+          });
         });
 
-        // We're nearly ready to wrap up Step 3; all that's left is to set up
-        // our initial preview canvas state, and perform our initial conversion
-        // and rendering...
-        var canvas = document.getElementById("processFilePreview");
-        var context = canvas.getContext("2d");
-        canvas.width = outputImageWidth;
-        canvas.height = outputImageHeight;
-        convertImageFromSF2000();
-        renderImageToCanvas();
+        // We're nearly ready to wrap up Step 3; all that's left is to perform
+        // our initial conversion and rendering...
+        convertFromSF2000AndRender();
       }
 
-      // This function sets up the HTML for "Convert to SF2000 > Step 2 > Step 3"...
+      // This function sets up the HTML for "Convert to SF2000 > Step 2 >
+      // Step 3"...
       function setupStepThree_To_SF2000Image() {
 
-        // In this section, we'll be rendering the HTML for some image processing
-        // controls, as well as an image preview. As we're coming from a known
-        // image, we already have our width and height this time, and so we can
-        // just get on to rendering the HTML. Create our new section, add its
-        // heading and instruction paragraphs...
+        // In this section, we'll be rendering the HTML for some image
+        // processing controls, as well as an image preview. As we're coming
+        // from a known image, we already have our width and height this time,
+        // and so we can just get on to rendering the HTML. Create our new
+        // section, add its heading and instruction paragraphs...
         html = "<section id=\"processUserFile\"><h2>Step 3: Set Conversion Options</h2><p>The options below control how your image is converted for use on the SF2000. A preview of the image will appear below the options, reflecting their current settings; the preview has a white dash outline so you can better judge where the bounds of transparent images are. Below the preview image is a \"Download\" button you can use to download the image as binary blob for the SF2000. If you name your input image like <code>name.extension.extension</code> (e.g., <code>c1eac.pal.png</code>), then the download will automatically be named like <code>name.extension</code> (e.g., <code>c1eac.pal</code>); this may help to speed up your workflow.</p><p>Here's a brief description of what each option does:</p><dl><dt>Image Format:</dt><dd>Specifies the data format for the output image. There are two image formats currently used by the SF2000 - RGB565 (used for most of the \"basic\" UI elements, including main backgrounds, etc.), and BGRA (used for anything that requires transparency, such as the system logos on the main menu, etc.). If you're not sure which format to choose, <a href=\"https://vonmillhausen.github.io/sf2000/#images-used\" target=\"_blank\" rel=\"noreferrer noopener\">refer to my list of images used by the SF2000</a>.</dd><dt>Scaling:</dt><dd>One of two available scaling modes for your input image; the \"Scaling\" option lets you scale your image maintaining aspect ratio amongst several common sizes (e.g., 1x scaling to maintain the input image size, 2x scaling to double it, etc.)</dd><dt>Fit to:</dt><dd>The other available scaling mode; this will scale your image to the specified width and height, <em>without</em> maintaining aspect ratio. This will allow you to scale an image to any dimension you want, but it'll be up to you to do your own aspect ratio calculations.</dd><dt>Filter Type:</dt><dd>When scaling an image by anything other than 1x, specifies the type of image filtering to use. \"Nearest Neighbour\" will give sharp pixel scaling but only at integer upscales; any other scale will appear aliased. \"Bilinear\" will give a fuzzier scale, but it works better for non-integer scale factors and for downscaling.</dd></dl>";
 
         // Now let's add our image controls; there's a few of them! We have a
@@ -436,24 +453,26 @@
         // ... and lastly we'll close off our section...
         html += "</section>";
 
-        // Add a <hr> separator after the previous step, and append the new step...
+        // Add a <hr> separator after the previous step, and append the new
+        // step...
         document.getElementById("steps").insertAdjacentHTML("beforeend", "<hr>");
         document.getElementById("steps").insertAdjacentHTML("beforeend", html);
 
-        // Now we'll attach event listeners for all of the interactive elements in
-        // this step. We'll start with our image format select box...
+        // Now we'll attach event listeners for all of the interactive elements
+        // in this step. We'll start with our image format select box...
         var ifField = document.getElementById("imageFormat");
         ifField.addEventListener("change", function() {
+
           // Update our global variable with the new value, convert the user's
           // image using the new format and render a preview...
           imageFormat = this.value;
-          convertImageToSF2000(scaleImage(userImageData).data);
-          convertImageFromSF2000();
-          renderImageToCanvas();
+          let newWH = calculateNewSize(userImageData);
+          convertImageToSF2000(scaleImage(userImageData, newWH.width, newWH.height, userFilterType));
+          convertFromSF2000AndRender();
         });
 
-        // The scaling mode radio buttons; these let the user choose between fixed-
-        // ratio scaling, or fixed width/height scaling...
+        // The scaling mode radio buttons; these let the user choose between
+        // fixed-ratio scaling, or fixed width/height scaling...
         var modes = document.getElementsByName("scaleMode");
         for (var i = 0; i < modes.length; i++) {
           modes[i].addEventListener("change", function() {
@@ -469,39 +488,36 @@
               document.getElementById("scaleFactor").removeAttribute("disabled");
               document.getElementById("userFitWidth").setAttribute("disabled", "");
               document.getElementById("userFitHeight").setAttribute("disabled", "");
-
-              // We'll also want to re-convert the user's image data and render
-              // a new preview...
-              convertImageToSF2000(scaleImage(userImageData).data);
-              convertImageFromSF2000();
-              renderImageToCanvas();
             }
             else if (userScaleMode == "fit") {
 
-              // They chose fixed width/height scaling, so enable our width/height
-              // number inputs, and disable the ratio-scaling selection box...
+              // They chose fixed width/height scaling, so enable our
+              // width/height number inputs, and disable the ratio-scaling
+              // selection box...
               document.getElementById("userFitWidth").removeAttribute("disabled");
               document.getElementById("userFitHeight").removeAttribute("disabled");
               document.getElementById("scaleFactor").setAttribute("disabled", "");
-
-              // We'll also want to re-convert the user's image data and render
-              // a new preview...
-              convertImageToSF2000(scaleImage(userImageData).data);
-              convertImageFromSF2000();
-              renderImageToCanvas();
             }
+
+            // We'll also want to re-convert the user's image data and render
+            // a new preview...
+            let newWH = calculateNewSize(userImageData);
+            convertImageToSF2000(scaleImage(userImageData, newWH.width, newWH.height, userFilterType));
+            convertFromSF2000AndRender();
           });
         }
 
         // The fixed-ratio scaling selector...
         var sField = document.getElementById("scaleFactor");
         sField.addEventListener("change", function() {
+
           // Update our global variable with the newly chosen scaling factor,
-          // and then re-convert the user's image data and render a new preview...
+          // and then re-convert the user's image data and render a new
+          // preview...
           userScaleFactor = this.value;
-          convertImageToSF2000(scaleImage(userImageData).data);
-          convertImageFromSF2000();
-          renderImageToCanvas();
+          let newWH = calculateNewSize(userImageData);
+          convertImageToSF2000(scaleImage(userImageData, newWH.width, newWH.height, userFilterType));
+          convertFromSF2000AndRender();
         });
 
         // And the fixed-width/height number inputs...
@@ -511,17 +527,19 @@
           // These get two event listeners; the first is designed to prevent the
           // user from entering anything other than positive integers...
           field.addEventListener("keydown", function(event) {
+
             // Only allow integer entry and things like arrow keys, etc!
             if (event.key.length > 1 || /\d/.test(event.key)) {
               return;
             }
             event.preventDefault();
-          })
+          });
 
           // ... and this updates our global variables, re-converts the user's
           // image data and renders a new preview image when the numbers are
           // changed...
           field.addEventListener("change", function() {
+
             if (this.value === "" || this.value === "0") {
               this.value = "1";
             }
@@ -531,520 +549,107 @@
             else {
               userFitHeight = this.value;
             }
-            convertImageToSF2000(scaleImage(userImageData).data);
-            convertImageFromSF2000();
-            renderImageToCanvas();
-          })
-        })
+            let newWH = calculateNewSize(userImageData);
+            convertImageToSF2000(scaleImage(userImageData, newWH.width, newWH.height, userFilterType));
+            convertFromSF2000AndRender();
+          });
+        });
 
         // Next, the event listener for our filter type selection...
         var ftField = document.getElementById("userFilterType");
         ftField.addEventListener("change", function() {
+
           // Update our global variable with the new filter type, re-convert
           // the user's image data, and update our preview...
           userFilterType = this.value;
-          convertImageToSF2000(scaleImage(userImageData).data);
-          convertImageFromSF2000();
-          renderImageToCanvas();
+          let newWH = calculateNewSize(userImageData);
+          convertImageToSF2000(scaleImage(userImageData, newWH.width, newWH.height, userFilterType));
+          convertFromSF2000AndRender();
         });
 
         // And last but not least, our Download button...
         var dButton = document.getElementById("userDownload");
         dButton.addEventListener("click", function() {
-          downloadUserConvertedImage();
+
+          // For the file-name we're going to do something semi-fancy; if the
+          // user's original image file name had *two* extensions (e.g.,
+          // c1eac.pal.png), then we'll strip off the second extension and
+          // just save the file with the remainder of the name (e.g.,
+          // c1eac.pal) - this will speed up their workflow if their source
+          // image came from a design tool that exports images named after
+          // layers/artboards. Otherwise, we'll just use the name of the
+          // file they provided with ".bin" appended to the end...
+          var downloadName = fileName + ".bin";
+          var match = fileName.match(/(.+)\.([^.]+)\.([^.]+)/);
+          if (match) {
+
+            // It's got a double extension - so let's just strip off the
+            // second one...
+            downloadName = match[1] + "." + match[2];
+          }
+          downloadToBrowser(sf2000ImageData, "application/octet-stream", downloadName);
         });
 
         // The last thing to do here in Step 3 is to perform our initial
         // image data conversion and preview rendering... so let's do it!
-        convertImageToSF2000(scaleImage(userImageData).data);
-        convertImageFromSF2000();
-        renderImageToCanvas();
+        let newWH = calculateNewSize(userImageData);
+        convertImageToSF2000(scaleImage(userImageData, newWH.width, newWH.height, userFilterType));
+        convertFromSF2000AndRender();
       }
 
-      // Utility function which takes in an ImageData object, and returns
-      // a (partially) upscaled version using bilinear filtering...
-      function _bilinear(imageData, newWidth, newHeight) {
-        var canvas = document.createElement("canvas");
-        var context = canvas.getContext("2d");
-        canvas.width = imageData.width;
-        canvas.height = imageData.height;
-        context.putImageData(imageData, 0, 0);
-
-        var outCanvas = document.createElement("canvas");
-        var outContext = outCanvas.getContext("2d");
-        outContext.imageSmoothingEnabled = true;
-        outContext.imageSmoothingQuality = "high";
-        outCanvas.width = newWidth;
-        outCanvas.height = newHeight;
-        outContext.drawImage(canvas, 0, 0, canvas.width, canvas.height, 0, 0, newWidth, newHeight);
-
-        return outContext.getImageData(0, 0, newWidth, newHeight);
-      }
-
-      // Utility function which takes in an ImageData object, and returns
-      // a (partially) downscaled version using gaussian resampling...
-      // [Side note: I asked Bing AI for this function; ain't technology grand!]
-      function _gaussian(imageData, newWidth, newHeight) {
-        // Get the original width and height of the image data
-        let oldWidth = imageData.width;
-        let oldHeight = imageData.height;
-
-        // Get the pixel data array of the image data
-        let oldData = imageData.data;
-
-        // Create a new pixel data array for the scaled image data
-        let newData = new Uint8ClampedArray(newWidth * newHeight * 4);
-
-        // Calculate the scaling factor along each axis
-        let scaleX = newWidth / oldWidth;
-        let scaleY = newHeight / oldHeight;
-
-        // Calculate the radius of the Gaussian kernel based on the scaling factor
-        let radiusX = Math.ceil(1 / scaleX);
-        let radiusY = Math.ceil(1 / scaleY);
-
-        // Calculate the size of the Gaussian kernel along each axis
-        let sizeX = radiusX * 2 + 1;
-        let sizeY = radiusY * 2 + 1;
-
-        // Create a Gaussian kernel array
-        let kernel = new Float32Array(sizeX * sizeY);
-
-        // Calculate the standard deviation of the Gaussian distribution based on the radius
-        let sigmaX = radiusX / 3;
-        let sigmaY = radiusY / 3;
-
-        // Calculate the inverse of the variance of the Gaussian distribution along each axis
-        let invVarX = 1 / (2 * sigmaX * sigmaX);
-        let invVarY = 1 / (2 * sigmaY * sigmaY);
-
-        // Calculate the normalization factor for the Gaussian kernel
-        let norm = Math.sqrt(2 * Math.PI * sigmaX * sigmaY);
-
-        // Loop through each element in the Gaussian kernel array
-        for (let ky = -radiusY; ky <= radiusY; ky++) {
-          for (let kx = -radiusX; kx <= radiusX; kx++) {
-            // Calculate the index of the element in the Gaussian kernel array
-            let k = (ky + radiusY) * sizeX + (kx + radiusX);
-
-            // Calculate the value of the element using the Gaussian formula
-            kernel[k] = Math.exp(-(kx * kx) * invVarX - (ky * ky) * invVarY) / norm;
-          }
-        }
-
-        // Loop through each pixel in the new image data
-        for (let y = 0; y < newHeight; y++) {
-          for (let x = 0; x < newWidth; x++) {
-            // Calculate the corresponding coordinates in the old image data
-            let oldX = x / scaleX;
-            let oldY = y / scaleY;
-
-            // Initialize the RGBA values of the pixel to zero
-            let r7 = 0;
-            let g7 = 0;
-            let b7 = 0;
-            let a7 = 0;
-
-            // Initialize the sum of the kernel values to zero
-            let sum = 0;
-
-            // Loop through each element in the Gaussian kernel array
-            for (let ky = -radiusY; ky <= radiusY; ky++) {
-              for (let kx = -radiusX; kx <= radiusX; kx++) {
-                // Calculate the index of the element in the Gaussian kernel array
-                let k = (ky + radiusY) * sizeX + (kx + radiusX);
-
-                // Get the value of the element in the Gaussian kernel array
-                let w = kernel[k];
-
-                // Calculate the coordinates of the pixel in the old image data that corresponds to this element
-                let x1 = Math.round(oldX + kx);
-                let y1 = Math.round(oldY + ky);
-
-                // Clamp the coordinates to the valid range
-                x1 = Math.max(0, Math.min(x1, oldWidth - 1));
-                y1 = Math.max(0, Math.min(y1, oldHeight - 1));
-
-                // Get the index of the pixel in the old pixel data array
-                let i1 = (y1 * oldWidth + x1) * 4;
-
-                // Get the RGBA values of the pixel in the old pixel data array
-                let r1 = oldData[i1];
-                let g1 = oldData[i1 + 1];
-                let b1 = oldData[i1 + 2];
-                let a1 = oldData[i1 + 3];
-
-                // Multiply the RGBA values by the kernel value and add them to the pixel values
-                r7 += r1 * w;
-                g7 += g1 * w;
-                b7 += b1 * w;
-                a7 += a1 * w;
-
-                // Add the kernel value to the sum
-                sum += w;
-              }
-            }
-
-            // Divide the RGBA values by the sum to get an average value
-            r7 /= sum;
-            g7 /= sum;
-            b7 /= sum;
-            a7 /= sum;
-
-            // Round the RGBA values to integers
-            r7 = Math.round(r7);
-            g7 = Math.round(g7);
-            b7 = Math.round(b7);
-            a7 = Math.round(a7);
-
-            // Get the index of the pixel in the new pixel data array
-            let j = (y * newWidth + x) * 4;
-
-            // Set the RGBA values of the pixel in the new pixel data array
-            newData[j]     = r7;
-            newData[j + 1] = g7;
-            newData[j + 2] = b7;
-            newData[j + 3] = a7;
-          }
-        }
-
-        // Create and return a new ImageData object with the new pixel data array and dimensions
-        return new ImageData(newData, newWidth, newHeight);
-      }
-
-      // This function takes in an ImageData object, and returns a new
-      // ImageData object containing a scaled version of the original
-      // image. The new image's width and height are specified by our
-      // image processing settings (read from our global variables),
-      // as is the filtering type to use...
-      function scaleImage(imageData) {
-
-        // Get the original width and height...
-        var width = imageData.width;
-        var height = imageData.height;
-
-        // Calculate the new width and height; these will either be the
-        // specific numbers the user has chosen (fit to width/height),
-        // or calculated from the input image width/height based on the
-        // selected scale factor...
+      // This function takes in an ImageData object, and given our global
+      // variables for the image conversion options, returns an object
+      // containing the new width and height of the image based on those
+      // options...
+      function calculateNewSize(imageData) {
         var newWidth = userFitWidth;
         var newHeight = userFitHeight;
         if (userScaleMode == "scale") {
-          newWidth = Math.round(width * Number(userScaleFactor.slice(0, -1)));
-          newHeight = Math.round(height * Number(userScaleFactor.slice(0, -1)));
+          newWidth = Math.round(imageData.width * Number(userScaleFactor.slice(0, -1)));
+          newHeight = Math.round(imageData.height * Number(userScaleFactor.slice(0, -1)));
         }
 
-        // Update the global variables used for rendering SF2000 image
-        // data with our new output width and height...
+        // Update the global variables used for rendering SF2000 image data with
+        // our new output width and height...
         outputImageWidth = newWidth;
         outputImageHeight = newHeight;
 
-        // Before we consider doing *any* scaling, let's check to make
-        // sure the new dimensions are different from the old ones; if
-        // they're not, there's no point in doing any scaling!
-        if (width == newWidth && height == newHeight) {
-
-          // Dimensions unchanged! Just return the input data...
-          return imageData;
-
-        }
-
-        // If we're here, then we're really scaling; the process to follow
-        // is *heavily* dependent upon the selected filtering mode, so
-        // let's switch based on that...
-        switch (userFilterType) {
-
-          // If the filtering mode is set to "Nearest Neighbour"...
-          case "Nearest Neighbour":
-
-            // Get the original pixel data array
-            var data = imageData.data;
-
-            // Create a new canvas element to draw the scaled image
-            // (we'll use the canvas to get our output ImageData
-            // object)...
-            var canvas = document.createElement("canvas");
-            var context = canvas.getContext("2d");
-
-            // Set the canvas size to the new dimensions...
-            canvas.width = newWidth;
-            canvas.height = newHeight;
-
-            // Create a new image data object to store the scaled pixel data...
-            var scaledData = context.createImageData(newWidth, newHeight);
-
-            // Loop through each pixel of the new image...
-            for (var y = 0; y < newHeight; y++) {
-              for (var x = 0; x < newWidth; x++) {
-
-                // Calculate the index of the new pixel in the scaled data
-                // array...
-                var index = (y * newWidth + x) * 4;
-
-                // Calculate the x and y coordinates of the corresponding
-                // pixel in the original image...
-                var x2 = Math.floor(x * width / newWidth);
-                var y2 = Math.floor(y * height / newHeight);
-
-                // Calculate the index of the original pixel in the data array...
-                var index2 = (y2 * width + x2) * 4;
-
-                // Copy the color values from the original pixel to the new pixel...
-                scaledData.data[index] = data[index2];         // Red
-                scaledData.data[index + 1] = data[index2 + 1]; // Green
-                scaledData.data[index + 2] = data[index2 + 2]; // Blue
-                scaledData.data[index + 3] = data[index2 + 3]; // Alpha
-              }
-            }
-
-            // Finally, return the scaled ImageData object...
-            return scaledData;
-            break;
-
-          // If the filtering mode is set to "Bilinear"...
-          case "Bilinear":
-
-            // OK, "Bilinear" is a bit of a lie... bilinear filtering is fine when
-            // you're *upscaling* an image, but if you're *downscaling* an image
-            // by more than half the original's width/height, then true bilinear
-            // filtering creates just as much of an aliased mess as nearest
-            // neighbour filtering. Most image editing apps therefore cheat and
-            // use a resampling algorithm when downscaling, and bilinear filtering
-            // when upscaling... so that's what we're going to do here too! We'll
-            // use gaussian resampling for any image axis that's being downscaled,
-            // and bilinear for any axis that's being upscaled; this should give
-            // the user a result that's much closer to what they'd expect to see...
-
-            // Let's see which kind of scaling scenario we're in...
-            if (newWidth > width && newHeight > height) {
-              // All dimensions being upscaled, so we'll use bilinear filtering
-              // for everything...
-              return _bilinear(imageData, newWidth, newHeight);
-            }
-            else if (newWidth < width && newHeight < height) {
-              // All dimensions being downscaled, so we'll use gaussian resampling
-              // for everything...
-              return _gaussian(imageData, newWidth, newHeight);
-            }
-            else {
-              // It's a mix!
-              if (newWidth < width) {
-                // Gaussian for width, bilinear for height...
-                let partial = _gaussian(imageData, newWidth, height);
-                return _bilinear(partial, newWidth, newHeight);
-              }
-              else if (newHeight < height) {
-                // Gaussian for height, bilinear for width...
-                let partial = _gaussian(imageData, width, newHeight);
-                return _bilinear(partial, newWidth, newHeight);
-              }
-            }
-            break;
-        }
+        return {width: newWidth, height: newHeight};
       }
 
-      // This function takes in a Uint8ClampedArray from an ImageData object,
-      // and converts it to either RGB565-Little-Endian, or BGRA, storing the
-      // raw binary output in our sf2000ImageData global...
+      // This function takes in an ImageData object, and uses our standard
+      // library conversion functions to convert it to either RGB565 or BGRA
+      // format, and sets the sf2000ImageData global to the resulting
+      // Uint8Array object...
       function convertImageToSF2000(sourceData) {
         if (imageFormat == "RGB565") {
-          // Loop through the image data, and convert it to little-endian RGB565. First,
-          // we'll store the raw RGB565-converted integers in an array, one entry per pixel...
-          var intArray = [];
-          var pixelCount = 0;
-          for (var i = 0; i < sourceData.length; i += 4){
-            // Read in the raw source RGB colours from the image data stream, ignoring alpha...
-            var red = sourceData[i];
-            var green = sourceData[i+1];
-            var blue = sourceData[i+2];
-            
-            // Use some shifting and masking to get a big-endian version of the RGB565 colour
-            // and store it in our array before moving on...
-            intArray[pixelCount] = ((red & 248)<<8) + ((green & 252)<<3) + (blue>>3);
-            pixelCount++;
-          }
-
-          // Create a data buffer and a data view; we'll use the view to convert our int
-          // array data to little-endian format (the "true" below) to be stored in the buffer...
-          var buffer = new ArrayBuffer(intArray.length * 2);
-          var dataView = new DataView(buffer);
-          for (var i = 0; i < intArray.length; i++) {
-            dataView.setInt16(i * 2, intArray[i], true);
-          }
-
-          // Use the buffer to fill a Uint8Array, which we'll assign to our global...
-          sf2000ImageData = new Uint8Array(buffer);
+          sf2000ImageData = imageDataToRgb565(sourceData);
         }
         else if (imageFormat == "BGRA") {
-          // BGRA format, so basically store the data as-is, only swapping the
-          // Red and Blue bytes per pixel...
-          sf2000ImageData = new Uint8Array(sourceData.length);
-          for (var i = 0; i < sourceData.length; i += 4) {
-            sf2000ImageData[i] = sourceData[i + 2];
-            sf2000ImageData[i + 1] = sourceData[i + 1];
-            sf2000ImageData[i + 2] = sourceData[i];
-            sf2000ImageData[i + 3] = sourceData[i + 3];
-          }
+          sf2000ImageData = imageDataToBgra(sourceData);
         }
       }
 
-      // This function takes the SF2000-format binary image data stored in our
-      // sf2000ImageData global variable, and converts it to 8-bit RGB(A)
-      // format, storing the result in our previewCanvasData global. This is
-      // then used for drawing the image data to our preview canvas...
-      function convertImageFromSF2000() {
+      // This function takes our global sf2000ImageData object (Uint8Array),
+      // converts it to an ImageData object and assigns it to our
+      // previewCanvasData global; it then renders that ImageData to our preview
+      // canvas...
+      function convertFromSF2000AndRender() {
         if (imageFormat == "RGB565") {
-
-          // We're converting RGB565-little-endian data (no alpha); size our
-          // output buffer accordingly...
-          previewCanvasData = new Uint8Array((sf2000ImageData.length / 2) * 3);
-          offset = 0;
-          for (var i = 0; i < sf2000ImageData.length; i += 2) {
-            // Read in two bytes, representing one RGB565 pixel in little-endian format
-            var byte1 = sf2000ImageData[i];
-            var byte2 = sf2000ImageData[i + 1];
-            // Extract the red, green and blue components. The first five bits of byte2
-            // are red...
-            var red = (byte2 & 0b11111000) >> 3;
-            // ... the first three bits of byte1 and the last three bits of byte2 are
-            // green...
-            var green = ((byte1 & 0b11100000) >> 5) | ((byte2 & 0b00000111) << 3);
-            // ... and the last five bits of byte1 are blue...
-            var blue = byte1 & 0b00011111;
-            // These values are in 5-bit/6-bit ranges - we need to scale them to 8-bit
-            // ranges for the colours to look right...
-            red = Math.round(red * 255 / 31);
-            green = Math.round(green * 255 / 63);
-            blue = Math.round(blue * 255 / 31);
-            // Finally store the RGB components in-order in our rgb888 buffer...
-            previewCanvasData[offset] = red;
-            previewCanvasData[offset + 1] = green;
-            previewCanvasData[offset + 2] = blue;
-            offset += 3;
-          }
+          previewCanvasData = rgb565ToImageData(sf2000ImageData, outputImageWidth, outputImageHeight);
         }
         else if (imageFormat == "BGRA") {
-
-          // We're converting BGRA data; nice and simple, just copy the data across
-          // while swapping the Red and Blue components...
-          previewCanvasData = new Uint8Array(sf2000ImageData.length);
-          for (var i = 0; i < sf2000ImageData.length; i += 4) {
-            previewCanvasData[i] = sf2000ImageData[i + 2];
-            previewCanvasData[i + 1] = sf2000ImageData[i + 1];
-            previewCanvasData[i + 2] = sf2000ImageData[i];
-            previewCanvasData[i + 3] = sf2000ImageData[i + 3];
-          }
+          previewCanvasData = bgraToImageData(sf2000ImageData, outputImageWidth, outputImageHeight);
         }
-      }
-
-      // This function takes the current stream of SF2000 image data (either
-      // coming from an SF2000 image file, or from a user-provided images that
-      // has been previously converted *into* an SF2000 format), and renders
-      // it to our preview canvas...
-      function renderImageToCanvas() {
-
-        // Get our preview canvas, and make sure it's been resized to our target
-        // output image size. Also, clear the canvas to remove any image data
-        // that might already be on it...
         var canvas = document.getElementById("processFilePreview");
         var context = canvas.getContext("2d");
-        canvas.width = outputImageWidth;
-        canvas.height = outputImageHeight;
+        canvas.width = previewCanvasData.width;
+        canvas.height = previewCanvasData.height;
         context.clearRect(0, 0, canvas.width, canvas.height);
-
-        // Depending on whether or not we're working with RGB565 or BGRA data,
-        // some of the math below will need to be working in groups of 3 bytes
-        // or 4... so let's calculate that factor ahead of time!
-        var factor = 3;
-        if (imageFormat == "BGRA") { factor = 4; }
-
-        // Now, let's start drawing stuff to our canvas; we'll loop through
-        // every row and column...
-        for (var y = 0; y < canvas.height; y++) {
-          for (var x = 0; x < canvas.width; x++) {
-
-            // Calculate the offset of our current pixel within our input data
-            // stream...
-            var pixel = ((canvas.width * y) * factor) + (x * factor);
-
-            // Before we try and draw anything, let's make sure we actually have
-            // enough data in our stream to match this pixel location...
-            if (previewCanvasData.length >= (pixel + (factor - 1))) {
-
-              // OK, we're good - we've stream data for this pixel. Get its
-              // colour (and possibly alpha) values, and set them up for
-              // our next canvas draw call...
-              if (imageFormat == "RGB565") {
-                context.fillStyle = "rgb("+ previewCanvasData[pixel] +", " + previewCanvasData[pixel + 1] + ", " + previewCanvasData[pixel + 2] + ")";
-              }
-              else if (imageFormat == "BGRA") {
-                context.fillStyle = "rgba("+ previewCanvasData[pixel] +", " + previewCanvasData[pixel + 1] + ", " + previewCanvasData[pixel + 2] + ", " + previewCanvasData[pixel + 3] / 255 + ")";
-              }
-            }
-            else {
-              // Oops! We've reached the end of our data stream, but not the
-              // end of our canvas... so just set up a solid white pixel
-              // instead...
-              if (imageFormat == "RGB565") {
-                context.fillStyle = "rgb(255, 255, 255)";
-              }
-              else if (imageFormat == "BGRA") {
-                context.fillStyle = "rgba(255, 255, 255, 1)";
-              }
-            }
-
-            // Draw the actual pixel to the canvas...
-            context.fillRect(x, y, 1, 1);
-          }
-        }
-      }
-
-      // This function takes our converted SF2000 image data, and downloads it
-      // to the user's device as an appropriately named PNG image...
-      function downloadSF2000ConvertedImage() {
-        var canvas = document.getElementById("processFilePreview");
-        var link = document.createElement("a");
-        link.href = canvas.toDataURL("image/png");
-        link.download = fileName + ".png";
-        link.style.display = "none";
-        document.body.appendChild(link);
-        link.click();
-        window.URL.revokeObjectURL(link.href);
-        document.body.removeChild(link);
-      }
-
-      // This function takes our converted user image in SF2000 raw binary
-      // format, and downloads it to the user's device as an appropriately
-      // named binary blob...
-      function downloadUserConvertedImage() {
-
-        // For the file-name we're going to do something semi-fancy; if the
-        // user's original image file name had *two* extensions (e.g.,
-        // c1eac.pal.png), then we'll strip off the second extension and
-        // just save the file with the remainder of the name (e.g.,
-        // c1eac.pal) - this will speed up their workflow if their source
-        // image came from a design tool that exports images named after
-        // layers/artboards. Otherwise, we'll just use the name of the
-        // file they provided with ".bin" appended to the end...
-        var downloadName = fileName + ".bin";
-        var match = fileName.match(/(.+)\.([^.]+)\.([^.]+)/);
-        if (match) {
-          // It's got a double extension - so let's just strip off the
-          // second one...
-          downloadName = match[1] + "." + match[2];
-        }
-
-        var link = document.createElement("a");
-        link.href = window.URL.createObjectURL(new Blob([sf2000ImageData], {type: "application/octet-stream"}));
-        link.download = downloadName;
-        link.style.display = "none";
-        document.body.appendChild(link);
-        link.click();
-        window.URL.revokeObjectURL(link.href);
-        document.body.removeChild(link);
+        context.putImageData(previewCanvasData, 0, 0);
       }
     </script>
     <hr>
-    <p><a rel="license" href="https://creativecommons.org/publicdomain/zero/1.0/">CC0</a>: public domain. Version 1.0, 20230524.1</p>
+    <p><a rel="license" href="https://creativecommons.org/publicdomain/zero/1.0/">CC0</a>: public domain. Version 1.1, 20230626.1</p>
   </body>
 </html>

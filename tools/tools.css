@@ -1,0 +1,129 @@
+/*
+
+  Von Millhausen's SF2000 Tools Shared CSS Library
+  ================================================
+
+  There's a fairly common UI between all of my tools, so rather than each tool
+  including a full copy of all the shared stuff, all the shared stuff can go
+  into this CSS file. Makes the tools a bit more maintainable, at the cost of a
+  bit less portability.
+
+  Just like the tools themselves, this file should be considered CC0 Public
+  Domain (https://creativecommons.org/publicdomain/zero/1.0/)
+
+  Version 1.0: Initial version
+
+*/
+
+:root {
+  --background: rgb(240, 235, 220);
+  --text: rgb(50, 40, 20);
+  --infoBackground: rgb(65, 160, 65);
+  --infoText: rgb(255, 255, 255);
+  --errorBackground: rgb(200, 65, 65);
+  --errorText: rgb(255, 255, 255);
+  --warningBackground: rgb(200, 128, 64);
+  --warningText: rgb(255, 255, 255);
+  --mappingBox: rgba(50, 40, 20, 0.1);
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: rgb(70, 75, 100);
+    --text: rgb(190, 190, 200);
+    --infoBackground: rgb(75, 130, 85);
+    --infoText: rgb(200, 245, 200);
+    --errorBackground: rgb(130, 85, 75);
+    --errorText: rgb(245, 200, 200);
+    --warningBackground: rgb(130, 110, 75);
+    --warningText: rgb(255, 240, 214);
+    --mappingBox: rgba(190, 190, 200, 0.1);
+  }
+}
+
+body {
+  background-color: var(--background);
+  color: var(--text);
+  font-family: -apple-system, BlinkMacSystemFont, avenir next, avenir, segoe ui, helvetica neue, helvetica, Cantarell, Ubuntu, roboto, noto, arial, sans-serif;
+}
+
+a, a:visited, a:hover, a:active { color: inherit; }
+
+hr {
+  border: 1px solid var(--text);
+  margin: 2em 0;
+}
+
+p.info, p.warning, p.error {
+  border: 1px dashed;
+  border-radius: 10px;
+  padding: 10px;
+  margin: 20px;
+}
+p.info {
+  background-color: var(--infoBackground);
+  border-color: var(--infoText);
+  color: var(--infoText);
+}
+p.warning {
+  background-color: var(--warningBackground);
+  border-color: var(--warningText);
+  color: var(--warningText);
+}
+p.error {
+  background-color: var(--errorBackground);
+  border-color: var(--errorText);
+  color: var(--errorText);
+}
+.icon {
+  position: relative;
+  top: 0.15em;
+  left: -0.2em;
+  height: 1em;
+}
+
+h1:first-child { text-align: center; }
+p:last-child { text-align: center; }
+
+.controlContainer {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+.control {
+  display: inline;
+  background-color: var(--mappingBox);
+  padding: 1em;
+  border-radius: 1em;
+  margin: 0.5em;
+}
+.control input[type=number] {width: 4em;}
+.control h3:first-child {
+  text-align: center;
+  margin-top: 0;
+  border-bottom: 1px solid var(--text);
+}
+.control table {
+  width: 100%;
+  border-spacing: 0 0.1em;
+  background-color: var(--mappingBox);
+  border-radius: 0.5em;
+  padding: 0.5em;
+}
+.control table:nth-child(2) { margin-bottom: 1em; }
+.control table caption { margin-bottom: 0.5em; }
+.control table thead tr th {
+  border-bottom: 1px solid var(--text);
+  border-collapse: separate;
+  border-spacing: 1em 1em;
+  padding: 0 1em;
+}
+.alignC { text-align: center; }
+.alignL { text-align: left; }
+
+canvas {
+  border: 1px white dashed;
+}
+
+#slotSelector label:not(:last-child) {
+  margin-right: 1em;
+}

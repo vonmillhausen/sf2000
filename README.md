@@ -17,6 +17,7 @@ So is the "Data Frog" any good? Only you can answer that question for yourself. 
     - [Is there any custom firmware?](#is-there-any-custom-firmware)
     - [I just got my SF2000; what modding can I do with it?](#i-just-got-my-sf2000-what-modding-can-i-do-with-it)
     - [How do I change the four shortcuts/games listed on each system's main menu page?](#how-do-i-change-the-four-shortcutsgames-listed-on-each-systems-main-menu-page)
+    - [SNES games run really, _really_ slowly... what's wrong?](#snes-games-run-really-really-slowly-whats-wrong)
     - [Help! I was doing stuff in the `bios` folder or trying to install a new firmware, and now my SF2000 won't turn on, or is stuck at a black screen!](#help-i-was-doing-stuff-in-the-bios-folder-or-trying-to-install-a-new-firmware-and-now-my-sf2000-wont-turn-on-or-is-stuck-at-a-black-screen)
     - [When I connect the SF2000 to a TV via the A/V cable, the sound is very quiet/low - is that normal?](#when-i-connect-the-sf2000-to-a-tv-via-the-av-cable-the-sound-is-very-quietlow---is-that-normal)
   - [Hardware](#hardware)
@@ -65,7 +66,7 @@ So is the "Data Frog" any good? Only you can answer that question for yourself. 
 [Read my introductory section above :)](#sf2000)
 
 ### Is there any custom firmware?
-As of June 21st 2023, **no**, not yet. However efforts are underway; an SDK for the CPU has been identified, which may allow for the development of a custom in the future (currently, custom code execution and audio playback is confirmed). [A GitLab repo](https://git.maschath.de/ignatz/hcrtos) has been set up by `ignatzdraconis` for the work, and you can [follow along with discussion in the `Retro Handhelds` Discord](https://discord.com/channels/741895796315914271/1092831839955193987).
+As of June 26th 2023, **no**, not yet. However efforts are underway; an SDK for the CPU has been identified, and custom firmware is now in the very early stages of development (currently, custom code execution, access to the microSD card and display, and audio/video playback have been demonstrated). [A GitLab repo](https://git.maschath.de/ignatz/hcrtos) has been set up by `ignatzdraconis` for the work, and you can [follow along with discussion in the `Retro Handhelds` Discord](https://discord.com/channels/741895796315914271/1092831839955193987).
 
 ### I just got my SF2000; what modding can I do with it?
 In no particular order, some of the current customisation options available are:
@@ -80,10 +81,13 @@ In no particular order, some of the current customisation options available are:
 * You can add your own ROMs to the `roms` folder on the microSD card, which will then appear in the user ROMs menu of the device. You can also modify the built-in ROM lists using [FROGTOOL](https://github.com/tzlion/frogtool)
 * You can replace the default menu theme with a custom one
 
-There's no centralised repository for boot logos or custom themes, but you can find many of them linked in the ["The Frog's Best Bits 🐸" thread](https://discord.com/channels/741895796315914271/1110397766074638397) in the [Retro Handhelds Discord server](https://discord.gg/retrohandhelds).
+A new centralised repository for boot logos, custom themes and background music has been created by `Zerter#4954`, which you can [find here](https://zerter555.github.io/sf2000-collection/); you can also find many of them linked in the ["The Frog's Best Bits 🐸" thread](https://discord.com/channels/741895796315914271/1110397766074638397) in the [Retro Handhelds Discord server](https://discord.gg/retrohandhelds).
 
 ### How do I change the four shortcuts/games listed on each system's main menu page?
 Answer: with a fair bit of work! The _images_ for the shortcuts are baked into each system's main menu background image - check out the ["Images (Used)"](#images-used) section below, and use your browser's search feature to search for `main menu background`, and you'll see what I mean. The _text_ under each shortcut is stored in a separate image - in the `05.22` firmware, the files are `gkavc.ers` if the device's language is set to Chinese, or `gakne.ctp` for all other languages (again, check the details in the ["Images (Used)"](#images-used) section below). Finally, the actual roms that are launched for each shortcut are stored in the `xfgle.hgp` file, which is plain text - you can learn more about it in the ["ROM Lists"](#rom-lists) section below.
+
+### SNES games run really, _really_ slowly... what's wrong?
+There's a bug in all stock firmware versions later than the original mid-March firmware which often causes SNES games to run really slowly on first launch (and their sound is slow and lower pitch too); this only impacts SNES. Usually this can be corrected by launching the game, then quitting back to the game selection menu via `START + SELECT`, and then immediately re-launching the game again. Note however that the stock firmwares do also struggle a bit with SNES emulation in general, so any additional slowdown after the second launch is just what you get.
 
 ### Help! I was doing stuff in the `bios` folder or trying to install a new firmware, and now my SF2000 won't turn on, or is stuck at a black screen!
 You've probably run into the bootloader bug - you can [find the two fixes to it below](#bootloader-bug). Alternatively, [follow Data Frog's instructions](https://www.youtube.com/watch?v=j8dT2fdGfck) to wipe your microSD card and flash a clean firmware image.
@@ -100,7 +104,7 @@ So you can try launching the game first, and _then_ plug in the A/V cable to get
 ## Hardware
 
 ### CPU
-Although the main CPU of the SF2000 has literally had it's markings milled off by a routing tool, the community has determined that it's a HCSEMI B210, a single-core MIPS processor running at 810 MHz. It appears to be a clone of an ALi Tech chip. No SDK is currently available for it, and the device is closed-source.
+Although the main CPU of the SF2000 has literally had it's markings milled off by a routing tool, the community has determined that it's a HCSEMI B210, a single-core MIPS processor running at 810 MHz. It appears to be a clone of an ALi Tech chip. [An SDK has been found](http://www.zcsd-tech.com//download/content-54.html) for it.
 
 ### Display
 The SF2000 features a `240x320` IPS display panel (not OCA laminated), which has been rotated 90&deg; clockwise to give a `320x240` display. It demonstrates screen tearing for all emulators, running from the right of the console to the left due to the panel rotation.
@@ -223,7 +227,7 @@ Known firmware versions are currently (dates approximate):
 | May 15th | ? | Added a built-in UI for global button mapping (which is broken in several ways, mainly SNES and Genesis controls are swapped, and no support for setting Player 2 controls), added a History feature, added a Favourites feature |
 | May 22nd | 1.5V | First firmware with an official version number. Fixed the SNES/Genesis swapped button mappings, and now sets Player 2 controls to be identical to Player 1 (no way to set independently). There's some evidence of undocumented emulation improvements; some GBA homebrew that was non-functional in previous firmwares now loads correctly, and some GBA titles see marginally improved performance |
 
-There is not currently any custom firmware (CFW) for the device. The stock firmware is currently being investigated; here are some findings from it:
+Custom firmware (CFW) is currently in the very early stages of development (see [here](#is-there-any-custom-firmware)). In the meantime, the stock firmware has been investigated quite a bit; here are some findings from it:
 
 ### Bootloader Bug
 The bootloader on the SF2000 (the bit of code embedded in the devices hardware; it initialises things, and kicks-off loading of the BIOS from `bisrv.asd`) has a bug, which can cause the SF2000 to lock-up with a black screen during boot if the `bios` folder has been messed with. Specifically, the bug is triggered when the `bios` folder's FAT table contains a multiple of `4` entries, or a multiple of `4` plus `1`.
@@ -489,7 +493,7 @@ So, for example: if your most recently played game (first in the history list) w
 For more information on the ROM lists in general, see the next section.
 
 ### ROM Lists
-Credit for this section goes to `taizou`, author of [FROGTOOL](https://github.com/tzlion/frogtool). These files relate to the built-in game-lists under each main system; the list of games is pulled from these files instead of being built at runtime - annoying, but presumably for performance reasons. It means if you want to change the list of built-in games (instead of using the User ROMs section), you have to edit these files - hence FROGTOOL, you should really check it out.
+Credit for this section goes to `taizou`, author of [FROGTOOL](https://github.com/tzlion/frogtool). These files relate to the built-in game-lists under each main system; the list of games is pulled from these files instead of being built at runtime - annoying, but presumably for performance reasons. It means if you want to change the list of built-in games (instead of using the User ROMs section), you have to edit these files - hence FROGTOOL, you should really check it out. There is also a tool called [Tadpole](https://github.com/EricGoldsteinNz/tadpole) by `.ericgoldstein` which provides a GUI for FROGTOOL along with some additional features.
 
 | Files | Description |
 | ----- | ----------- |
@@ -569,10 +573,14 @@ All of these are linked above already in their relevant sections, but just in ca
 - [`ignatzdraconis`'s Gitlab Repo](https://git.maschath.de/ignatz/hcrtos)
 - [Save State Tool](https://vonmillhausen.github.io/sf2000/tools/saveStateTool.htm)
 - [Silent background music file](/sounds/silentMusic/pagefile.sys) (replace the file in the `Resources` folder on the microSD card)
+- [Tadpole](https://github.com/EricGoldsteinNz/tadpole) (a GUI and additional features for FROGTOOL)
+- [Zerter's SF2000 Theme Collection](https://zerter555.github.io/sf2000-collection/)
 
 ---
 
 ## Version History
+- `20230626 - 1.21`: Added a FAQ about slow SNES games. Updated details of CFW development with the latest status. Added a link to the discovered SDK. Added a link to `Zerter#4954`'s new theme collection site. Added a link to the Tadpole tool by `.ericgoldstein`.
+
 - `20230622 - 1.20`: Added a note to the Game Boy Advance section about the newly discovered `gba_bios.bin` loading bug, and how to work around it (thanks `bnister`!)
 
 - `20230618 - 1.19`: Added a question to the FAQ regarding how to change the main menu shortcuts.

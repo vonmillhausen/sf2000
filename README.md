@@ -20,6 +20,7 @@ So is the "Data Frog" any good? Only you can answer that question for yourself. 
     - [SNES games run really, _really_ slowly... what's wrong?](#snes-games-run-really-really-slowly-whats-wrong)
     - [Help! I was doing stuff in the `bios` folder or trying to install a new firmware, and now my SF2000 won't turn on, or is stuck at a black screen!](#help-i-was-doing-stuff-in-the-bios-folder-or-trying-to-install-a-new-firmware-and-now-my-sf2000-wont-turn-on-or-is-stuck-at-a-black-screen)
     - [When I connect the SF2000 to a TV via the A/V cable, the sound is very quiet/low - is that normal?](#when-i-connect-the-sf2000-to-a-tv-via-the-av-cable-the-sound-is-very-quietlow---is-that-normal)
+    - [Game saves don't seem to be working for me? Save _states_ are fine, but the built-in save function in games doesn't seem to work?](#game-saves-dont-seem-to-be-working-for-me-save-states-are-fine-but-the-built-in-save-function-in-games-doesnt-seem-to-work)
   - [Hardware](#hardware)
     - [CPU](#cpu)
     - [Display](#display)
@@ -98,6 +99,9 @@ It's "normal" for newer versions of the firmware, anyway! Older firmware version
 > when I did this the AV audio work normally: I had to load the game first then plug-in the 2.5mm to rca jack. [...] but when I quit then exit then tried the game again it returns to very low audio. [...] will need to do the work around again
 
 So you can try launching the game first, and _then_ plug in the A/V cable to get full volume on the TV.
+
+### Game saves don't seem to be working for me? Save _states_ are fine, but the built-in save function in games doesn't seem to work?
+Unfortunately, correct - with the stock firmware, the built-in save feature of emulated games does not work correctly, and the SF2000 won't store new save data after the first time it's created for a game. If you want to save your progress in a game on the SF2000's stock firmware, use save states instead.
 
 ---
 
@@ -579,6 +583,8 @@ All of these are linked above already in their relevant sections, but just in ca
 ---
 
 ## Version History
+- `20230630 - 1.22`: Added a FAQ about save games not working.
+
 - `20230626 - 1.21`: Added a FAQ about slow SNES games. Updated details of CFW development with the latest status. Added a link to the discovered SDK. Added a link to `Zerter#4954`'s new theme collection site. Added a link to the Tadpole tool by `.ericgoldstein`.
 
 - `20230622 - 1.20`: Added a note to the Game Boy Advance section about the newly discovered `gba_bios.bin` loading bug, and how to work around it (thanks `bnister`!)

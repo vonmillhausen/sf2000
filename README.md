@@ -18,10 +18,10 @@ So is the "Data Frog" any good? Only you can answer that question for yourself. 
     - [I just got my SF2000; what modding can I do with it?](#i-just-got-my-sf2000-what-modding-can-i-do-with-it)
     - [How do I install new menu themes?](#how-do-i-install-new-menu-themes)
     - [How do I change the four shortcuts/games listed on each system's main menu page?](#how-do-i-change-the-four-shortcutsgames-listed-on-each-systems-main-menu-page)
-    - [SNES games run really, _really_ slowly... what's wrong?](#snes-games-run-really-really-slowly-whats-wrong)
-    - [Help! I was doing stuff in the `bios` folder or trying to install a new firmware, and now my SF2000 won't turn on, or is stuck at a black screen!](#help-i-was-doing-stuff-in-the-bios-folder-or-trying-to-install-a-new-firmware-and-now-my-sf2000-wont-turn-on-or-is-stuck-at-a-black-screen)
+    - [SNES games run really slowly... what's wrong?](#snes-games-run-really-slowly-whats-wrong)
+    - [Help! I was doing stuff in the bios folder or trying to install a new firmware, and now my SF2000 won't turn on, or is stuck at a black screen!](#help-i-was-doing-stuff-in-the-bios-folder-or-trying-to-install-a-new-firmware-and-now-my-sf2000-wont-turn-on-or-is-stuck-at-a-black-screen)
     - [When I connect the SF2000 to a TV via the A/V cable, the sound is very quiet/low - is that normal?](#when-i-connect-the-sf2000-to-a-tv-via-the-av-cable-the-sound-is-very-quietlow---is-that-normal)
-    - [Game saves don't seem to be working for me? Save _states_ are fine, but the built-in save function in games doesn't seem to work?](#game-saves-dont-seem-to-be-working-for-me-save-states-are-fine-but-the-built-in-save-function-in-games-doesnt-seem-to-work)
+    - [Game saves don't seem to be working for me? Save states are fine, but the built-in save function in games doesn't seem to work?](#game-saves-dont-seem-to-be-working-for-me-save-states-are-fine-but-the-built-in-save-function-in-games-doesnt-seem-to-work)
   - [Hardware](#hardware)
     - [CPU](#cpu)
     - [Display](#display)
@@ -33,7 +33,7 @@ So is the "Data Frog" any good? Only you can answer that question for yourself. 
     - [A/V Output](#av-output)
   - [Emulators](#emulators)
     - [Arcade](#arcade)
-      - [`.skp` Files](#skp-files)
+      - [.skp Files](#skp-files)
     - [NES](#nes)
     - [SNES](#snes)
     - [Genesis/Mega Drive](#genesismega-drive)
@@ -95,10 +95,10 @@ Another thing to note: some themes might come with an updated boot logo. If that
 ### How do I change the four shortcuts/games listed on each system's main menu page?
 Answer: with a fair bit of work! The _images_ for the shortcuts are baked into each system's main menu background image - check out the ["Images (Used)"](#images-used) section below, and use your browser's search feature to search for `main menu background`, and you'll see what I mean. The _text_ under each shortcut is stored in a separate image - in the `05.22` firmware, the files are `gkavc.ers` if the device's language is set to Chinese, or `gakne.ctp` for all other languages (again, check the details in the ["Images (Used)"](#images-used) section below). Finally, the actual roms that are launched for each shortcut are stored in the `xfgle.hgp` file, which is plain text - you can learn more about it in the ["ROM Lists"](#rom-lists) section below.
 
-### SNES games run really, _really_ slowly... what's wrong?
+### SNES games run really slowly... what's wrong?
 There's a bug in all stock firmware versions later than the original mid-March firmware which often causes SNES games to run really slowly on first launch (and their sound is slow and lower pitch too); this only impacts SNES. Usually this can be corrected by launching the game, then quitting back to the game selection menu via `START + SELECT`, and then immediately re-launching the game again. Note however that the stock firmwares do also struggle a bit with SNES emulation in general, so any additional slowdown after the second launch is just what you get.
 
-### Help! I was doing stuff in the `bios` folder or trying to install a new firmware, and now my SF2000 won't turn on, or is stuck at a black screen!
+### Help! I was doing stuff in the bios folder or trying to install a new firmware, and now my SF2000 won't turn on, or is stuck at a black screen!
 You've probably run into the bootloader bug - you can [find the two fixes to it below](#bootloader-bug). Alternatively, [follow Data Frog's instructions](https://www.youtube.com/watch?v=j8dT2fdGfck) to wipe your microSD card and flash a clean firmware image.
 
 ### When I connect the SF2000 to a TV via the A/V cable, the sound is very quiet/low - is that normal?
@@ -108,7 +108,7 @@ It's "normal" for newer versions of the firmware, anyway! Older firmware version
 
 So you can try launching the game first, and _then_ plug in the A/V cable to get full volume on the TV.
 
-### Game saves don't seem to be working for me? Save _states_ are fine, but the built-in save function in games doesn't seem to work?
+### Game saves don't seem to be working for me? Save states are fine, but the built-in save function in games doesn't seem to work?
 Unfortunately, correct - with the stock firmware, the built-in save feature of emulated games does not work correctly, and the SF2000 won't store new save data after the first time it's created for a game. If you want to save your progress in a game on the SF2000's stock firmware, use save states instead.
 
 ---
@@ -175,7 +175,7 @@ The device is running Final Burn Alpha v0.2.97.42 (Git commit [`621e371`](https:
 - Playable set total size: `3.10 GB` (3,336,344,502 bytes)
 - Full set total size: `11.4 GB` (12,245,306,389 bytes)
 
-#### `.skp` Files
+#### .skp Files
 Another thing worth mentioning about arcade emulation on the SF2000; in the `ARCADE` folder on the microSD card is a sub-folder called `skp`. This folder contains (by default) 167 `.skp` files, each named after one of the zipped ROM sets in the `ARCADE/bin` folder (e.g., `mslug.zip.skp`). These files are actually save state bundle files, just like the ones you can save yourself using the save state feature - the only difference is that these have the `.skp` extension instead of `.sa#`, and these are loaded automatically when the game itself is loaded. Many of these files start their respective arcade game up with a credit already inserted. One speculative possibility for why these files exist is that some arcade games will start to a dip-switch screen, or some other ROM-check screen, which may be difficult to bypass with the SF2000's limited controls - a save state that automatically loads _past_ such a screen is therefore very useful to have.
 
 As the `.skp` files are just save states under a different name, if you want to mess around with them you can [use my Save State Tool](https://vonmillhausen.github.io/sf2000/tools/saveStateTool.htm) to do so - if you're creating a new `.skp` file, just pick any save state slot, and change the downloaded SF2000 save state bundle extension from `.sa#` to `.skp`.

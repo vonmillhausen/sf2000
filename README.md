@@ -16,6 +16,7 @@ So is the "Data Frog" any good? Only you can answer that question for yourself. 
     - [Is this thing any good?](#is-this-thing-any-good)
     - [Is there any custom firmware?](#is-there-any-custom-firmware)
     - [I just got my SF2000; what modding can I do with it?](#i-just-got-my-sf2000-what-modding-can-i-do-with-it)
+    - [How do I install new menu themes?](#how-do-i-install-new-menu-themes)
     - [How do I change the four shortcuts/games listed on each system's main menu page?](#how-do-i-change-the-four-shortcutsgames-listed-on-each-systems-main-menu-page)
     - [SNES games run really, _really_ slowly... what's wrong?](#snes-games-run-really-really-slowly-whats-wrong)
     - [Help! I was doing stuff in the `bios` folder or trying to install a new firmware, and now my SF2000 won't turn on, or is stuck at a black screen!](#help-i-was-doing-stuff-in-the-bios-folder-or-trying-to-install-a-new-firmware-and-now-my-sf2000-wont-turn-on-or-is-stuck-at-a-black-screen)
@@ -67,7 +68,7 @@ So is the "Data Frog" any good? Only you can answer that question for yourself. 
 [Read my introductory section above :)](#sf2000)
 
 ### Is there any custom firmware?
-As of June 26th 2023, **no**, not yet. However efforts are underway; an SDK for the CPU has been identified, and custom firmware is now in the very early stages of development (currently, custom code execution, access to the microSD card and display, and audio/video playback have been demonstrated). [A GitLab repo](https://git.maschath.de/ignatz/hcrtos) has been set up by `ignatzdraconis` for the work, and you can [follow along with discussion in the `Retro Handhelds` Discord](https://discord.com/channels/741895796315914271/1092831839955193987).
+As of July 5th 2023, **no**, not yet. However efforts are underway; an SDK for the CPU has been identified, and custom firmware is now in the very early stages of development (currently, custom code execution, access to the microSD card and display, audio/video playback, and registering button inputs have been demonstrated). [A GitLab repo](https://git.maschath.de/ignatz/hcrtos) has been set up by `ignatzdraconis` for the work, and you can [follow along with discussion in the `Retro Handhelds` Discord](https://discord.com/channels/741895796315914271/1092831839955193987).
 
 ### I just got my SF2000; what modding can I do with it?
 In no particular order, some of the current customisation options available are:
@@ -80,9 +81,16 @@ In no particular order, some of the current customisation options available are:
 * You can [replace the main menu music, or remove it entirely](#sounds)
 * You can [change the default button mappings](https://vonmillhausen.github.io/sf2000/tools/buttonMappingChanger.htm) for each emulator (newer firmwares have this feature built-in, but the built-in implementation is buggy)
 * You can add your own ROMs to the `roms` folder on the microSD card, which will then appear in the user ROMs menu of the device. You can also modify the built-in ROM lists using [FROGTOOL](https://github.com/tzlion/frogtool)
-* You can replace the default menu theme with a custom one
+* You can [replace the default menu theme with a custom one](#how-do-i-install-new-menu-themes)
+
+### How do I install new menu themes?
+The SF2000 doesn't natively support themes at all; however, all of the images and sounds for the stock theme live in the `Resources` folder on the microSD card. Therefore, by simply replacing the stock theme's files, the stock theme can be replaced.
 
 A new centralised repository for boot logos, custom themes and background music has been created by `Zerter#4954`, which you can [find here](https://zerter555.github.io/sf2000-collection/); you can also find many of them linked in the ["The Frog's Best Bits 🐸" thread](https://discord.com/channels/741895796315914271/1110397766074638397) in the [Retro Handhelds Discord server](https://discord.gg/retrohandhelds).
+
+Just take the files from the theme, and use them to replace the existing files on the microSD card. You might want to make your own backup of the stock `Resources` folder first, in case you want to go back to the stock theme yourself at a later date. Note also that in addition to theme assets, [the `Resources` folder](#resources) also contains data files related to your [button mapping](#button-mappingskey-bindings), [favourites and history](#favourites-and-history), etc.; so when backing up or replacing files in `Resources` for themes, just be aware not to overwrite anything non-theme-related you want to keep.
+
+Another thing to note: some themes might come with an updated boot logo. If that logo is provided as [a `bisrv.asd` file](#firmwarebios-bisrvasd) in the `bios` folder, this is actually a modified _firmware_ for the device, which happens to contain the new logo. If you decide to replace your existing `bisrv.asd` file, you might want to make sure that the theme's firmware version matches the firmware version already on your device. Generally, it's probably safer just to [update your own firmware's boot logo](https://vonmillhausen.github.io/sf2000/tools/bootLogoChanger.htm) with an image file.
 
 ### How do I change the four shortcuts/games listed on each system's main menu page?
 Answer: with a fair bit of work! The _images_ for the shortcuts are baked into each system's main menu background image - check out the ["Images (Used)"](#images-used) section below, and use your browser's search feature to search for `main menu background`, and you'll see what I mean. The _text_ under each shortcut is stored in a separate image - in the `05.22` firmware, the files are `gkavc.ers` if the device's language is set to Chinese, or `gakne.ctp` for all other languages (again, check the details in the ["Images (Used)"](#images-used) section below). Finally, the actual roms that are launched for each shortcut are stored in the `xfgle.hgp` file, which is plain text - you can learn more about it in the ["ROM Lists"](#rom-lists) section below.
@@ -583,6 +591,8 @@ All of these are linked above already in their relevant sections, but just in ca
 ---
 
 ## Version History
+- `20230705 - 1.23`: Updated FAQ about custom firmware with latest details. Moved "what can I do" bullet point about custom themes to its own separate FAQ to make it easier to find, and added more details about how to actually _install_ a theme.
+
 - `20230630 - 1.22`: Added a FAQ about save games not working.
 
 - `20230626 - 1.21`: Added a FAQ about slow SNES games. Updated details of CFW development with the latest status. Added a link to the discovered SDK. Added a link to `Zerter#4954`'s new theme collection site. Added a link to the Tadpole tool by `.ericgoldstein`.

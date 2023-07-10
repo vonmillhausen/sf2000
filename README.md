@@ -95,7 +95,7 @@ Just take the files from the theme, and use them to replace the existing files o
 Another thing to note: some themes might come with an updated boot logo. If that logo is provided as [a `bisrv.asd` file](#firmwarebios-bisrvasd) in the `bios` folder, this is actually a modified _firmware_ for the device, which happens to contain the new logo. If you decide to replace your existing `bisrv.asd` file, you might want to make sure that the theme's firmware version matches the firmware version already on your device. Generally, it's probably safer just to [update your own firmware's boot logo](https://vonmillhausen.github.io/sf2000/tools/bootLogoChanger.htm) with an image file.
 
 ### How do I change the four shortcuts/games listed on each system's main menu page?
-Answer: with a fair bit of work! The _images_ for the shortcuts are baked into each system's main menu background image - check out the ["Images (Used)"](#images-used) section below, and use your browser's search feature to search for `main menu background`, and you'll see what I mean. The _text_ under each shortcut is stored in a separate image - in the `05.22` firmware, the files are `gkavc.ers` if the device's language is set to Chinese, or `gakne.ctp` for all other languages (again, check the details in the ["Images (Used)"](#images-used) section below). Finally, the actual roms that are launched for each shortcut are stored in the `xfgle.hgp` file, which is plain text - you can learn more about it in the ["ROM Lists"](#rom-lists) section below.
+Answer: with a fair bit of work! The _images_ for the shortcuts are baked into each system's main menu background image - check out the ["Images (Used)"](#images-used) section below, and use your browser's search feature to search for `main menu background`, and you'll see what I mean. `Zerter#4954` has created a tool for theme makers which lets you more easily edit these icons, [which you can find here](https://zerter555.github.io/sf2000-collection/mainMenuIcoEditor.html). The _text_ under each shortcut is stored in a separate image - in the `05.22` firmware, the files are `gkavc.ers` if the device's language is set to Chinese, or `gakne.ctp` for all other languages (again, check the details in the ["Images (Used)"](#images-used) section below). Finally, the actual roms that are launched for each shortcut are stored in the `xfgle.hgp` file, which is plain text - you can learn more about it in the ["ROM Lists"](#rom-lists) section below.
 
 ### SNES games run really slowly... what's wrong?
 There's a bug in all stock firmware versions later than the original mid-March firmware which often causes SNES games to run really slowly on first launch (and their sound is slow and lower pitch too); this only impacts SNES. Usually this can be corrected by launching the game, then quitting back to the game selection menu via `START + SELECT`, and then immediately re-launching the game again. Note however that the stock firmwares do also struggle a bit with SNES emulation in general, so any additional slowdown after the second launch is just what you get.
@@ -585,6 +585,7 @@ All of these are linked above already in their relevant sections, but just in ca
 - [FROGTOOL](https://github.com/tzlion/frogtool) (for updating the built-in game lists)
 - [Generic Image Tool](https://vonmillhausen.github.io/sf2000/tools/genericImageTool.htm)
 - [`ignatzdraconis`'s Gitlab Repo](https://git.maschath.de/ignatz/hcrtos)
+- [Main Menu Icon Editor Tool by Zerter](https://zerter555.github.io/sf2000-collection/mainMenuIcoEditor.html)
 - [Save State Tool](https://vonmillhausen.github.io/sf2000/tools/saveStateTool.htm)
 - [SF2000 Theme Compilation Page](https://zerter555.github.io/sf2000-collection/)
 - [Silent background music file](/sounds/silentMusic/pagefile.sys) (replace the file in the `Resources` folder on the microSD card)
@@ -593,6 +594,8 @@ All of these are linked above already in their relevant sections, but just in ca
 ---
 
 ## Version History
+- `20230710 - 1.25`: Added link to `Zerter#4954`'s new main menu icon editor tool.
+
 - `20230709 - 1.24`: Updated FAQ about custom firmware with latest details (initial Retroarch build! 🎉)
 
 - `20230705 - 1.23`: Updated FAQ about custom firmware with latest details. Moved "what can I do" bullet point about custom themes to its own separate FAQ to make it easier to find, and added more details about how to actually _install_ a theme.

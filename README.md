@@ -68,7 +68,7 @@ So is the "Data Frog" any good? Only you can answer that question for yourself. 
 [Read my introductory section above :)](#sf2000)
 
 ### Is there any custom firmware?
-As of July 9th 2023, **no**, not yet. However efforts are underway; an SDK for the CPU has been identified, and custom firmware is now in the very early stages of development. Most recently, an "empty shell" build of Retroarch has been demonstrated to run (no emulation cores, no video driver, no audio driver, etc. - just a bare-minimum build of the Retroarch project framework). Previously, custom code execution, access to the microSD card and display, audio/video playback, and registering button inputs have been demonstrated.
+As of July 12th 2023, **no**, not yet. However efforts are underway; an SDK for the CPU has been identified, and custom firmware is now in the very early stages of development. Most recently, an "empty shell" build of Retroarch has been demonstrated to run, with a basic display driver capable of showing the Retroarch main menu - no emulation cores or audio driver have yet been developed, the current build is just the bare-minimum build of the Retroarch project framework. Previously, custom code execution, access to the microSD card and display, audio/video playback, and registering button inputs have been demonstrated.
 
 [A GitLab repo](https://git.maschath.de/ignatz/hcrtos) has been set up by `ignatzdraconis` for the work, and you can [follow along with discussion in the `Retro Handhelds` Discord](https://discord.com/channels/741895796315914271/1092831839955193987).
 
@@ -594,6 +594,8 @@ All of these are linked above already in their relevant sections, but just in ca
 ---
 
 ## Version History
+- `20230712 - 1.26`: Updated FAQ about custom firmware with latest details (Retroarch video driver is now able to display the main menu!)
+
 - `20230710 - 1.25`: Added link to `Zerter#4954`'s new main menu icon editor tool.
 
 - `20230709 - 1.24`: Updated FAQ about custom firmware with latest details (initial Retroarch build! 🎉)

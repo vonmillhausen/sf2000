@@ -68,7 +68,7 @@ So is the "Data Frog" any good? Only you can answer that question for yourself. 
 [Read my introductory section above :)](#sf2000)
 
 ### Is there any custom firmware?
-As of July 14th 2023, **no**, not yet. However efforts are underway; an SDK for the CPU has been identified, and custom firmware is now in the very early stages of development. Most recently, an "empty shell" build of Retroarch has been demonstrated to run, with a basic display driver capable of showing the Retroarch main menu, and a basic input driver (inputs are detected as a keyboard, not as a gamepad), allowing the menu to be navigated - no emulation cores or audio driver have yet been developed, the current build is just the bare-minimum build of the Retroarch project framework. Previously, custom code execution, access to the microSD card and display, audio/video playback, and registering button inputs have been demonstrated.
+As of July 18th 2023, **no**, not yet. However efforts are underway; an SDK for the CPU has been identified, and custom firmware is now in the very early stages of development. Most recently, a limited build of Retroarch has been demonstrated to run, with a single core (TGBDual, the same Game Boy/Game Boy Color emulator included in the stock firmware) capable of loading ROM content. Video and audio drivers for Retroarch are at very early stages of development and are therefore not optimised, and much audio "crackling" is present; additionally, performance issues have been hinted at (game runs much faster when the audio subsystem is not engaged).
 
 [A GitLab repo](https://git.maschath.de/ignatz/hcrtos) has been set up by `ignatzdraconis` for the work, and you can [follow along with discussion in the `Retro Handhelds` Discord](https://discord.com/channels/741895796315914271/1092831839955193987).
 
@@ -594,6 +594,8 @@ All of these are linked above already in their relevant sections, but just in ca
 ---
 
 ## Version History
+- `20230718 - 1.27`: Updated FAQ about custom firmware with latest details (first running Retroarch core! 🎉)
+
 - `20230714 - 1.27`: Updated FAQ about custom firmware with latest details (Retroarch input driver in basic functional state)
 
 - `20230712 - 1.26`: Updated FAQ about custom firmware with latest details (Retroarch video driver is now able to display the main menu!)

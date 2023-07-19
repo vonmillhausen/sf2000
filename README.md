@@ -68,7 +68,7 @@ Some downsides to the device: it's mono only (you only get the left-channel audi
 So is the "Data Frog" any good? Only you can answer that question for yourself. There are certainly more powerful devices out there, more fully featured devices, devices with better hardware, etc. - but almost all of those devices cost a lot more than the SF2000. At the end of the day, you have to look at the features offered at the given price-point, and only then can you decide if you're interested in the device or not.
 
 ### Is there any custom firmware?
-As of July 18th 2023, **no**, not yet. However efforts are underway; an SDK for the CPU has been identified, and custom firmware is now in the very early stages of development. Most recently, a limited build of Retroarch has been demonstrated to run, with a single core (TGBDual, the same Game Boy/Game Boy Color emulator included in the stock firmware) capable of loading ROM content. Video and audio drivers for Retroarch are at very early stages of development and are therefore not optimised, and much audio "crackling" is present; additionally, performance issues have been hinted at (game runs much faster when the audio subsystem is not engaged).
+As of July 20th 2023, **no**, not yet. However efforts are underway; an SDK for the CPU has been identified, and custom firmware is now in the very early stages of development. Most recently, a limited build of Retroarch has been demonstrated to run, with two separate cores capable of loading ROM content compiled as separate firmwares (TGBDual, the same Game Boy/Game Boy Color emulator included in the stock firmware; and gpSP, the same Game Boy Advance emulator included in the stock firmware as well). Video and audio drivers for Retroarch are at very early stages of development and are therefore not optimised, and much audio "crackling" is present under TGBDual; gpSP as of yet has no audio at all. Additionally, performance issues have been hinted at (TGBDual runs much faster when the audio subsystem is not engaged, and gpSP requires frame-skipping to be playable).
 
 [A GitLab repo](https://git.maschath.de/ignatz/hcrtos) has been set up by `ignatzdraconis` for the work, and you can [follow along with discussion in the `Retro Handhelds` Discord](https://discord.com/channels/741895796315914271/1092831839955193987).
 
@@ -594,6 +594,8 @@ All of these are linked above already in their relevant sections, but just in ca
 ---
 
 ## Version History
+- `20230720 - 1.29`: Another custom firmware FAQ update (a second core, gpSP, has now been compiled and is at an early stage of running).
+
 - `20230719 - 1.28`: Moved most of the intro section under the "Is this thing any good?" FAQ, and slightly reworded parts of it. Fixed a few typos.
 
 - `20230718 - 1.27`: Updated FAQ about custom firmware with latest details (first running Retroarch core! 🎉)

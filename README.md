@@ -18,6 +18,7 @@ This document is a collection of notes and information I've made about the devic
     - [Help! I was doing stuff in the bios folder or trying to install a new firmware, and now my SF2000 won't turn on, or is stuck at a black screen!](#help-i-was-doing-stuff-in-the-bios-folder-or-trying-to-install-a-new-firmware-and-now-my-sf2000-wont-turn-on-or-is-stuck-at-a-black-screen)
     - [When I connect the SF2000 to a TV via the A/V cable, the sound is very quiet/low - is that normal?](#when-i-connect-the-sf2000-to-a-tv-via-the-av-cable-the-sound-is-very-quietlow---is-that-normal)
     - [Game saves don't seem to be working for me? Save states are fine, but the built-in save function in games doesn't seem to work?](#game-saves-dont-seem-to-be-working-for-me-save-states-are-fine-but-the-built-in-save-function-in-games-doesnt-seem-to-work)
+    - [I have a question that isn't answered here... who or where do I ask?](#i-have-a-question-that-isnt-answered-here-who-or-where-do-i-ask)
   - [Hardware](#hardware)
     - [CPU](#cpu)
     - [Display](#display)
@@ -68,7 +69,7 @@ Some downsides to the device: it's mono only (you only get the left-channel audi
 So is the "Data Frog" any good? Only you can answer that question for yourself. There are certainly more powerful devices out there, more fully featured devices, devices with better hardware, etc. - but almost all of those devices cost a lot more than the SF2000. At the end of the day, you have to look at the features offered at the given price-point, and only then can you decide if you're interested in the device or not.
 
 ### Is there any custom firmware?
-As of July 20th 2023, **no**, not yet. However efforts are underway; an SDK for the CPU has been identified, and custom firmware is now in the very early stages of development. Most recently, a limited build of Retroarch has been demonstrated to run, with two separate cores capable of loading ROM content compiled as separate firmwares (TGBDual, the same Game Boy/Game Boy Color emulator included in the stock firmware; and gpSP, the same Game Boy Advance emulator included in the stock firmware as well). Video and audio drivers for Retroarch are at very early stages of development and are therefore not optimised, and much audio "crackling" is present under TGBDual; gpSP as of yet has no audio at all. Additionally, performance issues have been hinted at (TGBDual runs much faster when the audio subsystem is not engaged, and gpSP requires frame-skipping to be playable).
+As of July 20th 2023, **no**, not yet. However efforts are underway; an SDK for the CPU has been identified, and custom firmware is now in the very early stages of development. Most recently, a limited build of Retroarch has been demonstrated to run, with two separate cores capable of loading ROM content compiled as separate firmwares (TGBDual, the same Game Boy/Game Boy Color emulator included in the stock firmware; and gpSP, the same Game Boy Advance emulator included in the stock firmware as well). Video and audio drivers for Retroarch are at very early stages of development and are therefore not optimised, and much audio "crackling" is present under both cores. Additionally, performance issues have been hinted at (TGBDual runs much faster when the audio subsystem is not engaged, and gpSP requires frame-skipping to be playable at all).
 
 [A GitLab repo](https://git.maschath.de/ignatz/hcrtos) has been set up by `ignatzdraconis` for the work, and you can [follow along with discussion in the `Retro Handhelds` Discord](https://discord.com/channels/741895796315914271/1092831839955193987).
 
@@ -112,6 +113,9 @@ So you can try launching the game first, and _then_ plug in the A/V cable to get
 
 ### Game saves don't seem to be working for me? Save states are fine, but the built-in save function in games doesn't seem to work?
 Unfortunately, correct - with the stock firmware, the built-in save feature of emulated games does not work correctly, and the SF2000 won't store new save data after the first time it's created for a game. If you want to save your progress in a game on the SF2000's stock firmware, use save states instead.
+
+### I have a question that isn't answered here... who or where do I ask?
+If you have questions about the SF2000 you can't find the answer to, the best place to ask is in the [`🐸 data_frog_sf2000` channel in the Retro Handhelds Discord server](https://discord.com/channels/741895796315914271/1092831839955193987).
 
 ---
 
@@ -520,9 +524,9 @@ Credit for this section goes to `taizou`, author of [FROGTOOL](https://github.co
 ### Sounds
 There are several sound files in the `20230420` firmware, stored in raw signed 16-bit PCM format (mono, little-endian at 22050 Hz). The SF2000 seems to play the files back at an incorrect sample rate vs. the raw data; if you want to customise the background music, resample your audio to 21560 Hz (21561.1 Hz is technically precise, but 21560 Hz is easer to remember, and all but the most exacting of human ears is unlikely to detect the difference), and then speed the audio up to 22050 Hz, using the resulting audio as the raw data (credit to `notv37` in Discord for doing the initial discovery math, and to `bnister` for doing technical follow-up in the firmware - you can [read their deep-dive into the details here](https://discord.com/channels/741895796315914271/1099465777825972347/1112643797344583710) (Discord link)).
 
-If you want to do it using [Audacity](https://www.audacityteam.org/) , the steps are:
+If you want to do it using [Audacity](https://www.audacityteam.org/), the steps are:
 
-1. Open your audio file
+1. Open your audio file; there's a hard-coded limit of 1 minute 30 seconds on the maximum length of the audio you can use, so if your audio file is longer than that, you'll need to trim it to be 1 minute 30 seconds or shorter (longer audio will glitch)
 2. Click the "Audio Setup" button on the top toolbar, choose "Audio Settings..."
     * Set "Project Sample Rate" to "22050 Hz"
     * Click "OK"
@@ -537,8 +541,9 @@ If you want to do it using [Audacity](https://www.audacityteam.org/) , the steps
 7. "File" menu > "Export" > "Export Audio..."
     * Set "Save as type" to "Other uncompressed files"
     * In "Format Options", set "Header" to "RAW (header-less)"; set "Encoding" to "Signed 16-bit PCM"
-    * Enter your "File name", and click "Save"
+    * Enter your "File name" as `pagefile.sys`, and click "Save"
     * If the "Edit Metadata Tags" window appears, just leave everything blank and click "OK"
+8. Replace the existing `pagefile.sys` file in the `Resources` folder on your SF2000 microSD card
 
 | Filename | 03.15 | 04.20 | 05.15 | 05.22 | Description | Listen |
 | -------- | ----- | ----- | ----- | ----- | ----------- | ------ |
@@ -594,6 +599,8 @@ All of these are linked above already in their relevant sections, but just in ca
 ---
 
 ## Version History
+- `20230720 - 1.30`: Corrected that gpSP Retroarch core demo does indeed have sound (but it's stuttery/crackly). Added a new FAQ about where to ask questions. Updated the Audacity steps for custom sound creation with some additional detail.
+
 - `20230720 - 1.29`: Another custom firmware FAQ update (a second core, gpSP, has now been compiled and is at an early stage of running).
 
 - `20230719 - 1.28`: Moved most of the intro section under the "Is this thing any good?" FAQ, and slightly reworded parts of it. Fixed a few typos.

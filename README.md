@@ -69,9 +69,9 @@ Some downsides to the device: it's mono only (you only get the left-channel audi
 So is the "Data Frog" any good? Only you can answer that question for yourself. There are certainly more powerful devices out there, more fully featured devices, devices with better hardware, etc. - but almost all of those devices cost a lot more than the SF2000. At the end of the day, you have to look at the features offered at the given price-point, and only then can you decide if you're interested in the device or not.
 
 ### Is there any custom firmware?
-As of July 20th 2023, **no**, not yet. However efforts are underway; an SDK for the CPU has been identified, and custom firmware is now in the very early stages of development. Most recently, a limited build of Retroarch has been demonstrated to run, with two separate cores capable of loading ROM content compiled as separate firmwares (TGBDual, the same Game Boy/Game Boy Color emulator included in the stock firmware; and gpSP, the same Game Boy Advance emulator included in the stock firmware as well). Video and audio drivers for Retroarch are at very early stages of development and are therefore not optimised, and much audio "crackling" is present under both cores. Additionally, performance issues have been hinted at (TGBDual runs much faster when the audio subsystem is not engaged, and gpSP requires frame-skipping to be playable at all).
+As of July 24th 2023, **no**, not yet. However efforts are underway; an SDK for the CPU has been identified, and custom firmware is now in the very early stages of development. Most recently, a limited build of Retroarch has been demonstrated to run, with two separate cores capable of loading ROM content compiled as separate firmwares (TGBDual, the same Game Boy/Game Boy Color emulator included in the stock firmware; and gpSP, the same Game Boy Advance emulator included in the stock firmware as well). Video and audio drivers for Retroarch are at very early stages of development and are therefore not optimised, and much audio "crackling" is present under both cores. Additionally, performance issues have been hinted at (TGBDual runs much faster when the audio subsystem is not engaged, and gpSP requires frame-skipping to be playable at all).
 
-[A GitLab repo](https://git.maschath.de/ignatz/hcrtos) has been set up by `ignatzdraconis` for the work, and you can [follow along with discussion in the `Retro Handhelds` Discord](https://discord.com/channels/741895796315914271/1092831839955193987).
+[A GitLab repo](https://git.maschath.de/ignatz/hcrtos) has been set up by `ignatzdraconis` for the work, and you can follow along with discussion in the [`Retro Handhelds` Discord server](https://discord.gg/retrohandhelds) (specifically, in the `🐸data_frog_sf2000` channel there's a `SF2000 Dev` thread where most of the tech talk and details are posted first).
 
 ### I just got my SF2000; what modding can I do with it?
 In no particular order, some of the current customisation options available are:
@@ -89,7 +89,7 @@ In no particular order, some of the current customisation options available are:
 ### How do I install new menu themes?
 The SF2000 doesn't natively support themes at all; however, all of the images and sounds for the stock theme live in the `Resources` folder on the microSD card. Therefore, by simply replacing the stock theme's files, the stock theme can be replaced.
 
-A new centralised repository for boot logos, custom themes and background music has been created by `Zerter#4954`, which you can [find here](https://zerter555.github.io/sf2000-collection/); you can also find many of them linked in the ["The Frog's Best Bits 🐸" thread](https://discord.com/channels/741895796315914271/1110397766074638397) in the [Retro Handhelds Discord server](https://discord.gg/retrohandhelds).
+A new centralised repository for boot logos, custom themes and background music has been created by `Zerter#4954`, which you can [find here](https://zerter555.github.io/sf2000-collection/); you can also find many of them linked in the `The Frog's Best Bits 🐸` thread of the `🐸data_frog_sf2000` channel in the [`Retro Handhelds` Discord server](https://discord.gg/retrohandhelds).
 
 Just take the files from the theme, and use them to replace the existing files on the microSD card. You might want to make your own backup of the stock `Resources` folder first, in case you want to go back to the stock theme yourself at a later date. Note also that in addition to theme assets, [the `Resources` folder](#resources) also contains data files related to your [button mapping](#button-mappingskey-bindings), [favourites and history](#favourites-and-history), etc.; so when backing up or replacing files in `Resources` for themes, just be aware not to overwrite anything non-theme-related you want to keep.
 
@@ -97,6 +97,8 @@ Another thing to note: some themes might come with an updated boot logo. If that
 
 ### How do I change the four shortcuts/games listed on each system's main menu page?
 Answer: with a fair bit of work! The _images_ for the shortcuts are baked into each system's main menu background image - check out the ["Images (Used)"](#images-used) section below, and use your browser's search feature to search for `main menu background`, and you'll see what I mean. `Zerter#4954` has created a tool for theme makers which lets you more easily edit these icons, [which you can find here](https://zerter555.github.io/sf2000-collection/mainMenuIcoEditor.html). The _text_ under each shortcut is stored in a separate image - in the `05.22` firmware, the files are `gkavc.ers` if the device's language is set to Chinese, or `gakne.ctp` for all other languages (again, check the details in the ["Images (Used)"](#images-used) section below). Finally, the actual roms that are launched for each shortcut are stored in the `xfgle.hgp` file, which is plain text - you can learn more about it in the ["ROM Lists"](#rom-lists) section below.
+
+Recent versions of [Tadpole](https://github.com/EricGoldsteinNz/tadpole) by `.ericgoldstein` have support for changing the shortcuts if you're looking for a more automated way to do things.
 
 ### SNES games run really slowly... what's wrong?
 There's a bug in all stock firmware versions later than the original mid-March firmware which often causes SNES games to run really slowly on first launch (and their sound is slow and lower pitch too); this only impacts SNES. Usually this can be corrected by launching the game, then quitting back to the game selection menu via `START + SELECT`, and then immediately re-launching the game again. Note however that the stock firmwares do also struggle a bit with SNES emulation in general, so any additional slowdown after the second launch is just what you get.
@@ -115,7 +117,7 @@ So you can try launching the game first, and _then_ plug in the A/V cable to get
 Unfortunately, correct - with the stock firmware, the built-in save feature of emulated games does not work correctly, and the SF2000 won't store new save data after the first time it's created for a game. If you want to save your progress in a game on the SF2000's stock firmware, use save states instead.
 
 ### I have a question that isn't answered here... who or where do I ask?
-If you have questions about the SF2000 you can't find the answer to, the best place to ask is in the [`🐸 data_frog_sf2000` channel in the Retro Handhelds Discord server](https://discord.com/channels/741895796315914271/1092831839955193987).
+If you have questions about the SF2000 you can't find the answer to, the best place to ask is in the `🐸data_frog_sf2000` channel in the [Retro Handhelds Discord server](https://discord.gg/retrohandhelds).
 
 ---
 
@@ -522,7 +524,7 @@ Credit for this section goes to `taizou`, author of [FROGTOOL](https://github.co
 | `TSMFK.TAX` | This is a ROM list file similar to the other `.tax` files, except it is built at run-time from the ROM files in the user roms folder. The file is regenerated each time the device boots |
 
 ### Sounds
-There are several sound files in the `20230420` firmware, stored in raw signed 16-bit PCM format (mono, little-endian at 22050 Hz). The SF2000 seems to play the files back at an incorrect sample rate vs. the raw data; if you want to customise the background music, resample your audio to 21560 Hz (21561.1 Hz is technically precise, but 21560 Hz is easer to remember, and all but the most exacting of human ears is unlikely to detect the difference), and then speed the audio up to 22050 Hz, using the resulting audio as the raw data (credit to `notv37` in Discord for doing the initial discovery math, and to `bnister` for doing technical follow-up in the firmware - you can [read their deep-dive into the details here](https://discord.com/channels/741895796315914271/1099465777825972347/1112643797344583710) (Discord link)).
+There are several sound files in the `20230420` firmware, stored in raw signed 16-bit PCM format (mono, little-endian at 22050 Hz). The SF2000 seems to play the files back at an incorrect sample rate vs. the raw data; if you want to customise the background music, resample your audio to 21560 Hz (21561.1 Hz is technically precise, but 21560 Hz is easer to remember, and all but the most exacting of human ears is unlikely to detect the difference), and then speed the audio up to 22050 Hz, using the resulting audio as the raw data (credit to `notv37` in Discord for doing the initial discovery math, and to `bnister` for doing technical follow-up in the firmware - you can [read their deep-dive into the details here](https://discord.com/channels/741895796315914271/1099465777825972347/1112643797344583710) (Discord link - you may need to be a member of the [`Retro Handhelds` Discord server](https://discord.gg/retrohandhelds) first for the link to work)).
 
 If you want to do it using [Audacity](https://www.audacityteam.org/), the steps are:
 
@@ -599,6 +601,8 @@ All of these are linked above already in their relevant sections, but just in ca
 ---
 
 ## Version History
+- `20230724 - 1.31`: Fixed Discord links (thanks `xdpirate`!). Added mention of Tadpole to FAQ about changing menu links.
+
 - `20230720 - 1.30`: Corrected that gpSP Retroarch core demo does indeed have sound (but it's stuttery/crackly). Added a new FAQ about where to ask questions. Updated the Audacity steps for custom sound creation with some additional detail.
 
 - `20230720 - 1.29`: Another custom firmware FAQ update (a second core, gpSP, has now been compiled and is at an early stage of running).

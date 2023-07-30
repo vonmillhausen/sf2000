@@ -69,7 +69,7 @@ Some downsides to the device: it's mono only (you only get the left-channel audi
 So is the "Data Frog" any good? Only you can answer that question for yourself. There are certainly more powerful devices out there, more fully featured devices, devices with better hardware, etc. - but almost all of those devices cost a lot more than the SF2000. At the end of the day, you have to look at the features offered at the given price-point, and only then can you decide if you're interested in the device or not.
 
 ### Is there any custom firmware?
-As of July 24th 2023, **no**, not yet. However efforts are underway; an SDK for the CPU has been identified, and custom firmware is now in the very early stages of development. Most recently, a limited build of Retroarch has been demonstrated to run, with two separate cores capable of loading ROM content compiled as separate firmwares (TGBDual, the same Game Boy/Game Boy Color emulator included in the stock firmware; and gpSP, the same Game Boy Advance emulator included in the stock firmware as well). Video and audio drivers for Retroarch are at very early stages of development and are therefore not optimised, and much audio "crackling" is present under both cores. Additionally, performance issues have been hinted at (TGBDual runs much faster when the audio subsystem is not engaged, and gpSP requires frame-skipping to be playable at all).
+As of July 30th 2023, **no**, not yet. However efforts are underway; an SDK for the CPU has been identified, and custom firmware is now in the very early stages of development. Most recently, folks working on the firmware have been focussing on their toolchain - both attempting to create a reliable way to capture hard-crashes of the SF2000 to aid in debugging, as well as simplifying the build environment (the SDK as downloaded is quite messy/complex). Previously, a limited build of Retroarch has been demonstrated to run, with two separate cores capable of loading ROM content compiled as separate firmwares (TGBDual, the same Game Boy/Game Boy Color emulator included in the stock firmware; and gpSP, the same Game Boy Advance emulator included in the stock firmware as well). Video and audio drivers for Retroarch are at very early stages of development and are therefore not optimised, and much audio "crackling" is present under both cores. Additionally, performance issues have been hinted at (TGBDual runs much faster when the audio subsystem is not engaged, and gpSP requires frame-skipping to be playable at all).
 
 [A GitLab repo](https://git.maschath.de/ignatz/hcrtos) has been set up by `ignatzdraconis` for the work, and you can follow along with discussion in the [`Retro Handhelds` Discord server](https://discord.gg/retrohandhelds) (specifically, in the `🐸data_frog_sf2000` channel there's a `SF2000 Dev` thread where most of the tech talk and details are posted first).
 
@@ -597,10 +597,13 @@ All of these are linked above already in their relevant sections, but just in ca
 - [SF2000 Theme Compilation Page](https://zerter555.github.io/sf2000-collection/)
 - [Silent background music file](/sounds/silentMusic/pagefile.sys) (replace the file in the `Resources` folder on the microSD card)
 - [Tadpole](https://github.com/EricGoldsteinNz/tadpole) (a GUI and additional features for FROGTOOL)
+- [ZFBTool](https://github.com/Dteyn/ZFBTool) (a tool for creating `.zfb` files for pairing custom thumbnails with arcade ROMs)
 
 ---
 
 ## Version History
+- `20230730 - 1.32`: Added a link to "ZFBTool" by `dteyn` in the "Tools and Links" section. Updated the custom firmware FAQ answer with the latest progress notes.
+
 - `20230724 - 1.31`: Fixed Discord links (thanks `xdpirate`!). Added mention of Tadpole to FAQ about changing menu links.
 
 - `20230720 - 1.30`: Corrected that gpSP Retroarch core demo does indeed have sound (but it's stuttery/crackly). Added a new FAQ about where to ask questions. Updated the Audacity steps for custom sound creation with some additional detail.

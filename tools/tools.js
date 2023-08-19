@@ -12,6 +12,9 @@
   Just like the tools themselves, this file should be considered CC0 Public
   Domain (https://creativecommons.org/publicdomain/zero/1.0/)
 
+  Version 1.1: Added support for the August 3rd BIOS in getFirmwareHash() and
+    knownHash()
+
   Version 1.0: Initial version
 
 */
@@ -50,7 +53,7 @@ function getFirmwareHash(data) {
   var dataCopy = data.slice();
 
   // Only really worthwhile doing this for big bisrv.asd files...
-  if (dataCopy.length > 12640000) {
+  if (dataCopy.length > 12600000) {
 
     // First, replace CRC32 bits with 00...
     dataCopy[396] = 0x00;
@@ -174,6 +177,9 @@ function knownHash(hash) {
 
     case "6aebab0e4da39e0a997df255ad6a1bd12fdd356cdf51a85c614d47109a0d7d07":
       return "05.22";
+
+    case "3f0ca7fcd47f1202828f6dbc177d8f4e6c9f37111e8189e276d925ffd2988267":
+      return "08.03";
 
     default:
       return false;

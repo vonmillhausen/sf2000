@@ -116,14 +116,18 @@ The three most likely causes for this are:
 * Your battery could be running low. The SF2000 will still "turn on" when its battery is low on charge (the red light will still come on), but the device itself will actually fail to boot, just leaving you with a black screen. Turn the device off, and charge it fully (the stock battery takes 3.5 hours to charge from empty - the green charging light will not go out, so you'll have to time it yourself).
 
 ### When I connect the SF2000 to a TV via the A/V cable, the sound is very quiet/low - is that normal?
-It's "normal" for newer versions of the firmware, anyway! Older firmware versions had no issues with audio volume via A/V, but at least the `05.22` version does. `Zerter#4954` from Discord found a workaround:
+It's "normal" for certain versions of the firmware, anyway! Older firmware versions had no issues with audio volume via A/V, but at least the `05.22` version does. `Zerter#4954` from Discord found a workaround:
 
 > when I did this the AV audio work normally: I had to load the game first then plug-in the 2.5mm to rca jack. [...] but when I quit then exit then tried the game again it returns to very low audio. [...] will need to do the work around again
 
 So you can try launching the game first, and _then_ plug in the A/V cable to get full volume on the TV.
 
+Alternatively, the issue was addressed in the `08.03`/`1.6V` firmware, so you could [try updating to that](https://www.youtube.com/watch?v=j8dT2fdGfck).
+
 ### Game saves don't seem to be working for me? Save states are fine, but the built-in save function in games doesn't seem to work?
 Unfortunately, correct - with the stock firmware, the built-in save feature of emulated games does not work correctly, and the SF2000 won't store new save data after the first time it's created for a game. If you want to save your progress in a game on the SF2000's stock firmware, use save states instead.
+
+Note that the `08.03`/`1.6V` firmware _appears_ to have fixed this for GBA based on community reports, but not for other emulated systems.
 
 ### I have a question that isn't answered here... who or where do I ask?
 If you have questions about the SF2000 you can't find the answer to, the best place to ask is in the `🐸data_frog_sf2000` channel in the [Retro Handhelds Discord server](https://discord.gg/retrohandhelds).
@@ -623,7 +627,7 @@ All of these are linked above already in their relevant sections, but just in ca
 ---
 
 ## Document Version History
-- `20230829 - 1.35`: Added a [MicroSD Card](#microsd-card) section to [Hardware](#hardware) to provide some detail about the SF2000's slightly unusual microSD card situation. Added detail about the [Neo Geo Unibios Menu](#neo-geo-unibios-menu) discovery to the [Arcade](#arcade) section (thanks `nanchon18#2262`!). Updated the custom firmware FAQ with the latest details. Updated the "what modding can I do" FAQ to strongly suggest fixing the [bootloader bug](#bootloader-bug) before doing any other modding to the device; also added a note that the Tadpole tool can perform a lot of the modding tasks. Added a note to the [Battery](#battery) section about the SF2000's poorly calibrated power monitoring curve, along with a link to `dteyn`'s SF2000 Battery Level Patcher script (also added a link to that in the [Tools and Links](#tools-and-links) section). Data Frog has now officially released the `August 3rd`/`08.03`/`1.6V` firmware, so added that to the [Firmware](#firmwarebios-bisrvasd) section; also updated all of the tables in the [Resources](#resources) section to include the new firmware. Finally, renamed this "Version History" section to "Document Version History", to help prevent any confusion in regards to what the version numbers in this section refer to (they're not related to firmware).
+- `20230829 - 1.35`: Added a [MicroSD Card](#microsd-card) section to [Hardware](#hardware) to provide some detail about the SF2000's slightly unusual microSD card situation. Added detail about the [Neo Geo Unibios Menu](#neo-geo-unibios-menu) discovery to the [Arcade](#arcade) section (thanks `nanchon18#2262`!). Updated the custom firmware FAQ with the latest details. Updated the "what modding can I do" FAQ to strongly suggest fixing the [bootloader bug](#bootloader-bug) before doing any other modding to the device; also added a note that the Tadpole tool can perform a lot of the modding tasks. Updated the "quiet A/V sound" FAQ with details about the fix in the `08.03`/`1.6V` firmware. Updated the "in game saves don't work" FAQ with details about this apparently being fixed for GBA in the `08.03`/`1.6V` firmware. Added a note to the [Battery](#battery) section about the SF2000's poorly calibrated power monitoring curve, along with a link to `dteyn`'s SF2000 Battery Level Patcher script (also added a link to that in the [Tools and Links](#tools-and-links) section). Data Frog has now officially released the `August 3rd`/`08.03`/`1.6V` firmware, so added that to the [Firmware](#firmwarebios-bisrvasd) section; also updated all of the tables in the [Resources](#resources) section to include the new firmware. Finally, renamed this "Version History" section to "Document Version History", to help prevent any confusion in regards to what the version numbers in this section refer to (they're not related to firmware).
 
 - `20230819 - 1.34`: Updated the custom firmware FAQ answer with the latest progress notes. Replaced the bootloader bug FAQ with a more generic FAQ covering the main situations under which the SF2000 fails to boot correctly. Added a brief note on the mysterious new `August 3rd` BIOS that has started appearing on some newer devices.
 

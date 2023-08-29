@@ -91,10 +91,71 @@ function getFirmwareHash(data) {
       return false;
     }
 
+    // Next we'll look for (and zero out) the five bytes that the power
+    // monitoring functions of the SF2000 use for switching the UI's battery
+    // level indicator. These unfortunately can't be searched for - they're just
+    // in specific known locations for specific firmware versions...
+    var prePowerCurve = findSequence([0x11, 0x05, 0x00, 0x02, 0x24], dataCopy);
+    if (prePowerCurve > -1) {
+      var powerCurveFirstByteLocation = prePowerCurve + 5;
+      switch (powerCurveFirstByteLocation) {
+        case 0x35A8F8:
+          // Seems to match mid-March layout...
+          dataCopy[0x35A8F8] = 0x00;
+          dataCopy[0x35A900] = 0x00;
+          dataCopy[0x35A9B0] = 0x00;
+          dataCopy[0x35A9B8] = 0x00;
+          dataCopy[0x35A9D4] = 0x00;
+          break;
+
+        case 0x35A954:
+          // Seems to match April 20th layout...
+          dataCopy[0x35A954] = 0x00;
+          dataCopy[0x35A95C] = 0x00;
+          dataCopy[0x35AA0C] = 0x00;
+          dataCopy[0x35AA14] = 0x00;
+          dataCopy[0x35AA30] = 0x00;
+          break;
+
+        case 0x35C78C:
+          // Seems to match May 15th layout...
+          dataCopy[0x35C78C] = 0x00;
+          dataCopy[0x35C794] = 0x00;
+          dataCopy[0x35C844] = 0x00;
+          dataCopy[0x35C84C] = 0x00;
+          dataCopy[0x35C868] = 0x00;
+          break;
+
+        case 0x35C790:
+          // Seems to match May 22nd layout...
+          dataCopy[0x35C790] = 0x00;
+          dataCopy[0x35C798] = 0x00;
+          dataCopy[0x35C848] = 0x00;
+          dataCopy[0x35C850] = 0x00;
+          dataCopy[0x35C86C] = 0x00;
+          break;
+
+        case 0x3564EC:
+          // Seems to match August 3rd layout...
+          dataCopy[0x3564EC] = 0x00;
+          dataCopy[0x3564F4] = 0x00;
+          dataCopy[0x35658C] = 0x00;
+          dataCopy[0x356594] = 0x00;
+          dataCopy[0x3565B0] = 0x00;
+          break;
+      
+        default:
+          return false;
+      }
+    }
+    else {
+      return false;
+    }
+
     // If we're here, we've zeroed-out all of the bits of the firmware that are
-    // semi-user modifiable (boot logo, button mappings and the CRC32 bits); now
-    // we can generate a hash of what's left and compare it against some known
-    // values...
+    // semi-user modifiable (CRC32 bits, boot logo, button mappings and power
+    // curve bytes); now we can generate a hash of what's left and compare it
+    // against some known values...
     return crypto.subtle.digest("SHA-256", dataCopy.buffer)
     .then(function(digest) {
       var array = Array.from(new Uint8Array(digest));
@@ -166,19 +227,19 @@ function downloadToBrowser(data, type, name) {
 // convention, or false if the provided hash doesn't match...
 function knownHash(hash) {
   switch (hash) {
-    case "4411143d3030adc442e99f7ac4e7772f300c844bbe10d639702fb3ba049a4ee1":
+    case "17b931ed95cc5506b06941cc1ea152fda9eef94d8109168f6e180fce8043ef66":
       return "03.15";
 
-    case "b50e50aa4b1b1d41489586e989f09d47c4e2bc27c072cb0112f83e6bc04e2cca":
+    case "c4ae6c69e6ca1a39bae1f8e342e41779bd45ee396e29855b795e1bacddd5916a":
       return "04.20";
 
-    case "d878a99d26242836178b452814e916bef532d05acfcc24d71baa31b8b6f38ffd":
+    case "48f86e1ff56223349186029270c6c022ce0de1ff47d6704c73e55c31ad68aec4":
       return "05.15";
 
-    case "6aebab0e4da39e0a997df255ad6a1bd12fdd356cdf51a85c614d47109a0d7d07":
+    case "1cd37343576a6584565884fcbbe2ffaf18b50466144b356aa0b885cd9cf10484":
       return "05.22";
 
-    case "3f0ca7fcd47f1202828f6dbc177d8f4e6c9f37111e8189e276d925ffd2988267":
+    case "334c8f0a8584db07078d7dfc940e540e6538dde948cb6fdbf50754e4e113d6bc":
       return "08.03";
 
     default:

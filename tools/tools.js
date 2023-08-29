@@ -12,6 +12,9 @@
   Just like the tools themselves, this file should be considered CC0 Public
   Domain (https://creativecommons.org/publicdomain/zero/1.0/)
 
+  Version 1.2: Added support for blanking out the power curve monitoring bytes
+    in getFirmwareHash(), and updated the hashes accordingly in knownHash()
+
   Version 1.1: Added support for the August 3rd BIOS in getFirmwareHash() and
     knownHash()
 

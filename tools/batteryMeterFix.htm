@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <title>Data Frog SF2000 Battery Meter Fix</title>
+    <meta name="viewport" content="width=device-width">
+    <link rel="stylesheet" href="tools.css">
+  </head>
+  <body>
+    <h1>Data Frog SF2000 Battery Meter Fix</h1>
+    <p>This tool can be used to fix the battery meter on an SF2000 handheld gaming console so that it better represents the charge status of the stock battery. Please note this tool is provided as-is, and no support will be given if this corrupts your device's bios; make sure you have backups of anything you care about before messing with your device's critical files! 🙂</p>
+	<p><strong>Note:</strong> This patch is primarily designed to fix the battery meter when using the stock battery that comes with the SF2000. If you have installed a larger mAh battery (3000mAh+), this patch is not needed.</p>
+    <hr>
+    <div id="steps">
+      <section id="bisrvSection">
+        <h2>Step 1: Select Original <code>bisrv.asd</code></h2>
+        <p>Select the <code>bisrv.asd</code> file whose battery meter you want to fix. You should probably make a backup of the file first, just in case! You can find the <code>bisrv.asd</code> file in the <code>bios</code> folder on your microSD card.</p>
+        <div id="bisrvMessages"></div>
+        <div class="controlContainer">
+          <label class="control">Open <code>bisrv.asd</code>: <input id="bisrvSelector" type="file" accept=".asd" onchange="bisrvLoad(event.target.files[0])"></label>
+        </div>
+      </section>
+    </div>
+    <script src="tools.js"></script>
+    <script type="text/javascript">
+
+      // Global variables...
+      var bisrvData;             // Used to store the binary data from the bisrv.asd file
+      var battLevelOffset = [];  // Will contain the offsets of the battery meter data within the bisrv.asd file
+      var newBattLevel = [];     // Used to store the new values to write to the firmware's battery meter level thresholds
+
+      // Define the new voltage values to write to the firmware
+	  newBattLevel[0] = 4.00  // 5 bars (green)
+	  newBattLevel[1] = 3.88  // 4 bars (green)
+	  newBattLevel[2] = 3.80  // 3 bars (green)
+	  newBattLevel[3] = 3.72  // 2 bars (yellow)
+	  newBattLevel[4] = 3.66  // 1 bar (red) - voltage less than this will show 'warning' screen
+
+      // This function is triggered when the person selects a file in Step 1...
+      function bisrvLoad(file) {
+
+        // Read in the contents of the selected file as array buffer...
+        var frBisrv = new FileReader();
+        frBisrv.readAsArrayBuffer(file);
+        frBisrv.onload = function(event) {
+
+          // Clear out any HTML that might already exist after Step 1...
+          while(document.getElementById("bisrvSection").nextSibling) {
+            document.getElementById("bisrvSection").nextSibling.remove();
+          }
+
+          // Clear any old messages...
+          document.getElementById("bisrvMessages").innerHTML = "";
+
+          // Read the provided file's data into an array...
+          bisrvData = new Uint8Array(event.target.result);
+
+          // We'll do a hash-check against it...
+          hashResult = getFirmwareHash(bisrvData);
+
+          // The result could be either a Promise if it had a bisrv.asd-like structure and we got
+          // a hash, or false otherwise... let's check!
+          if (hashResult instanceof Promise) {
+
+            // We got a Promise! Wait for it to finish so we get our bisrv.asd hash...
+            hashResult.then(function(dataHash) {
+
+              // Check the hash against all the known good ones...
+              switch (knownHash(dataHash)) {
+
+				// Mid-March BIOS...
+				case "03.15":
+				  battLevelOffset[0] = 0x35A8F8;
+				  battLevelOffset[1] = 0x35A900;
+				  battLevelOffset[2] = 0x35A9B0;
+				  battLevelOffset[3] = 0x35A9B8;
+				  battLevelOffset[4] = 0x35A9D4;
+				  setMessage("info", "bisrvMessages", "INFO: Mid-March <code>bisrv.asd</code> detected.");
+				  break;
+
+				// April 20th BIOS...
+				case "04.20":
+				  battLevelOffset[0] = 0x35A954;
+				  battLevelOffset[1] = 0x35A95C;
+				  battLevelOffset[2] = 0x35AA0C;
+				  battLevelOffset[3] = 0x35AA14;
+				  battLevelOffset[4] = 0x35AA30;
+				  setMessage("info", "bisrvMessages", "INFO: April 20th <code>bisrv.asd</code> detected.");
+				  break;
+
+				// May 15th BIOS...
+				case "05.15":
+				  battLevelOffset[0] = 0x35C78C;
+				  battLevelOffset[1] = 0x35C794;
+				  battLevelOffset[2] = 0x35C844;
+				  battLevelOffset[3] = 0x35C84C;
+				  battLevelOffset[4] = 0x35C868;
+				  setMessage("info", "bisrvMessages", "INFO: May 15th <code>bisrv.asd</code> detected.");
+				  break;
+
+				// May 22nd BIOS...
+				case "05.22":
+				  battLevelOffset[0] = 0x35C790;
+				  battLevelOffset[1] = 0x35C798;
+				  battLevelOffset[2] = 0x35C848;
+				  battLevelOffset[3] = 0x35C850;
+				  battLevelOffset[4] = 0x35C86C;
+				  setMessage("info", "bisrvMessages", "INFO: May 22nd <code>bisrv.asd</code> detected.");
+				  break;
+
+				// August 3rd BIOS...
+				case "08.03":
+				  battLevelOffset[0] = 0x3564EC;
+				  battLevelOffset[1] = 0x3564F4;
+				  battLevelOffset[2] = 0x35658C;
+				  battLevelOffset[3] = 0x356594;
+				  battLevelOffset[4] = 0x3565B0;
+				  setMessage("info", "bisrvMessages", "INFO: August 3rd <code>bisrv.asd</code> detected.");
+				  break;
+
+                default:
+                  // Huh... wasn't false so had bisrv.asd structure, but didn't return
+                  // a known hash... a new BIOS version? Unknown anyway!
+                  console.log(dataHash);
+                  setMessage("error", "bisrvMessages", "ERROR: While the file you've selected does appear to be generally structured like the SF2000's <code>bisrv.asd</code> BIOS file, the specifics of your file don't match any known SF2000 BIOS version. As such, this tool cannot safely modify the selected file.");
+                  return;
+              }
+
+              // If we're here we've got a good file, so onwards to Step 2 (modifying battery meter levels)...
+              stepTwo();
+            });
+          }
+          else {
+
+            // We got false, so whatever it was, it wasn't a bisrv.asd...
+            setMessage("error", "bisrvMessages", "ERROR: The file you've selected doesn't appear to have the same data structure as expected for a <code>bisrv.asd</code> file.");
+            return;
+          }
+        };
+      }
+
+      // This function triggers when the user has selected a known `bisrv.asd`
+      // variant...
+      function stepTwo() {
+
+		// We're going to build up the HTML for Step 2, which has the user
+		// browse for the bisrv.asd firmware file. We need to validate the chosen
+		// file is the correct firmware version for the SF2000. If it is, we will
+		// patch the battery level data and move on to Step 3. First, let's start 
+		// building our HTML...
+		var html = "<section id=\"patchSection\"><h2>Step 2: Patch Battery Levels</h2><p>This step will patch the battery level thresholds in the <code>bisrv.asd</code> firmware file. The new battery level thresholds will be based on predefined values. </p><div id=\"patchMessages\"></div>";
+
+		// Add a button to trigger the patching process
+		html += "<div class=\"controlContainer\"><button id=\"patchButton\">Patch Battery Levels</button></div>";
+
+        // Close our section...
+        html += "</section>";
+
+        // Finally, add a <hr> separator after the last step, and append the new step...
+        document.getElementById("steps").insertAdjacentHTML("beforeend", "<hr>");
+        document.getElementById("steps").insertAdjacentHTML("beforeend", html);
+
+        // Attach our event handler to our new button...
+        var patchButton = document.getElementById("patchButton");
+        patchButton.addEventListener("click", function() {
+		
+		  // The user has clicked 'Patch Battery Levels', let's proceed!
+		  
+		  // First let's clear any old messages...
+          document.getElementById("patchMessages").innerHTML = "";
+
+          // And clear up any HTML already added after the current step...
+          while(document.getElementById("patchSection").nextSibling) {
+            document.getElementById("patchSection").nextSibling.remove();
+          }
+		
+		  // Now, let's convert the predefined voltage values to firmware values by multiplying by 50...
+		  var firmwareValues = newBattLevel.map(value => Math.round(value * 50));
+			
+		  // Then, we'll patch the firmware with the new battery meter values...
+		  for (let i = 0; i < firmwareValues.length; i++) {
+		    bisrvData[battLevelOffset[i] = firmwareValues[i]
+		  }
+			
+          // On to Step 3!
+          stepThree();
+        });
+      }
+
+      function stepThree() {
+        var html = "<section id=\"downloadSection\"><h2>Step 3: Download Updated <code>bisrv.asd</code></h2><p>Click the download button for the updated <code>bisrv.asd</code> file; use it to replace the one in the <code>bios</code> folder on your SF2000's microSD card.</p><div id=\"downloadMessages\"></div>";
+
+		// Add our download button...
+        html += "<div class=\"controlContainer\"><div class=\"control\"><input id=\"userDownload\" type=\"button\" value=\"Download\"></div></div>";
+
+        // Close our section...
+        html += "</section>";
+
+        // Finally, add a <hr> separator after the last step, and append the new step...
+        document.getElementById("steps").insertAdjacentHTML("beforeend", "<hr>");
+        document.getElementById("steps").insertAdjacentHTML("beforeend", html);
+
+        // Let's add the event handler for our Download button...
+        var dButton = document.getElementById("userDownload");
+        dButton.addEventListener("click", function() {
+
+		  // So, we should now have the patched bisrv.asd data in bisrvData; all that's left
+		  // to do is re-calculate the CRC32 bytes for the modified file and set them in the
+		  // data, and send the data to the user's browser. Easy!
+
+          // Next, we calculate a new CRC32 for the updated bisrv.asd and apply it...
+          patchCRC32(bisrvData);
+
+          // And finally, send the data to the user's browser as a file download...
+          downloadToBrowser(bisrvData, "application/octet-stream", "bisrv.asd");
+
+        });
+      }
+    </script>
+    <hr>
+    <p><a rel="license" href="https://creativecommons.org/publicdomain/zero/1.0/">CC0</a>: public domain. Version 1.0, 20230901.1</p>
+  </body>
+</html>

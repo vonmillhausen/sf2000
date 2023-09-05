@@ -269,7 +269,7 @@ Known firmware versions are currently (dates approximate):
 | April 20th | ? | The first official firmware update; fixed some button mappings for Genesis, added support for 15 new languages. Also partially broke SNES compatibility - many SNES games will run very slowly on first launch, but quitting and immediately re-launching the game will have it run at normal speed (normal for the SF2000, anyway) |
 | May 15th | ? | Added a built-in UI for global button mapping (which is broken in several ways, mainly SNES and Genesis controls are swapped, and no support for setting Player 2 controls), added a History feature, added a Favourites feature |
 | May 22nd | 1.5V | First firmware with an official version number. Fixed the SNES/Genesis swapped button mappings, and now sets Player 2 controls to be identical to Player 1 (no way to set independently). There's some evidence of undocumented emulation improvements; some GBA homebrew that was non-functional in previous firmwares now loads correctly, and some GBA titles see marginally improved performance |
-| August 3rd | 1.6V | The only official release note indicates that the issue with low sound volume when using A/V out was fixed. Aside from that, community members have noticed that the inability of the SF2000 to work with in-game saves appears to have been fixed for GBA (but not other emulators) |
+| August 3rd | 1.6V | The only official release note indicates that the issue with low sound volume when using A/V out was fixed. Aside from that, community members have noticed that the inability of the SF2000 to work with in-game saves appears to have been fixed for GBA (but not other emulators), and that the CPU clock has been changed from 810 MHz to 918 MHz (an overclock); this may be responsible for some community reports of slightly better performance for some games |
 
 Custom firmware (CFW) is currently in the very early stages of development (see [here](#is-there-any-custom-firmware)). In the meantime, the stock firmware has been investigated quite a bit; here are some findings from it:
 
@@ -571,6 +571,8 @@ If you want to do it using [Audacity](https://www.audacityteam.org/), the steps 
     * If the "Edit Metadata Tags" window appears, just leave everything blank and click "OK"
 8. Replace the existing `pagefile.sys` file in the `Resources` folder on your SF2000 microSD card
 
+`dteyn` has also created a Python script which can take a `.WAV` file, trim it if it's longer than 90 seconds, and convert it to a `pagefile.sys` for you - you can [find the SF2000 BGM Tool here](https://github.com/Dteyn/SF2000_BGM_Tool).
+
 | Filename | 03.15 | 04.20 | 05.15 | 05.22 | 08.03 | Description | Listen |
 | -------- | ----- | ----- | ----- | ----- | ----- | ----------- | ------ |
 | `c2fkec.pgt` | ✨ | ✅ | 🚩 | ✅ | ✅ | "Popping" sound that is played when moving around the search keyboard | [listen](/sounds/c2fkec.pgt.mp3) |
@@ -619,6 +621,7 @@ All of these are linked above already in their relevant sections, but just in ca
 - [`ignatzdraconis`'s Gitlab Repo](https://git.maschath.de/ignatz/hcrtos)
 - [Main Menu Icon Editor Tool by Zerter](https://zerter555.github.io/sf2000-collection/mainMenuIcoEditor.html)
 - [Save State Tool](https://vonmillhausen.github.io/sf2000/tools/saveStateTool.htm)
+- [SF2000 BGM Tool by Dteyn](https://github.com/Dteyn/SF2000_BGM_Tool)
 - [SF2000 Battery Level Patcher by Dteyn](https://github.com/Dteyn/SF2000_Battery_Level_Patcher)
 - [SF2000 Theme Compilation Page](https://zerter555.github.io/sf2000-collection/)
 - [Silent background music file](/sounds/silentMusic/pagefile.sys) (replace the file in the `Resources` folder on the microSD card)
@@ -628,6 +631,8 @@ All of these are linked above already in their relevant sections, but just in ca
 ---
 
 ## Document Version History
+- `20230905 - 1.37`: Added note about `bnister`'s CPU clock bump discovery to the [Firmware](#firmwarebios-bisrvasd) section. Added link to `dteyn`'s new background music tool to the [Sounds](#sounds) and [Tools and Links](#tools-and-links) sections.
+
 - `20230903 - 1.36`: Added links to `Detyn`'s new Battery Meter Fix tool to both the [Battery](#battery) section and [Tools and Links](#tools-and-links). Updated the [custom firmware FAQ](#is-there-any-custom-firmware) with the latest progress notes.
 
 - `20230829 - 1.35`: Added a [MicroSD Card](#microsd-card) section to [Hardware](#hardware) to provide some detail about the SF2000's slightly unusual microSD card situation. Added detail about the [Neo Geo Unibios Menu](#neo-geo-unibios-menu) discovery to the [Arcade](#arcade) section (thanks `nanchon18#2262`!). Updated the custom firmware FAQ with the latest details. Updated the "what modding can I do" FAQ to strongly suggest fixing the [bootloader bug](#bootloader-bug) before doing any other modding to the device; also added a note that the Tadpole tool can perform a lot of the modding tasks. Updated the "quiet A/V sound" FAQ with details about the fix in the `08.03`/`1.6V` firmware. Updated the "in game saves don't work" FAQ with details about this apparently being fixed for GBA in the `08.03`/`1.6V` firmware. Added a note to the [Battery](#battery) section about the SF2000's poorly calibrated power monitoring curve, along with a link to `dteyn`'s SF2000 Battery Level Patcher script (also added a link to that in the [Tools and Links](#tools-and-links) section). Data Frog has now officially released the `August 3rd`/`08.03`/`1.6V` firmware, so added that to the [Firmware](#firmwarebios-bisrvasd) section; also updated all of the tables in the [Resources](#resources) section to include the new firmware. Finally, renamed this "Version History" section to "Document Version History", to help prevent any confusion in regards to what the version numbers in this section refer to (they're not related to firmware).

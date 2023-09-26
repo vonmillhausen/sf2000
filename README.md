@@ -33,6 +33,7 @@ This document is a collection of notes and information I've made about the devic
     - [Arcade](#arcade)
       - [Neo Geo Unibios Menu](#neo-geo-unibios-menu)
       - [.skp Files](#skp-files)
+      - [.zfb Files](#zfb-files)
     - [NES](#nes)
     - [SNES](#snes)
     - [Genesis/Mega Drive](#genesismega-drive)
@@ -43,6 +44,8 @@ This document is a collection of notes and information I've made about the devic
     - [Default ROMs](#default-roms)
   - [Firmware/BIOS (bisrv.asd)](#firmwarebios-bisrvasd)
     - [Bootloader Bug](#bootloader-bug)
+      - [If Your SF2000 Is Currently Able To Boot Normally](#if-your-sf2000-is-currently-able-to-boot-normally)
+      - [If Your SF2000 Is Currently Not Booting (Black Screen)](#if-your-sf2000-is-currently-not-booting-black-screen)
     - [Button Mappings/Key Bindings](#button-mappingskey-bindings)
     - [Boot Logo](#boot-logo)
   - [Resources](#resources)
@@ -71,12 +74,16 @@ Some downsides to the device: it's mono only (you only get the left-channel audi
 So is the "Data Frog" any good? Only you can answer that question for yourself. There are certainly more powerful devices out there, more fully featured devices, devices with better hardware, etc. - but almost all of those devices cost a lot more than the SF2000. At the end of the day, you have to look at the features offered at the given price-point, and only then can you decide if you're interested in the device or not.
 
 ### Is there any custom firmware?
-As of September 3rd 2023, **no**, not yet. However efforts are underway; an SDK for the CPU has been identified, and custom firmware is now in the very early stages of development. Most recently, folks have been experimenting with trying to build different Retroarch cores, both to see if they build at all, and if they do, to see what their performance is like on the SF2000. Results thus far have varied. Some have functioned correctly, albeit at slow speeds; others have failed to run entirely. Most have crackly/broken audio due to running below correct speed, and some have no sound at all. Input problems with some cores have also been reported. The cores are individual cores, built as entire firmwares in their own right - there is currently no way to "switch" between cores without taking the microSD card out of the SF2000 and replacing the firmware with one built to contain a different core. Work on allowing the core to be switched by some mechanism is also an area of focus for future work by the devs. A side project has been investigating modifying the stock firmware to replace or add additional emulator cores; the intention of this is just to learn more about how the device functions internally, and it is not currently planned to build a custom firmware this way. Other efforts are focused on trying to build an efficient toolchain for further development.
+As of September 26th 2023, **no**, not yet; however efforts are underway. While an SDK for the CPU has been identified, the developers working on custom firmware have generally reached the conclusion that the SDK is unfinished and of low quality. While it has been used to produce experimental builds of Retroarch, demonstrating various cores operating on the SF2000, there are notable problems - core features like video and audio drivers are missing (and thus would have to be developed from scratch), and overall system stability is very low. Additionally, most of the experimental core builds had audio and/or video performance issues, and most also caused the SF2000 to run "hot", which may impact the lifespan of the device.
 
-[A GitLab repo](https://git.maschath.de/ignatz/hcrtos) has been set up by `ignatzdraconis` for the work, and you can follow along with discussion in the [`Retro Handhelds` Discord server](https://discord.gg/retrohandhelds) (specifically, in the `🐸data_frog_sf2000` channel there's a `SF2000 Dev` thread where most of the tech talk and details are posted first). Note that any cores currently built should be considered highly experimental, and are not vetted to be "safe" to run (e.g., current builds may push the hardware of the SF2000 to its operational limits do to optimisation issues, and may incur thermal damage to the device if left running for too long, etc.).
+Most recently, a new tack is being tried by the development team - they're trying to modify the stock SF2000 firmware to add additional functionality. Theoretically, this would come with the benefit of having audio and video drivers already built.
+
+[A GitLab repo](https://git.maschath.de/ignatz/hcrtos) has been set up by `ignatzdraconis` for the work based on the SDK, and [a separate GitLab repo](https://gitlab.com/kobily/sf2000_multicore) has been set up by `kobil` for the work on modifying the stock firmware. You can follow along with discussion in the [`Retro Handhelds` Discord server](https://discord.gg/retrohandhelds) (specifically, in the `🐸data_frog_sf2000` channel there's a `SF2000 Dev` thread where most of the tech talk and details are posted first).
+
+Note that any non-stock firmwares currently built for the SF2000 should be considered highly experimental, and are not vetted to be "safe" to run (e.g., current builds may push the hardware of the SF2000 to its operational limits do to optimisation issues, and may incur thermal damage to the device if left running for too long, etc.).
 
 ### I just got my SF2000; what modding can I do with it?
-If you're planning to customise your SF2000 in _any_ way, then I **strongly** recommend the very first thing you do is [fix an annoying bug in the device's bootloader](#bootloader-bug) - otherwise you're likely to end up with a non-booting device. Seriously - do this before you do anything else!
+If you're planning to customise your SF2000 in _any_ way, then I **strongly** recommend the _very_ first thing you do is [fix an annoying bug in the device's bootloader](#bootloader-bug) - otherwise you're likely to end up with a non-booting device. Seriously - **do this before you do anything else!**
 
 Afterwards, in no particular order, some of the current customisation options available are:
 
@@ -89,21 +96,23 @@ Afterwards, in no particular order, some of the current customisation options av
 * You can add your own ROMs to the `roms` folder on the microSD card, which will then appear in the user ROMs menu of the device. You can also modify the built-in ROM lists using [FROGTOOL](https://github.com/tzlion/frogtool)
 * You can [replace the default menu theme with a custom one](#how-do-i-install-new-menu-themes)
 
-Many of the above tasks can be done using [Tadpole](https://github.com/EricGoldsteinNz/tadpole), a general management tool for the SF2000 developed by `.ericgoldstein`.
+Many of the above tasks can be done using [Tadpole](https://github.com/EricGoldsteinNz/tadpole), a general management tool for the SF2000 developed by `.ericgoldstein` and `jasongrieves_02643`.
 
 ### How do I install new menu themes?
 The SF2000 doesn't natively support themes at all; however, all of the images and sounds for the stock theme live in the `Resources` folder on the microSD card. Therefore, by simply replacing the stock theme's files, the stock theme can be replaced.
 
-A new centralised repository for boot logos, custom themes and background music has been created by `Zerter#4954`, which you can [find here](https://zerter555.github.io/sf2000-collection/); you can also find many of them linked in the `The Frog's Best Bits 🐸` thread of the `🐸data_frog_sf2000` channel in the [`Retro Handhelds` Discord server](https://discord.gg/retrohandhelds).
+A centralised repository for boot logos, custom themes and background music has been created by `Zerter#4954`, which you can [find here](https://zerter555.github.io/sf2000-collection/); you can also find many of them linked in the `The Frog's Best Bits 🐸` thread of the `🐸data_frog_sf2000` channel in the [`Retro Handhelds` Discord server](https://discord.gg/retrohandhelds).
 
-Just take the files from the theme, and use them to replace the existing files on the microSD card. You might want to make your own backup of the stock `Resources` folder first, in case you want to go back to the stock theme yourself at a later date. Note also that in addition to theme assets, [the `Resources` folder](#resources) also contains data files related to your [button mapping](#button-mappingskey-bindings), [favourites and history](#favourites-and-history), etc.; so when backing up or replacing files in `Resources` for themes, just be aware not to overwrite anything non-theme-related you want to keep.
+The community built tool [Tadpole](https://github.com/EricGoldsteinNz/tadpole) can be used to change the theme on the SF2000, amongst many other features.
+
+If you wish to manually install a theme you've downloaded, just take the files from the theme, and use them to replace the existing files on the microSD card. You might want to make your own backup of the stock `Resources` folder first, in case you want to go back to the stock theme yourself at a later date. Note also that in addition to theme assets, [the `Resources` folder](#resources) also contains data files related to your [button mapping](#button-mappingskey-bindings), [favourites and history](#favourites-and-history), etc.; so when backing up or replacing files in `Resources` for themes, just be aware not to overwrite anything non-theme-related you want to keep.
 
 Another thing to note: some themes might come with an updated boot logo. If that logo is provided as [a `bisrv.asd` file](#firmwarebios-bisrvasd) in the `bios` folder, this is actually a modified _firmware_ for the device, which happens to contain the new logo. If you decide to replace your existing `bisrv.asd` file, you might want to make sure that the theme's firmware version matches the firmware version already on your device. Generally, it's probably safer just to [update your own firmware's boot logo](https://vonmillhausen.github.io/sf2000/tools/bootLogoChanger.htm) with an image file.
 
 ### How do I change the four shortcuts/games listed on each system's main menu page?
 Answer: with a fair bit of work! The _images_ for the shortcuts are baked into each system's main menu background image - check out the ["Images (Used)"](#images-used) section below, and use your browser's search feature to search for `main menu background`, and you'll see what I mean. `Zerter#4954` has created a tool for theme makers which lets you more easily edit these icons, [which you can find here](https://zerter555.github.io/sf2000-collection/mainMenuIcoEditor.html). The _text_ under each shortcut is stored in a separate image - in the `05.22` firmware, the files are `gkavc.ers` if the device's language is set to Chinese, or `gakne.ctp` for all other languages (again, check the details in the ["Images (Used)"](#images-used) section below). Finally, the actual roms that are launched for each shortcut are stored in the `xfgle.hgp` file, which is plain text - you can learn more about it in the ["ROM Lists"](#rom-lists) section below.
 
-Recent versions of [Tadpole](https://github.com/EricGoldsteinNz/tadpole) by `.ericgoldstein` have support for changing the shortcuts if you're looking for a more automated way to do things.
+Recent versions of [Tadpole](https://github.com/EricGoldsteinNz/tadpole) by `.ericgoldstein` and `jasongrieves_02643` have support for changing the shortcuts if you're looking for a more automated way to do things.
 
 ### SNES games run really slowly... what's wrong?
 There's a bug in all stock firmware versions later than the original mid-March firmware which often causes SNES games to run really slowly on first launch (and their sound is slow and lower pitch too); this only impacts SNES. Usually this can be corrected by launching the game, then quitting back to the game selection menu via `START + SELECT`, and then immediately re-launching the game again. Note however that the stock firmwares do also struggle a bit with SNES emulation in general, so any additional slowdown after the second launch is just what you get.
@@ -137,7 +146,7 @@ If you have questions about the SF2000 you can't find the answer to, the best pl
 ## Hardware
 
 ### CPU
-Although the main CPU of the SF2000 has literally had it's markings milled off by a routing tool, the community has determined that it's a HCSEMI B210, a single-core MIPS processor running at 810 MHz. It appears to be a clone of an ALi Tech chip. [An SDK has been found](http://www.zcsd-tech.com//download/content-54.html) for it.
+Although the main CPU of the SF2000 has literally had it's markings milled off by a routing tool, the community has determined that it's a HCSEMI B210, a single-core MIPS processor running at 810 MHz (or 918 MHz with the `08.03`/`1.6V` firmware). It appears to be a clone of an ALi Tech chip. [An SDK has been found](http://www.zcsd-tech.com//download/content-54.html) for it.
 
 ### Display
 The SF2000 features a `240x320` IPS display panel (not OCA laminated), which has been rotated 90&deg; clockwise to give a `320x240` display. It demonstrates screen tearing for all emulators, running from the right of the console to the left due to the panel rotation.
@@ -168,7 +177,7 @@ Also note that while you can technically charge the SF2000 while it is powered o
 The stock firmware's power monitoring system (which controls the battery level indicator on the main menu, along with when the device warns the user about a low battery condition) is poorly calibrated for the stock battery that comes with the device; as such, the SF2000 basically indicates it has a full battery at all times. `bnister` and `dteyn` from Discord worked together to identify the locations within the stock firmware where the calibrations are stored, and determined more appropriate calibration values for the stock battery. `dteyn` wrote a web-based tool which will patch an existing `bisrv.asd` file to use the new values; you can [find their "Data Frog SF2000 Battery Meter Fix" tool here](https://dteyn.github.io/sf2000/tools/batteryMeterFix.htm). They also have a Python script to do the patching specifically for the `1.6V`/`08.03` firmware - you can [find that script here](https://github.com/Dteyn/SF2000_Battery_Level_Patcher), along with much more detail about the issue and the solution.
 
 ### Wireless Connectivity
-The SF2000 does not feature wifi or Bluetooth, but it _does_ have a 2.4Ghz antenna to support local wireless multiplayer using a compatible 2.4Ghz wireless controller for Player 2. The Y2 SFC wireless controller and the SF900 wireless controller have both been reported to work fine.
+The SF2000 does not feature WiFi or Bluetooth, but it _does_ have a 2.4Ghz antenna to support local wireless multiplayer using a compatible 2.4Ghz wireless controller for Player 2. The Y2 SFC wireless controller and the SF900 wireless controller have both been reported to work fine.
 
 ### A/V Output
 The SF2000 features a mini-jack for analogue composite A/V output. The device is capable of output a user-selectable PAL or NTSC video signal. Only the _left_ audio channel is output - the device does _not_ down-mix to mono, which results in missing audio channels in games that expect to output stereo sound.
@@ -176,6 +185,8 @@ The SF2000 features a mini-jack for analogue composite A/V output. The device is
 There's some limited evidence to suggest the A/V output is at 576i. When outputting a PAL signal, while the signal is indeed 50Hz, it seems like the emulators are still targeting 60Hz output - PAL scrolling is "jerky". Switching the device to output NTSC, scrolling becomes smooth. This holds true regardless of using a PAL or NTSC version of a ROM. Depending on your external display, video output over A/V may be somewhat heavily cropped on all screen edges - if so, this can result in UI elements at screen edges in games (health bars, remaining credits, etc.) being out-of-frame. Switching between PAL and NTSC doesn't alter the visible screen area. I've tested with a modern flat-panel Panasonic TV (cropped), a 1980s Commodore 1702 monitor (cropped), and with a cheap USB 2.0 "EasyCap" video-capture USB stick (not cropped).
 
 On my own unit, plugging in a charging cable while outputting over A/V introduces a lot of video noise in the A/V signal; so those planning to use the SF2000 as a TV console may need to do so while running on battery for the best experience.
+
+While not strictly related to the A/V jack, Discord user `iq_132` has written a guide on how to add Bluetooth audio support to the SF2000 by feeding off of the contacts for the internal speaker; you can [find their guide here](https://neo-source.com/stuff/datafrog/).
 
 ---
 
@@ -212,6 +223,16 @@ Another thing worth mentioning about arcade emulation on the SF2000; in the `ARC
 As the `.skp` files are just save states under a different name, if you want to mess around with them you can [use my Save State Tool](https://vonmillhausen.github.io/sf2000/tools/saveStateTool.htm) to do so - if you're creating a new `.skp` file, just pick any save state slot, and change the downloaded SF2000 save state bundle extension from `.sa#` to `.skp`.
 
 You can [learn more about save states below](#save-states).
+
+#### .zfb Files
+Due to the different nature of arcade emulation compared to any of the other systems the SF2000 supports, the ROM layout for the arcade section is different as well. Inside the `/ARCADE` folder in the root of the MicroSD card you'll find a `bin` subfolder, and a bunch of `.zfb` files. The `bin` folder contains `.zip` files with an enforced 8.3 file naming scheme, and they contain the actual ROM data for the FBA emulator. The `.zfb` files are used to populate the arcade game list when you go into the arcade section on the SF2000's menu, and their file structure is as follows:
+
+* The first 59,905 bytes are an RGB565 image for the game thumbnail art shown in the menu (208px by 144px)
+* The next four bytes are `0x00`
+* The next sequence of bytes is the name of a `.zip` file in the `bin` folder, without any path (which is hardcoded in the firmware), e.g. `gamename.zip`
+* Finally, the file ends with two `0x00` bytes
+
+The name of the `.zfb` file is how the game is named in the SF2000 menu. The four arcade game shortcuts on the top-level SF2000 menu point directly to their respective `.zip` files, and not to the `.zfb` files (as the `.zfb`s are just for a name and a thumbnail, neither of which are required on the top-level menu).
 
 ### NES
 Emulator is FCEUmm (Git commit [`7cdfc7e`](https://github.com/libretro/libretro-fceumm/commit/7cdfc7e)). There are references in the firmware to different NES palettes, but there's no interface or configuration for the emulator itself to choose one. On the original firmware, the A and B buttons were swapped. See "[Button Mappings/Key Bindings](#button-mappingskey-bindings)" section below.
@@ -276,25 +297,33 @@ Custom firmware (CFW) is currently in the very early stages of development (see 
 ### Bootloader Bug
 The bootloader on the SF2000 (the bit of code embedded in the devices hardware; it initialises things, and kicks-off loading of the BIOS from `bisrv.asd`) has a bug, which can cause the SF2000 to lock-up with a black screen during boot if the `bios` folder has been messed with. Specifically, the bug is triggered when the `bios` folder's FAT table contains a multiple of `4` entries, or a multiple of `4` plus `1`.
 
-If your device is currently _not_ booting, and you've modified the `bios` folder in any way (e.g., patching a new boot logo, upgrading firmware, etc.), you can attempt to get the SF2000 booting again by creating empty text files inside the `bios` folder, one at a time (this creates new FAT entries, and should get you away from numbers of entries the stock bootloader doesn't like). For example, create an empty file in the `bios` folder called "temp1.txt", put the microSD card back in the SF2000, and see if it boots. If it still doesn't, add a "temp2.txt" file to the `bios` folder, put the card back in the SF2000 and try booting again, etc..
+It's strongly recommended that you fix the bug on your SF2000, as failure to do so can cause some headaches for you down the road with a non-booting device. There's a couple of ways to go about fixing it:
 
-Alternatively, `bnister` found the root cause for the bug, and has created a patch which permanently fixes it (no added files required). Below are the patching instructions.
+#### If Your SF2000 Is Currently Able To Boot Normally
+If your SF2000 is currently able to boot normally (i.e., when you power it on, you get to the stock main menu), then you can permanently fix the bug in the device's hardware as follows (credit to `bnister` for both finding the root cause for the bug, and creating the permanent fix):
 
-**NOTE: While many people have already reported success with patching their bootloader, and no-one has yet reported any issues with it, this patch should be considered experimental:**
-
-1. Ensure your SF2000 is in a state where it boots normally when turned on (displays a boot logo, proceeds to the main menu)
+1. Ensure your SF2000 is in a state where it boots normally when turned on (displays a boot logo, proceeds to the stock firmware main menu)
 2. Ensure your SF2000's battery is fully charged (having the device power off during the patching process will likely "brick" it, rendering it inoperable)
 3. Power off the SF2000, and remove the microSD card
 4. Connect the microSD card to your computer
 5. Download this zip file: [SF2000_bootloader_bugfix.zip](https://cdn.discordapp.com/attachments/1099465777825972347/1105582470990135316/SF2000_bootloader_bugfix.zip)
 6. Extract the zip file; inside is a folder called `UpdateFirmware`, containing a single file called `Firmware.upk`
-7. Copy the `UpdateFirmware` folder to the root of the microSD card, so that the `UpdateFirmware` folder is in the same place as the `bios` and `roms` folders
+7. Copy the `UpdateFirmware` folder to the root of the microSD card, so that the `UpdateFirmware` folder is in the same place as the `bios` and `roms` folders (i.e., you'll have an `SD:/UpdateFirmware/Firmware.upk` file)
 8. Eject the microSD card from your computer, and put it back in the SF2000
-9. Turn the SF2000 on; you should see a message in the lower-left corner of the screen indicating that patching is taking place. The process will only last a few seconds
+9. Turn the SF2000 on; you should see a message in the lower-left corner of the screen indicating that patching is taking place. The process will only last a few seconds. If you do not see this message, and instead just go to the main menu as normal, then either this means your SF2000 has previously had the fix applied already, or you should double-check you've placed the patch file in the right place
 10. When the patching is complete, you will be taken to the main menu as usual
 11. Power off the SF2000, and remove the microSD card
 12. Connect the microSD card to your computer
 13. Delete the `UpdateFirmware` folder (it's no longer needed)
+
+#### If Your SF2000 Is Currently Not Booting (Black Screen)
+If your device is currently _not_ booting, and you've modified the `bios` folder in any way (e.g., patching a new boot logo, upgrading firmware, etc.), you can attempt to get the SF2000 booting again by creating empty text files inside the `bios` folder, one at a time (this creates new FAT entries, and should get you away from numbers of entries the stock bootloader doesn't like). For example, create an empty file in the `bios` folder called "temp1.txt", put the microSD card back in the SF2000, and see if it boots. If it still doesn't, add a "temp2.txt" file to the `bios` folder, put the card back in the SF2000 and try booting again, etc..
+
+Alternatively, recent versions of [Tadpole](https://github.com/EricGoldsteinNz/tadpole) can help to automate this process for you.
+
+**NOTE**: Once you get your SF2000 booting again, I strongly suggest you perform [the permanent fix to the bug](#if-your-sf2000-is-currently-able-to-boot-normally) to prevent from getting into the same situation again in the future.
+
+There are also some [other reasons why an SF2000 may not be booting](#help-my-sf2000-wont-turn-on-or-is-stuck-at-a-black-screen).
 
 ### Button Mappings/Key Bindings
 `bnister` discovered that the OS supports loading game-specific key bindings from `.kmp` files, stored in the `save` folder for each system and named after a game's ROM file (e.g., `/FC/save/Game Name.EXT.kmp`). They also discovered where in the `bisrv.asd` file the default mappings for each emulator are stored. Working with this information, `notv37` worked out what bits related to what buttons for each emulator. Using both their findings, we now have a tool which can be used to update both the global button mappings for the emulators, as well as create per-ROM mappings - you can [find this tool here](https://vonmillhausen.github.io/sf2000/tools/buttonMappingChanger.htm).
@@ -571,7 +600,7 @@ If you want to do it using [Audacity](https://www.audacityteam.org/), the steps 
     * If the "Edit Metadata Tags" window appears, just leave everything blank and click "OK"
 8. Replace the existing `pagefile.sys` file in the `Resources` folder on your SF2000 microSD card
 
-`dteyn` has also created a Python script which can take a `.WAV` file, trim it if it's longer than 90 seconds, and convert it to a `pagefile.sys` for you - you can [find the SF2000 BGM Tool here](https://github.com/Dteyn/SF2000_BGM_Tool).
+`dteyn` has also created a Python script called `Kerokero` which can take a `.WAV` file, trim it if it's longer than 90 seconds, and convert it to a `pagefile.sys` for you - you can [find Kerokero here](https://github.com/Dteyn/SF2000_BGM_Tool).
 
 | Filename | 03.15 | 04.20 | 05.15 | 05.22 | 08.03 | Description | Listen |
 | -------- | ----- | ----- | ----- | ----- | ----- | ----------- | ------ |
@@ -618,11 +647,13 @@ All of these are linked above already in their relevant sections, but just in ca
 - [Data Frog SF2000 Battery Meter Fix by Dteyn](https://dteyn.github.io/sf2000/tools/batteryMeterFix.htm)
 - [FROGTOOL](https://github.com/tzlion/frogtool) (for updating the built-in game lists)
 - [Generic Image Tool](https://vonmillhausen.github.io/sf2000/tools/genericImageTool.htm)
-- [`ignatzdraconis`'s Gitlab Repo](https://git.maschath.de/ignatz/hcrtos)
+- [`ignatzdraconis`'s GitLab Repo](https://git.maschath.de/ignatz/hcrtos)
+- [Kerokero - SF2000 BGM Tool by Dteyn](https://github.com/Dteyn/SF2000_BGM_Tool)
+- [`kobil`'s GitLab Repo](https://gitlab.com/kobily/sf2000_multicore)
 - [Main Menu Icon Editor Tool by Zerter](https://zerter555.github.io/sf2000-collection/mainMenuIcoEditor.html)
 - [Save State Tool](https://vonmillhausen.github.io/sf2000/tools/saveStateTool.htm)
-- [SF2000 BGM Tool by Dteyn](https://github.com/Dteyn/SF2000_BGM_Tool)
 - [SF2000 Battery Level Patcher by Dteyn](https://github.com/Dteyn/SF2000_Battery_Level_Patcher)
+- [SF2000 Bluetooth Mod by IQ_132](https://neo-source.com/stuff/datafrog/)
 - [SF2000 Theme Compilation Page](https://zerter555.github.io/sf2000-collection/)
 - [Silent background music file](/sounds/silentMusic/pagefile.sys) (replace the file in the `Resources` folder on the microSD card)
 - [Tadpole](https://github.com/EricGoldsteinNz/tadpole) (a general SF2000 management tool)
@@ -631,6 +662,8 @@ All of these are linked above already in their relevant sections, but just in ca
 ---
 
 ## Document Version History
+- `20230926 - 1.38`: Updated [CFW FAQ](#is-there-any-custom-firmware) with the latest details. Added some additional references to Tadpole, and added credits for `jasongrieves_02643` who has been doing a lot of recent development work on the tool lately. Updated the [CPU section](#cpu) to reference the fact that the CPU clock has been increased in the latest firmware. Added links to `iq_132`'s Bluetooth mod. Added [a section about the `.zfb` files](#zfb-files) used in the arcade section. Rearranged the details in [the Bootloader Bug section](#bootloader-bug) to hopefully make things a bit clearer.
+
 - `20230905 - 1.37`: Added note about `bnister`'s CPU clock bump discovery to the [Firmware](#firmwarebios-bisrvasd) section. Added link to `dteyn`'s new background music tool to the [Sounds](#sounds) and [Tools and Links](#tools-and-links) sections.
 
 - `20230903 - 1.36`: Added links to `Detyn`'s new Battery Meter Fix tool to both the [Battery](#battery) section and [Tools and Links](#tools-and-links). Updated the [custom firmware FAQ](#is-there-any-custom-firmware) with the latest progress notes.

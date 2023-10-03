@@ -74,9 +74,9 @@ Some downsides to the device: it's mono only (you only get the left-channel audi
 So is the "Data Frog" any good? Only you can answer that question for yourself. There are certainly more powerful devices out there, more fully featured devices, devices with better hardware, etc. - but almost all of those devices cost a lot more than the SF2000. At the end of the day, you have to look at the features offered at the given price-point, and only then can you decide if you're interested in the device or not.
 
 ### Is there any custom firmware?
-As of September 26th 2023, **no**, not yet; however efforts are underway. While an SDK for the CPU has been identified, the developers working on custom firmware have generally reached the conclusion that the SDK is unfinished and of low quality. While it has been used to produce experimental builds of Retroarch, demonstrating various cores operating on the SF2000, there are notable problems - core features like video and audio drivers are missing (and thus would have to be developed from scratch), and overall system stability is very low. Additionally, most of the experimental core builds had audio and/or video performance issues, and most also caused the SF2000 to run "hot", which may impact the lifespan of the device.
+As of October 3rd 2023, **no**, not yet; however efforts are underway. While an SDK for the CPU has been identified, the developers working on custom firmware have generally reached the conclusion that the SDK is unfinished and of low quality. While it has been used to produce experimental builds of Retroarch, demonstrating various cores operating on the SF2000, there are notable problems - core features like video and audio drivers are missing (and thus would have to be developed from scratch), and overall system stability is very low. Additionally, most of the experimental core builds had audio and/or video performance issues, and most also caused the SF2000 to run "hot", which may impact the lifespan of the device.
 
-Most recently, a new tack is being tried by the development team - they're trying to modify the stock SF2000 firmware to add additional functionality. Theoretically, this would come with the benefit of having audio and video drivers already built.
+Most recently, a new tack is being tried by the development team - they're trying to modify the stock SF2000 firmware to add additional functionality. Theoretically, this would come with the benefit of having audio and video drivers already built, providing no worse performance than stock firmware, while providing features like support for additional emulated systems.
 
 [A GitLab repo](https://git.maschath.de/ignatz/hcrtos) has been set up by `ignatzdraconis` for the work based on the SDK, and [a separate GitLab repo](https://gitlab.com/kobily/sf2000_multicore) has been set up by `kobil` for the work on modifying the stock firmware. You can follow along with discussion in the [`Retro Handhelds` Discord server](https://discord.gg/retrohandhelds) (specifically, in the `🐸data_frog_sf2000` channel there's a `SF2000 Dev` thread where most of the tech talk and details are posted first).
 
@@ -225,11 +225,11 @@ As the `.skp` files are just save states under a different name, if you want to 
 You can [learn more about save states below](#save-states).
 
 #### .zfb Files
-Due to the different nature of arcade emulation compared to any of the other systems the SF2000 supports, the ROM layout for the arcade section is different as well. Inside the `/ARCADE` folder in the root of the MicroSD card you'll find a `bin` subfolder, and a bunch of `.zfb` files. The `bin` folder contains `.zip` files with an enforced 8.3 file naming scheme, and they contain the actual ROM data for the FBA emulator. The `.zfb` files are used to populate the arcade game list when you go into the arcade section on the SF2000's menu, and their file structure is as follows:
+Due to the different nature of arcade emulation compared to any of the other systems the SF2000 supports, the ROM layout for the arcade section is different as well. Inside the `/ARCADE` folder in the root of the microSD card you'll find a `bin` subfolder, and a bunch of `.zfb` files. The `bin` folder contains `.zip` files with an enforced 8.3 file naming scheme, and they contain the actual ROM data for the FBA emulator. The `.zfb` files are used to populate the arcade game list when you go into the arcade section on the SF2000's menu, and their file structure is as follows:
 
 * The first 59,905 bytes are an RGB565 image for the game thumbnail art shown in the menu (208px by 144px)
 * The next four bytes are `0x00`
-* The next sequence of bytes is the name of a `.zip` file in the `bin` folder, without any path (which is hardcoded in the firmware), e.g. `gamename.zip`
+* The next sequence of bytes is the name of a `.zip` file in the `bin` folder, without any path (SF2000's firmware automatically looks for the `.zip` in a `bin` subfolder relative to where the `.zfb` file is stored - thanks `.ericgoldstein` for the testing!), e.g. `gamename.zip`
 * Finally, the file ends with two `0x00` bytes
 
 The name of the `.zfb` file is how the game is named in the SF2000 menu. The four arcade game shortcuts on the top-level SF2000 menu point directly to their respective `.zip` files, and not to the `.zfb` files (as the `.zfb`s are just for a name and a thumbnail, neither of which are required on the top-level menu).
@@ -258,7 +258,9 @@ While the SF2000 does include a copy of the real GBA BIOS file in the `bios` fol
 - `ROMS/mnt/sda1/bios/gba_bios.bin` (this fixes it for GBA games added to the user `ROMS` folder)
 
 ### Save States
-All of the above emulators support stave sates natively through an interface that is accessed by pressing SELECT + START simultaneously in-game. Four save state slots are provided per-game; the files have the extensions `.sa0`, `.sa1`, `.sa2` and `.sa3` depending on which slot they're for. The extension is appended to the name of the ROM file the save state is for; for example, if the ROM is called `Apotris.gba`, and the save state is for slot 2, then the save state file name will be `Apotris.GBA.sa1`. One weird note is that save states created for ROMs stored in the user `ROMS` folder on the device get their ROM file extension capitalised when a save state is created (as per the previous example with `Apotris`, where `.gba` became `.GBA`); this does _not_ happen with save states created in the other ROM folders. The capitalisation doesn't appear to matter - the SF2000 successfully loads save states with any extension capitalisation in any folder.
+All of the above emulators support stave sates natively through an interface that is accessed by pressing SELECT + START simultaneously in-game. Four save state slots are provided per-game; the files have the extensions `.sa0`, `.sa1`, `.sa2` and `.sa3` depending on which slot they're for, and are stored in a `save` subfolder along-side wherever the game's ROM file is stored. The extension is appended to the name of the ROM file the save state is for; for example, if the ROM is called `SD:/ROMS/Apotris.gba`, and the save state is for slot 2, then the save state file name will be `SD:/ROMS/save/Apotris.GBA.sa1`. One weird note is that save states created for ROMs stored in the user `ROMS` folder on the device get their ROM file extension capitalised when a save state is created (as per the previous example with `Apotris`, where `.gba` became `.GBA`); this does _not_ happen with save states created in the other ROM folders. The capitalisation doesn't appear to matter - the SF2000 successfully loads save states with any extension capitalisation in any folder.
+
+If you want to back-up the save states you've got on your SD2000's microSD card, simply back up the `save` folders and their contents (be sure not to mix up which `save` folder belongs to which ROM folder on the device). [Tadpole](https://github.com/EricGoldsteinNz/tadpole) also has a save backup feature, which will give you a `.zip` file containing all of your saves.
 
 The save state files themselves contain two zlib-compressed data blobs, plus associated metadata - one blob for the raw save state data created by the emulator itself, and one blob for the thumbnail used for the save state in the UI. The exact format is as follows
 
@@ -280,7 +282,9 @@ I was curious to see how the included ROMs matched up against the current "[No-I
 ---
 
 ## Firmware/BIOS (bisrv.asd)
-The firmware for the SF2000 is actually located on the microSD card, in a file called `bisrv.asd` located in the BIOS folder. This file is a monolithic binary blob, which contains the device's OS, the emulators, their settings... basically everything. Data Frog have issued some firmware updates for the device since launch; the updates have added new features (e.g., additional language support, favourites, history, etc.), but have also introduced bugs (e.g., some SNES games run very slowly until they are quit and launched again, etc.). Data Frog have published a YouTube video showing how to update the firmware on the device, which [you can find here](https://www.youtube.com/watch?v=j8dT2fdGfck); the video's description contains a link to where you can download the latest firmware.
+The firmware for the SF2000 is actually located on the microSD card, in a file called `bisrv.asd` located in the BIOS folder. This file is a monolithic binary blob, which contains the device's OS, the emulators, their settings... basically everything. Data Frog have issued some firmware updates for the device since launch; the updates have added new features (e.g., additional language support, favourites, history, etc.), but have also introduced bugs (e.g., some SNES games run very slowly until they are quit and launched again, etc.). Data Frog have published a YouTube video showing how to update the firmware on the device, which [you can find here](https://www.youtube.com/watch?v=j8dT2fdGfck); the video's description contains a link to where you can download the latest firmware. Note that Data Frog's official firmware update/reinstallation process involves fully erasing the device's microSD card and replacing its contents with a fresh set of files - this will also erase any user-created files including saves states or user-installed ROMs. You can learn more about save state files and how to back them up in [the Save States section](#save-states).
+
+Note that Data Frog's official server for downloading firmware is _very_ slow, with typical transfers taking many hours to complete as their firmware images are full images including ROM files. If you don't care about the stock ROM files, an alternative method for downloading the latest firmware _without_ the ROM files is to use [Tadpole](https://github.com/EricGoldsteinNz/tadpole). Refer to Tadpole's documentation for more information.
 
 Known firmware versions are currently (dates approximate):
 
@@ -291,6 +295,8 @@ Known firmware versions are currently (dates approximate):
 | May 15th | ? | Added a built-in UI for global button mapping (which is broken in several ways, mainly SNES and Genesis controls are swapped, and no support for setting Player 2 controls), added a History feature, added a Favourites feature |
 | May 22nd | 1.5V | First firmware with an official version number. Fixed the SNES/Genesis swapped button mappings, and now sets Player 2 controls to be identical to Player 1 (no way to set independently). There's some evidence of undocumented emulation improvements; some GBA homebrew that was non-functional in previous firmwares now loads correctly, and some GBA titles see marginally improved performance |
 | August 3rd | 1.6V | The only official release note indicates that the issue with low sound volume when using A/V out was fixed. Aside from that, community members have noticed that the inability of the SF2000 to work with in-game saves appears to have been fixed for GBA (but not other emulators), and that the CPU clock has been changed from 810 MHz to 918 MHz (an overclock); this may be responsible for some community reports of slightly better performance for some games |
+
+If you want to check which version of the firmware you currently have on your SF2000, you can [use the Data Frog SF2000 Firmware Version Checker tool here](https://vonmillhausen.github.io/sf2000/tools/firmwareVersionChecker.htm).
 
 Custom firmware (CFW) is currently in the very early stages of development (see [here](#is-there-any-custom-firmware)). In the meantime, the stock firmware has been investigated quite a bit; here are some findings from it:
 
@@ -614,6 +620,8 @@ If you want to do it using [Audacity](https://www.audacityteam.org/), the steps 
 | `pagefile.sys` | ✨ | ✅ | 🚩 | ✅ | ✅ | Main menu background music. If you don't like background music, and would rather just have silence, you can [find a replacement silent `pagefile.sys` here](/sounds/silentMusic/pagefile.sys) - just replace the one in the `Resources` folder (don't forget to backup the original file first, in case you ever want that jaunty tune again!) | [listen](/sounds/pagefile.sys.mp3) |
 | `swapfile.sys` | ✨ | ✅ | ✅ | ✅ | ✅ | "Squishy" sound played when navigating horizontally through "shortcut" games on the main menu, or vertically within a system's game-list | [listen](/sounds/swapfile.sys.mp3) |
 
+If you would like to silence all the _UI_ sounds (everything other than the background music), `dteyn` has created a [Silent Sounds Pack](https://github.com/Dteyn/sf2000/raw/main/sounds/silentSounds/SF2000_Silent_Sounds_Pack.zip) (direct link to `.zip`). It contains eight replacement silent audio files - just drop them into the `Resources` folder on the microSD card, replacing the eight current files, and say goodbye to the SF2000's UI noises.
+
 ### Unknown Files
 These are files that I have not yet determined what they do; if anyone has any information on these, do post about it in the Data Frog channel in the Retro Handhelds Discord server please!
 
@@ -645,6 +653,7 @@ All of these are linked above already in their relevant sections, but just in ca
 - [Community DataFrog SF2000 Compatibility List](https://docs.google.com/spreadsheets/d/19TCedWEKFXlnS2dlmLxk1BcnlHrX-MSVrKwEURuiU0E/edit#gid=1327539659)
 - [Data Frog's firmware update tutorial](https://www.youtube.com/watch?v=j8dT2fdGfck)
 - [Data Frog SF2000 Battery Meter Fix by Dteyn](https://dteyn.github.io/sf2000/tools/batteryMeterFix.htm)
+- [Firmware Version Checker](https://vonmillhausen.github.io/sf2000/tools/firmwareVersionChecker.htm)
 - [FROGTOOL](https://github.com/tzlion/frogtool) (for updating the built-in game lists)
 - [Generic Image Tool](https://vonmillhausen.github.io/sf2000/tools/genericImageTool.htm)
 - [`ignatzdraconis`'s GitLab Repo](https://git.maschath.de/ignatz/hcrtos)
@@ -656,12 +665,15 @@ All of these are linked above already in their relevant sections, but just in ca
 - [SF2000 Bluetooth Mod by IQ_132](https://neo-source.com/stuff/datafrog/)
 - [SF2000 Theme Compilation Page](https://zerter555.github.io/sf2000-collection/)
 - [Silent background music file](/sounds/silentMusic/pagefile.sys) (replace the file in the `Resources` folder on the microSD card)
+- [Silent Sounds Pack by Dtyen](https://github.com/Dteyn/sf2000/raw/main/sounds/silentSounds/SF2000_Silent_Sounds_Pack.zip) (direct link to zip; replaces _all_ non-music UI sounds with silence)
 - [Tadpole](https://github.com/EricGoldsteinNz/tadpole) (a general SF2000 management tool)
 - [ZFBTool](https://github.com/Dteyn/ZFBTool) (a tool for creating `.zfb` files for pairing custom thumbnails with arcade ROMs)
 
 ---
 
 ## Document Version History
+- `20231003 - 1.39`: Updated [CFW FAQ](#is-there-any-custom-firmware) with the latest details. Corrected a detail about the relationship between arcade `.zfb` files and the `.zip` files they point to (thanks `.ericgoldstein`!). Added a note to the [Firmware](#firmwarebios-bisrvasd) section about the official firmware update process wiping the microSD card, and a note to the [Save States](#save-states) section about how to back up game saves (thanks for the suggestion `@uli42`!). Added [a simple firmware version checking tool](https://vonmillhausen.github.io/sf2000/tools/firmwareVersionChecker.htm), so that folks don't have to use the boot logo changer to check (which always seemed clunky to me). Added a link to `dteyn`'s Silent Sounds pack. Fixed some small typos.
+
 - `20230926 - 1.38`: Updated [CFW FAQ](#is-there-any-custom-firmware) with the latest details. Added some additional references to Tadpole, and added credits for `jasongrieves_02643` who has been doing a lot of recent development work on the tool lately. Updated the [CPU section](#cpu) to reference the fact that the CPU clock has been increased in the latest firmware. Added links to `iq_132`'s Bluetooth mod. Added [a section about the `.zfb` files](#zfb-files) used in the arcade section. Rearranged the details in [the Bootloader Bug section](#bootloader-bug) to hopefully make things a bit clearer.
 
 - `20230905 - 1.37`: Added note about `bnister`'s CPU clock bump discovery to the [Firmware](#firmwarebios-bisrvasd) section. Added link to `dteyn`'s new background music tool to the [Sounds](#sounds) and [Tools and Links](#tools-and-links) sections.

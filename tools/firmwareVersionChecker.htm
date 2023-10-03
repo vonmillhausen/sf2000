@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <title>Data Frog SF2000 Firmware Version Checker</title>
+    <meta name="viewport" content="width=device-width">
+    <link rel="stylesheet" href="tools.css">
+  </head>
+  <body>
+    <h1>Data Frog SF2000 Firmware Version Checker</h1>
+    <p>This simple tool will just check an SF2000 firmware/BIOS file against a list of known versions, and tell you which version it is. You can <a href="https://vonmillhausen.github.io/sf2000/#firmwarebios-bisrvasd">learn more about firmware revisions for the SF2000 here</a>.</p>
+    <hr>
+    <div id="steps">
+      <section id="bisrvSection">
+        <h2>Select Your <code>bisrv.asd</code></h2>
+        <p>Select the <code>bisrv.asd</code> firmware file whose version you want to check. You can find the <code>bisrv.asd</code> file in the <code>bios</code> folder on your microSD card.</p>
+        <div id="bisrvMessages"></div>
+        <div class="controlContainer">
+          <label class="control">Open <code>bisrv.asd</code>: <input id="bisrvSelector" type="file" accept=".asd" onchange="bisrvLoad(event.target.files[0])"></label>
+        </div>
+      </section>
+    </div>
+    <script src="tools.js"></script>
+    <script type="text/javascript">
+
+      // Global variables...
+      var bisrvData;    // Used to store the binary data from the bisrv.asd file
+
+      // This function is triggered when the person selects a file...
+      function bisrvLoad(file) {
+
+        // Read in the contents of the selected file as array buffer...
+        var frBisrv = new FileReader();
+        frBisrv.readAsArrayBuffer(file);
+        frBisrv.onload = function(event) {
+
+          // Clear any old messages...
+          document.getElementById("bisrvMessages").innerHTML = "";
+
+          // Read the provided file's data into an array...
+          bisrvData = new Uint8Array(event.target.result);
+
+          // We'll do a hash-check against it...
+          hashResult = getFirmwareHash(bisrvData);
+
+          // The result could be either a Promise if it had a bisrv.asd-like structure and we got
+          // a hash, or false otherwise... let's check!
+          if (hashResult instanceof Promise) {
+
+            // We got a Promise! Wait for it to finish so we get our bisrv.asd hash...
+            hashResult.then(function(dataHash) {
+
+              // Check the hash against all the known good ones...
+              switch (knownHash(dataHash)) {
+
+                // Mid-March BIOS...
+                case "03.15":
+                  setMessage("info", "bisrvMessages", "Mid-March <code>bisrv.asd</code> detected. Newer firmware is available, see link above for more information.");
+                  break;
+
+                // April 20th BIOS...
+                case "04.20":
+                  setMessage("info", "bisrvMessages", "April 20th <code>bisrv.asd</code> detected. Newer firmware is available, see link above for more information.");
+                  break;
+
+                // May 15th BIOS...
+                case "05.15":
+                  setMessage("info", "bisrvMessages", "May 15th <code>bisrv.asd</code> detected. Newer firmware is available, see link above for more information.");
+                  break;
+
+                // May 22nd BIOS...
+                case "05.22":
+                  setMessage("info", "bisrvMessages", "May 22nd <code>bisrv.asd</code> detected. Newer firmware is available, see link above for more information.");
+                  break;
+                
+                // August 3rd BIOS...
+                case "08.03":
+                  setMessage("info", "bisrvMessages", "August 3rd <code>bisrv.asd</code> detected. This is the latest known official firmware version.");
+                  break;
+
+                default:
+                  // Huh... wasn't false so had bisrv.asd structure, but didn't return
+                  // a known hash... a new BIOS version? Unknown anyway!
+                  console.log(dataHash);
+                  setMessage("error", "bisrvMessages", "While the file you've selected does appear to be generally structured like the SF2000's <code>bisrv.asd</code> firmware file, the specifics of your file don't match any known SF2000 firmware version.");
+                  return;
+              }
+            });
+          }
+          else {
+
+            // We got false, so whatever it was, it wasn't a bisrv.asd...
+            setMessage("error", "bisrvMessages", "The file you've selected doesn't appear to have the same data structure as expected for a <code>bisrv.asd</code> file.");
+            return;
+          }
+        };
+      }
+    </script>
+    <hr>
+    <p><a rel="license" href="https://creativecommons.org/publicdomain/zero/1.0/">CC0</a>: public domain. Version 1.0, 20231003.1</p>
+  </body>
+</html>

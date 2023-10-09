@@ -12,6 +12,10 @@
   Just like the tools themselves, this file should be considered CC0 Public
   Domain (https://creativecommons.org/publicdomain/zero/1.0/)
 
+  Version 1.3: Added support for blanking out the SNES audio bitrate and cycles
+    bits that `bnister` identified as a workaround for the "start-SNES-games-
+    twice" issue that cropped up in firmware versions after March
+
   Version 1.2: Added support for blanking out the power curve monitoring bytes
     in getFirmwareHash(), and updated the hashes accordingly in knownHash()
 
@@ -155,6 +159,22 @@ function getFirmwareHash(data) {
       return false;
     }
 
+    // Next we'll look for and zero out the bytes used for SNES audio rate and
+    // CPU cycles, in case folks want to patch those bytes to correct SNES
+    // first-launch issues on newer firmwares...
+    var preSNESBytes = findSequence([0x00, 0x00, 0x00, 0x80, 0x00, 0x00, 0x00, 0x80], dataCopy);
+    if (preSNESBytes > -1) {
+      var snesAudioBitrateBytes = preSNESBytes + 8;
+      var snesCPUCyclesBytes = snesAudioBitrateBytes + 8;
+      dataCopy[snesAudioBitrateBytes] = 0x00;
+      dataCopy[snesAudioBitrateBytes + 1] = 0x00;
+      dataCopy[snesCPUCyclesBytes] = 0x00;
+      dataCopy[snesCPUCyclesBytes + 1] = 0x00;
+    }
+    else {
+      return false;
+    }
+
     // If we're here, we've zeroed-out all of the bits of the firmware that are
     // semi-user modifiable (CRC32 bits, boot logo, button mappings and power
     // curve bytes); now we can generate a hash of what's left and compare it
@@ -230,19 +250,19 @@ function downloadToBrowser(data, type, name) {
 // convention, or false if the provided hash doesn't match...
 function knownHash(hash) {
   switch (hash) {
-    case "17b931ed95cc5506b06941cc1ea152fda9eef94d8109168f6e180fce8043ef66":
+    case "149706c009c446267e767313e149adc733d167d25e731694b2bdb1646a41ed08":
       return "03.15";
 
-    case "c4ae6c69e6ca1a39bae1f8e342e41779bd45ee396e29855b795e1bacddd5916a":
+    case "151d5eeac148cbede3acba28823c65a34369d31b61c54bdd8ad049767d1c3697":
       return "04.20";
 
-    case "48f86e1ff56223349186029270c6c022ce0de1ff47d6704c73e55c31ad68aec4":
+    case "ab0ce4923086afc535154023ddea1d355bcedb89e6314a47d9c1b77c7a9e75e3":
       return "05.15";
 
-    case "1cd37343576a6584565884fcbbe2ffaf18b50466144b356aa0b885cd9cf10484":
+    case "67c5dfc5825a0d9cf953206c2231b29512482e97fef688fe32bf5c31acdb370a":
       return "05.22";
 
-    case "334c8f0a8584db07078d7dfc940e540e6538dde948cb6fdbf50754e4e113d6bc":
+    case "5335860d13214484eeb1260db8fe322efc87983b425ac5a5f8b0fcdf9588f40a":
       return "08.03";
 
     default:

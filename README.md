@@ -74,20 +74,20 @@ Some downsides to the device: it's mono only (you only get the left-channel audi
 So is the "Data Frog" any good? Only you can answer that question for yourself. There are certainly more powerful devices out there, more fully featured devices, devices with better hardware, etc. - but almost all of those devices cost a lot more than the SF2000. At the end of the day, you have to look at the features offered at the given price-point, and only then can you decide if you're interested in the device or not.
 
 ### Is there any custom firmware?
-As of October 3rd 2023, **no**, not yet; however efforts are underway. While an SDK for the CPU has been identified, the developers working on custom firmware have generally reached the conclusion that the SDK is unfinished and of low quality. While it has been used to produce experimental builds of Retroarch, demonstrating various cores operating on the SF2000, there are notable problems - core features like video and audio drivers are missing (and thus would have to be developed from scratch), and overall system stability is very low. Additionally, most of the experimental core builds had audio and/or video performance issues, and most also caused the SF2000 to run "hot", which may impact the lifespan of the device.
+As of October 10th 2023, **no**, not yet; however efforts are underway. While an SDK for the CPU has been identified, the developers working on custom firmware have generally reached the conclusion that the SDK is unfinished and of low quality. While it has been used to produce experimental builds of Retroarch, demonstrating various game systems operating on the SF2000, there are notable problems - core features like video and audio drivers are missing (and thus would have to be developed from scratch), and overall system stability is very low. Additionally, most of the experimental system builds had audio and/or video performance issues, and most also caused the SF2000 to run "hot", which may impact the lifespan of the device. [A GitLab repo](https://git.maschath.de/ignatz/hcrtos) has been set up by `ignatzdraconis` for the work based on this SDK.
 
-Most recently, a new tack is being tried by the development team - they're trying to modify the stock SF2000 firmware to add additional functionality. Theoretically, this would come with the benefit of having audio and video drivers already built, providing no worse performance than stock firmware, while providing features like support for additional emulated systems.
+Most recently, a new tack is being tried by the development team - they're trying to modify the stock SF2000 firmware to add additional functionality. Theoretically, this would come with the benefit of having audio and video drivers already built, providing no worse performance than stock firmware, while providing features like support for additional emulated systems. An experimental developer build has been produced which demonstrates additional systems like Atari 2600 and PC-Engine running under the stock firmware. [A GitLab repo](https://gitlab.com/kobily/sf2000_multicore) has been set up by `kobil` for the work on modifying the stock firmware.
 
-[A GitLab repo](https://git.maschath.de/ignatz/hcrtos) has been set up by `ignatzdraconis` for the work based on the SDK, and [a separate GitLab repo](https://gitlab.com/kobily/sf2000_multicore) has been set up by `kobil` for the work on modifying the stock firmware. You can follow along with discussion in the [`Retro Handhelds` Discord server](https://discord.gg/retrohandhelds) (specifically, in the `🐸data_frog_sf2000` channel there's a `SF2000 Dev` thread where most of the tech talk and details are posted first).
+You can follow along with discussion in the [`Retro Handhelds` Discord server](https://discord.gg/retrohandhelds) (specifically, in the `🐸data_frog_sf2000` channel there's a `SF2000 Dev` thread where most of the tech talk and details are posted first).
 
-Note that any non-stock firmwares currently built for the SF2000 should be considered highly experimental, and are not vetted to be "safe" to run (e.g., current builds may push the hardware of the SF2000 to its operational limits do to optimisation issues, and may incur thermal damage to the device if left running for too long, etc.).
+**Note:** Any non-stock firmwares currently built for the SF2000 should be considered **highly** experimental, and are not vetted to be "safe" to run (e.g., current builds may push the hardware of the SF2000 to its operational limits do to optimisation issues, and may incur thermal damage to the device if left running for too long, etc.). Such builds are not intended for day-to-day usage yet; if you're waiting for safe custom firmware to be available, keep waiting - the current experimental builds are not ready for prime-time yet.
 
 ### I just got my SF2000; what modding can I do with it?
 If you're planning to customise your SF2000 in _any_ way, then I **strongly** recommend the _very_ first thing you do is [fix an annoying bug in the device's bootloader](#bootloader-bug) - otherwise you're likely to end up with a non-booting device. Seriously - **do this before you do anything else!**
 
 Afterwards, in no particular order, some of the current customisation options available are:
 
-* You can [upgrade the firmware to the latest version](https://www.youtube.com/watch?v=j8dT2fdGfck)
+* You can [upgrade the firmware to the latest version](#firmwarebios-bisrvasd)
 * You can swap out the [buttons](#buttons) and [d-pad](#d-pad) (and their membranes) for ones from original SNES controllers (not SNES Classic), which gives a more retro "mushy" feel (if your replacement buttons have 3 "pins", you may need to file or clip one of the pins off)
 * You can swap the [battery](#battery) for a higher-capacity `3500 mAh` 18650, which will give you longer playtime (at the cost of longer charging time). If you do decide to replace the battery, make sure you use one with a built-in protection circuit, as the SF2000 has no under-charge protection.
 * You can [replace the boot logo](https://vonmillhausen.github.io/sf2000/tools/bootLogoChanger.htm) with a custom one
@@ -95,6 +95,7 @@ Afterwards, in no particular order, some of the current customisation options av
 * You can [change the default button mappings](https://vonmillhausen.github.io/sf2000/tools/buttonMappingChanger.htm) for each emulator (newer firmwares have this feature built-in, but the built-in implementation is buggy)
 * You can add your own ROMs to the `roms` folder on the microSD card, which will then appear in the user ROMs menu of the device. You can also modify the built-in ROM lists using [FROGTOOL](https://github.com/tzlion/frogtool)
 * You can [replace the default menu theme with a custom one](#how-do-i-install-new-menu-themes)
+* You can [fix a bug with SNES emulation](#snes-games-run-really-slowly-whats-wrong)
 
 Many of the above tasks can be done using [Tadpole](https://github.com/EricGoldsteinNz/tadpole), a general management tool for the SF2000 developed by `.ericgoldstein` and `jasongrieves_02643`.
 
@@ -115,13 +116,15 @@ Answer: with a fair bit of work! The _images_ for the shortcuts are baked into e
 Recent versions of [Tadpole](https://github.com/EricGoldsteinNz/tadpole) by `.ericgoldstein` and `jasongrieves_02643` have support for changing the shortcuts if you're looking for a more automated way to do things.
 
 ### SNES games run really slowly... what's wrong?
-There's a bug in all stock firmware versions later than the original mid-March firmware which often causes SNES games to run really slowly on first launch (and their sound is slow and lower pitch too); this only impacts SNES. Usually this can be corrected by launching the game, then quitting back to the game selection menu via `START + SELECT`, and then immediately re-launching the game again. Note however that the stock firmwares do also struggle a bit with SNES emulation in general, so any additional slowdown after the second launch is just what you get.
+There's a bug in all stock firmware versions later than the original mid-March firmware which often causes SNES games to run really slowly on first launch (and their sound is slow and lower pitch too); this only impacts SNES. `bnister` discovered that this appears to be related to a firmware bug, in which certain settings (audio rate and clock speed) for the SNES emulator are set _after_ Retroarch has been initialised, causing Retroarch to get confused and run at half rate. `Dteyn` has created a web-based tool which will patch your BIOS with a workaround to correct the issue - [you can find their tool here](https://dteyn.github.io/sf2000/tools/snesEmulatorFix.htm).
+
+Alternatively, if you don't want to patch your BIOS then you can work around the issue by launching the game, then quitting back to the game selection menu via `START + SELECT`, and then immediately re-launching the game again. Note however that the stock firmwares do also struggle a bit with SNES emulation in general, so any additional slowdown after the second launch is just what you get.
 
 ### Help! My SF2000 won't turn on, or is stuck at a black screen!
 The three most likely causes for this are:
 
 * If you've switched to using a different microSD card than the one your SF2000 switched with, there's a good chance the new microSD card you're using is not compatible with the SF2000. The device seems to be very picky about the types of microSD cards it will or won't read. Try putting your original microSD card back into the SF2000 and see if it'll boot OK from that.
-* If you've done anything at all to the `bios` folder on the microSD card (_anything_ at all), then there's a good chance you've run into the bootloader bug - you can [find the two fixes to it below](#bootloader-bug). Alternatively (or if neither of the two fixes work for you), [follow Data Frog's instructions](https://www.youtube.com/watch?v=j8dT2fdGfck) to wipe your microSD card and flash a clean firmware image.
+* If you've done anything at all to the `bios` folder on the microSD card (_anything_ at all), then there's a good chance you've run into the bootloader bug - you can [find the two fixes to it below](#bootloader-bug). Alternatively (or if neither of the two fixes work for you), [follow Data Frog's instructions](https://www.youtube.com/watch?v=j8dT2fdGfck) to wipe your microSD card and flash a clean firmware image, or try using [Tadpole](https://github.com/EricGoldsteinNz/tadpole)'s built-in fix feature.
 * Your battery could be running low. The SF2000 will still "turn on" when its battery is low on charge (the red light will still come on), but the device itself will actually fail to boot, just leaving you with a black screen. Turn the device off, and charge it fully (the stock battery takes 3.5 hours to charge from empty - the green charging light will not go out, so you'll have to time it yourself).
 
 ### When I connect the SF2000 to a TV via the A/V cable, the sound is very quiet/low - is that normal?
@@ -131,7 +134,7 @@ It's "normal" for certain versions of the firmware, anyway! Older firmware versi
 
 So you can try launching the game first, and _then_ plug in the A/V cable to get full volume on the TV.
 
-Alternatively, the issue was addressed in the `08.03`/`1.6V` firmware, so you could [try updating to that](https://www.youtube.com/watch?v=j8dT2fdGfck).
+Alternatively, the issue was addressed in the `08.03`/`1.6V` firmware, so you could [try updating to that](#firmwarebios-bisrvasd).
 
 ### Game saves don't seem to be working for me? Save states are fine, but the built-in save function in games doesn't seem to work?
 Unfortunately, correct - with the stock firmware, the built-in save feature of emulated games does not work correctly, and the SF2000 won't store new save data after the first time it's created for a game. If you want to save your progress in a game on the SF2000's stock firmware, use save states instead.
@@ -238,7 +241,7 @@ The name of the `.zfb` file is how the game is named in the SF2000 menu. The fou
 Emulator is FCEUmm (Git commit [`7cdfc7e`](https://github.com/libretro/libretro-fceumm/commit/7cdfc7e)). There are references in the firmware to different NES palettes, but there's no interface or configuration for the emulator itself to choose one. On the original firmware, the A and B buttons were swapped. See "[Button Mappings/Key Bindings](#button-mappingskey-bindings)" section below.
 
 ### SNES
-Emulator is Snes9x 2005 v1.36 (Git commit [`b94a804`](https://github.com/libretro/snes9x2005/commit/b94a804)). With the April 20th version of the firmware, SNES games often appear to run very slowly _on first launch_; but if you exit the game and load it again, it usually starts performing _much_ better.
+Emulator is Snes9x 2005 v1.36 (Git commit [`b94a804`](https://github.com/libretro/snes9x2005/commit/b94a804)). With the April 20th version of the firmware and onwards, SNES games often appear to run very slowly _on first launch_; you can [learn more about this issue and how to correct it here](#snes-games-run-really-slowly-whats-wrong).
 
 ### Genesis/Mega Drive
 Emulator is PicoDrive 1.91 (Git commit [`cbc93b6`](https://github.com/libretro/picodrive/commit/cbc93b6)). Works pretty well. This emulator is capable of loading Master System ROMs if placed in the user ROMs folder on the microSD card; Game Gear ROMs do not load. Some PAL-region games may run too fast; NTSC-region games seem to always run at the correct speed. On the original firmware, A was mapped to A, B was mapped to B, and RB was mapped to C for some reason. See "[Button Mappings/Key Bindings](#button-mappingskey-bindings)" section below.
@@ -663,6 +666,7 @@ All of these are linked above already in their relevant sections, but just in ca
 - [Save State Tool](https://vonmillhausen.github.io/sf2000/tools/saveStateTool.htm)
 - [SF2000 Battery Level Patcher by Dteyn](https://github.com/Dteyn/SF2000_Battery_Level_Patcher)
 - [SF2000 Bluetooth Mod by IQ_132](https://neo-source.com/stuff/datafrog/)
+- [SF2000 SNES Emulator Fix by Dteyn](https://dteyn.github.io/sf2000/tools/snesEmulatorFix.htm)
 - [SF2000 Theme Compilation Page](https://zerter555.github.io/sf2000-collection/)
 - [Silent background music file](/sounds/silentMusic/pagefile.sys) (replace the file in the `Resources` folder on the microSD card)
 - [Silent Sounds Pack by Dtyen](https://github.com/Dteyn/sf2000/raw/main/sounds/silentSounds/SF2000_Silent_Sounds_Pack.zip) (direct link to zip; replaces _all_ non-music UI sounds with silence)
@@ -672,6 +676,8 @@ All of these are linked above already in their relevant sections, but just in ca
 ---
 
 ## Document Version History
+- `20231010 - 1.40`: Updated [CFW FAQ](#is-there-any-custom-firmware) with the latest details, and did a little re-arranging of existing info. Changed several links to Data Frog's YouTube firmware update process to links to the [Firmware](#firmwarebios-bisrvasd) section instead, as that section has more information about other options for firmware updates (e.g., Tadpole). Added links to `dteyn`'s SNES fix tool, and information about `bnister`'s discovery as to why SNES games had to be launched twice for full speed.
+
 - `20231003 - 1.39`: Updated [CFW FAQ](#is-there-any-custom-firmware) with the latest details. Corrected a detail about the relationship between arcade `.zfb` files and the `.zip` files they point to (thanks `.ericgoldstein`!). Added a note to the [Firmware](#firmwarebios-bisrvasd) section about the official firmware update process wiping the microSD card, and a note to the [Save States](#save-states) section about how to back up game saves (thanks for the suggestion `@uli42`!). Added [a simple firmware version checking tool](https://vonmillhausen.github.io/sf2000/tools/firmwareVersionChecker.htm), so that folks don't have to use the boot logo changer to check (which always seemed clunky to me). Added a link to `dteyn`'s Silent Sounds pack. Fixed some small typos.
 
 - `20230926 - 1.38`: Updated [CFW FAQ](#is-there-any-custom-firmware) with the latest details. Added some additional references to Tadpole, and added credits for `jasongrieves_02643` who has been doing a lot of recent development work on the tool lately. Updated the [CPU section](#cpu) to reference the fact that the CPU clock has been increased in the latest firmware. Added links to `iq_132`'s Bluetooth mod. Added [a section about the `.zfb` files](#zfb-files) used in the arcade section. Rearranged the details in [the Bootloader Bug section](#bootloader-bug) to hopefully make things a bit clearer.

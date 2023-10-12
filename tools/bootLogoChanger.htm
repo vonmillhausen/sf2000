@@ -90,6 +90,12 @@
                   setMessage("info", "bisrvMessages", "INFO: August 3rd <code>bisrv.asd</code> detected.");
                   break;
 
+                // October 7th BIOS...
+                case "10.07":
+                  logoOffset = 0x9B1FE8;
+                  setMessage("warning", "bisrvMessages", "WARNING: October 7th <code>bisrv.asd</code> detected; this version has known issues with SNES save states and is not recommended for use.");
+                  break;
+
                 default:
                   // Huh... wasn't false so had bisrv.asd structure, but didn't return
                   // a known hash... a new BIOS version? Unknown anyway!
@@ -226,6 +232,6 @@
       }
     </script>
     <hr>
-    <p><a rel="license" href="https://creativecommons.org/publicdomain/zero/1.0/">CC0</a>: public domain. Version 1.4, 20230819.1</p>
+    <p><a rel="license" href="https://creativecommons.org/publicdomain/zero/1.0/">CC0</a>: public domain. Version 1.4, 20231012.1</p>
   </body>
 </html>

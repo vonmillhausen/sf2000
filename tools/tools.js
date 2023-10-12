@@ -12,6 +12,9 @@
   Just like the tools themselves, this file should be considered CC0 Public
   Domain (https://creativecommons.org/publicdomain/zero/1.0/)
 
+  Version 1.5: Added support for the (broken) October 7th BIOS in
+    getFirmwareHash() and knownHash()
+
   Version 1.4: Re-ordered the getFirmwareHash() zeroing-out checks to match the
     expected order to find them in in the BIOS file - just some future-proofing
     in case some user-substituted content (e.g., a boot logo) happens to contain
@@ -71,10 +74,10 @@ function getFirmwareHash(data) {
   if (dataCopy.length > 12600000) {
 
     // First, replace CRC32 bits with 00...
-    dataCopy[396] = 0x00;
-    dataCopy[397] = 0x00;
-    dataCopy[398] = 0x00;
-    dataCopy[399] = 0x00;
+    dataCopy[0x18C] = 0x00;
+    dataCopy[0x18D] = 0x00;
+    dataCopy[0x18E] = 0x00;
+    dataCopy[0x18F] = 0x00;
 
     // Next we'll look for (and zero out) the five bytes that the power
     // monitoring functions of the SF2000 use for switching the UI's battery
@@ -128,6 +131,15 @@ function getFirmwareHash(data) {
           dataCopy[0x35658C] = 0x00;
           dataCopy[0x356594] = 0x00;
           dataCopy[0x3565B0] = 0x00;
+          break;
+        
+        case 0x356638:
+          // Seems to match October 7th layout...
+          dataCopy[0x356638] = 0x00;
+          dataCopy[0x356640] = 0x00;
+          dataCopy[0x3566D8] = 0x00;
+          dataCopy[0x3566E0] = 0x00;
+          dataCopy[0x3566FC] = 0x00;
           break;
       
         default:
@@ -276,6 +288,9 @@ function knownHash(hash) {
 
     case "5335860d13214484eeb1260db8fe322efc87983b425ac5a5f8b0fcdf9588f40a":
       return "08.03";
+    
+    case "b88458bf2c25d3a34ab57ee149f36cfdc6b8a5138d5c6ed147fbea008b4659db":
+      return "10.07"
 
     default:
       return false;

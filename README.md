@@ -11,6 +11,8 @@ This document is a collection of notes and information I've made about the devic
   - [FAQ (Frequently Asked Questions)](#faq-frequently-asked-questions)
     - [Is this thing any good?](#is-this-thing-any-good)
     - [Is there any custom firmware?](#is-there-any-custom-firmware)
+      - [hcRTOS (true CFW)](#hcrtos-true-cfw)
+      - [Multicore (modified stock)](#multicore-modified-stock)
     - [I just got my SF2000; what modding can I do with it?](#i-just-got-my-sf2000-what-modding-can-i-do-with-it)
     - [How do I install new menu themes?](#how-do-i-install-new-menu-themes)
     - [How do I change the four shortcuts/games listed on each system's main menu page?](#how-do-i-change-the-four-shortcutsgames-listed-on-each-systems-main-menu-page)
@@ -74,13 +76,15 @@ Some downsides to the device: it's mono only (you only get the left-channel audi
 So is the "Data Frog" any good? Only you can answer that question for yourself. There are certainly more powerful devices out there, more fully featured devices, devices with better hardware, etc. - but almost all of those devices cost a lot more than the SF2000. At the end of the day, you have to look at the features offered at the given price-point, and only then can you decide if you're interested in the device or not.
 
 ### Is there any custom firmware?
-As of October 12th 2023, **no**, not yet; however efforts are underway. While an SDK for the CPU has been identified, the developers working on custom firmware have generally reached the conclusion that the SDK is unfinished and of low quality. While it has been used to produce experimental builds of Retroarch, demonstrating various game systems operating on the SF2000, there are notable problems - core features like video and audio drivers are missing (and thus would have to be developed from scratch), and overall system stability is very low. Additionally, most of the experimental system builds had audio and/or video performance issues, and most also caused the SF2000 to run "hot", which may impact the lifespan of the device. [A GitLab repo](https://git.maschath.de/ignatz/hcrtos) has been set up by `ignatzdraconis` for the work based on this SDK.
+As of October 19th 2023, **no**, not yet. Two main efforts have been made:
 
-Most recently, a new tack is being tried by the development team - they're trying to modify the stock SF2000 firmware to add additional functionality. Theoretically, this would come with the benefit of having audio and video drivers already built, providing no worse performance than stock firmware, while providing features like support for additional emulated systems. An experimental developer build has been produced which demonstrates additional systems like Atari 2600 and PC-Engine running under the stock firmware. [A GitLab repo](https://gitlab.com/kobily/sf2000_multicore) has been set up by `kobil` for the work on modifying the stock firmware.
+#### hcRTOS (true CFW)
+Earlier this year, an SDK for the CPU in the SF2000 was been identified. Theoretically, this would allow a full custom firmware to be built and compiled for the device. The developers working on custom firmware spent some considerable time and effort working on porting Retroarch (as it seemed like it would be the quickest route to a custom firmware with support for many systems), however they ran into several problems. It appears that the SDK was unfinished and of low quality - core features like video and audio drivers were missing (and thus had to be developed from scratch), and overall system stability of the produced builds very low. When crashed happened with running cores (which was frequently) no useful debugging information was produced, and so tracking down the source of issues became a major time-sink. Additionally, most of the experimental builds when they did work had audio and/or video performance issues, and most also caused the SF2000 to run "hot", which would likely have impacted the lifespan of the device and thus are not recommended for usage beyond a few minutes at a time. [A GitLab repo](https://git.maschath.de/ignatz/hcrtos) was set up by `ignatzdraconis` for the work based on this SDK, however work on developing a full custom firmware using this SDK has been parked for now.
 
-You can follow along with discussion in the [`Retro Handhelds` Discord server](https://discord.gg/retrohandhelds) (specifically, in the `🐸data_frog_sf2000` channel there's a `SF2000 Dev` thread where most of the tech talk and details are posted first).
+#### Multicore (modified stock)
+More recently, a new tack is being tried by the development team - they're trying to modify the stock SF2000 firmware to add additional functionality. Theoretically, this would come with the benefit of having audio and video drivers already built (the contractors producing the stock firmware for the SF2000 have access to these), providing no worse performance than stock firmware, while also providing features like support for additional emulated systems. An experimental developer build called the "multicore" build has been produced which hijacks the stock Game Boy Advance emulator to run additional systems like Atari 2600 and PC-Engine, some stand-alone engines for games like Doom and Cave Store, as well as alternatives for some of the stock emulators already included with the SF2000. Some of the new systems appear to run at full speed; some run without sound or with less than full speed, and others don't work at all yet. [A GitLab repo](https://gitlab.com/kobily/sf2000_multicore) has been set up by `kobil` for the work on modifying the stock firmware.
 
-**Note:** Any non-stock firmwares currently built for the SF2000 should be considered **highly** experimental, and are not vetted to be "safe" to run (e.g., current builds may push the hardware of the SF2000 to its operational limits do to optimisation issues, and may incur thermal damage to the device if left running for too long, etc.). Such builds are not intended for day-to-day usage yet; if you're waiting for safe custom firmware to be available, keep waiting - the current experimental builds are not ready for prime-time yet.
+You can follow along in real time with the development discussion in the [`Retro Handhelds` Discord server](https://discord.gg/retrohandhelds) (specifically, in the `🐸data_frog_sf2000` channel there's a `SF2000 Dev` thread where most of the tech talk and details are posted first). Also be sure to check pinned messages both in the main channel and the thread before asking any questions 🙂
 
 ### I just got my SF2000; what modding can I do with it?
 If you're planning to customise your SF2000 in _any_ way, then I **strongly** recommend the _very_ first thing you do is [fix an annoying bug in the device's bootloader](#bootloader-bug) - otherwise you're likely to end up with a non-booting device. Seriously - **do this before you do anything else!**
@@ -88,7 +92,7 @@ If you're planning to customise your SF2000 in _any_ way, then I **strongly** re
 Afterwards, in no particular order, some of the current customisation options available are:
 
 * I'm not kidding - [fix the bootloader bug](#bootloader-bug) before you do _anything_ with your SF2000!
-* You can [upgrade the firmware to the latest version](#firmwarebios-bisrvasd) (many of the other things below modify your installed firmware, so if you're going to do some of the others, do this one before them)
+* You can potentially [upgrade the firmware to the latest version](#firmwarebios-bisrvasd) (many of the other things below modify your installed firmware, so if you're going to do some of the others, do this one before them)
 * You can swap out the [buttons](#buttons) and [d-pad](#d-pad) (and their membranes) for ones from original SNES controllers (not SNES Classic), which gives a more retro "mushy" feel (if your replacement buttons have 3 "pins", you may need to file or clip one of the pins off)
 * You can swap the [battery](#battery) for a higher-capacity `3500 mAh` 18650, which will give you longer playtime (at the cost of longer charging time). If you do decide to replace the battery, make sure you use one with a built-in protection circuit, as the SF2000 has no under-charge protection.
 * You can [patch the battery monitoring curve](https://github.com/Dteyn/SF2000_Battery_Level_Patcher) for the **stock** battery to make it more accurate using a web tool by `dteyn` (only use if you're keeping the stock battery; if you've put in a more powerful battery, the stock battery monitoring curve should be fine)
@@ -97,7 +101,7 @@ Afterwards, in no particular order, some of the current customisation options av
 * You can [change the default button mappings](https://vonmillhausen.github.io/sf2000/tools/buttonMappingChanger.htm) for each emulator (newer firmwares have this feature built-in, but the built-in implementation is buggy)
 * You can add your own ROMs to the `roms` folder on the microSD card, which will then appear in the user ROMs menu of the device. You can also modify the built-in ROM lists using [FROGTOOL](https://github.com/tzlion/frogtool)
 * You can [replace the default menu theme with a custom one](#how-do-i-install-new-menu-themes)
-* You can [fix a bug with SNES emulation](#snes-games-run-really-slowly-whats-wrong)
+* You can [fix a bug with SNES emulation](#snes-games-run-really-slowly-whats-wrong) if you're using a firmware version prior to 1.71
 
 Many of the above tasks can be done using [Tadpole](https://github.com/EricGoldsteinNz/tadpole), a general management tool for the SF2000 developed by `.ericgoldstein` and `jasongrieves_02643`.
 
@@ -113,14 +117,17 @@ If you wish to manually install a theme you've downloaded, just take the files f
 Another thing to note: some themes might come with an updated boot logo. If that logo is provided as [a `bisrv.asd` file](#firmwarebios-bisrvasd) in the `bios` folder, this is actually a modified _firmware_ for the device, which happens to contain the new logo. If you decide to replace your existing `bisrv.asd` file, you might want to make sure that the theme's firmware version matches the firmware version already on your device. Generally, it's probably safer just to [update your own firmware's boot logo](https://vonmillhausen.github.io/sf2000/tools/bootLogoChanger.htm) with an image file.
 
 ### How do I change the four shortcuts/games listed on each system's main menu page?
-Answer: with a fair bit of work! The _images_ for the shortcuts are baked into each system's main menu background image - check out the ["Images (Used)"](#images-used) section below, and use your browser's search feature to search for `main menu background`, and you'll see what I mean. `Zerter#4954` has created a tool for theme makers which lets you more easily edit these icons, [which you can find here](https://zerter555.github.io/sf2000-collection/mainMenuIcoEditor.html). The _text_ under each shortcut is stored in a separate image - in the `05.22` firmware, the files are `gkavc.ers` if the device's language is set to Chinese, or `gakne.ctp` for all other languages (again, check the details in the ["Images (Used)"](#images-used) section below). Finally, the actual roms that are launched for each shortcut are stored in the `xfgle.hgp` file, which is plain text - you can learn more about it in the ["ROM Lists"](#rom-lists) section below.
+Recent versions of [Tadpole](https://github.com/EricGoldsteinNz/tadpole) by `.ericgoldstein` and `jasongrieves_02643` have support for changing the shortcuts if you're looking for an automated way to do things. There's also a separate web-based tool from `Zerter#4954` which lets you edit these icons, [you can find it here](https://zerter555.github.io/sf2000-collection/mainMenuIcoEditor.html).
 
-Recent versions of [Tadpole](https://github.com/EricGoldsteinNz/tadpole) by `.ericgoldstein` and `jasongrieves_02643` have support for changing the shortcuts if you're looking for a more automated way to do things.
+Alternatively, you can do it manually with a fair bit of work. The _images_ for the shortcuts are baked into each system's main menu background image - check out the ["Images (Used)"](#images-used) section below, and use your browser's search feature to search for `main menu background`, and you'll see what I mean. The _text_ under each shortcut is stored in a separate image - in firmware version 1.5 onwards, the files are `gkavc.ers` if the device's language is set to Chinese, or `gakne.ctp` for all other languages (again, check the details in the ["Images (Used)"](#images-used) section below). Finally, the actual roms that are launched for each shortcut are stored in the `xfgle.hgp` file, which is plain text - you can learn more about it in the ["ROM Lists"](#rom-lists) section below.
 
 ### SNES games run really slowly... what's wrong?
-There's a bug in all stock firmware versions later than the original mid-March firmware which often causes SNES games to run really slowly on first launch (and their sound is slow and lower pitch too); this only impacts SNES. `bnister` discovered that this appears to be related to a firmware bug, in which certain settings (audio rate and clock speed) for the SNES emulator are set _after_ Retroarch has been initialised, causing Retroarch to get confused and run at half rate. `Dteyn` has created a web-based tool which will patch your BIOS with a workaround to correct the issue - [you can find their tool here](https://dteyn.github.io/sf2000/tools/snesEmulatorFix.htm).
+There's a bug in all stock firmware versions prior to 1.71 which often causes SNES games to run really slowly on first launch (and their sound is slow and lower pitch too); this only impacts SNES. `bnister` discovered that this appears to be related to a firmware bug, in which certain settings (audio rate and clock speed) for the SNES emulator are set _after_ Retroarch has been initialised, causing Retroarch to get confused and run at half rate. This bug was fixed in firmware 1.71, so you can [upgrade to that firmware version](#firmwarebios-bisrvasd) to fix things. If you don't want to upgrade to 1.71, there are two other ways to fix or work-around the issue:
 
-Alternatively, if you don't want to patch your BIOS then you can work around the issue by launching the game, then quitting back to the game selection menu via `START + SELECT`, and then immediately re-launching the game again. Note however that the stock firmwares do also struggle a bit with SNES emulation in general, so any additional slowdown after the second launch is just what you get.
+  * `Dteyn` has created a web-based tool which will patch your BIOS with a workaround to correct the issue - [you can find their tool here](https://dteyn.github.io/sf2000/tools/snesEmulatorFix.htm).
+  * Quitting back to the game selection menu via `START + SELECT`, and then immediately re-launching the game again will get the game to run at full speed the second time around; this would need to be done at least once every time you power on the SF2000.
+
+Note however that the stock firmware does also struggle a bit with SNES emulation in general, so any slowdown or poor SNES performance you see after addressing the bug is just what you get.
 
 ### Help! My SF2000 won't turn on, or is stuck at a black screen!
 The three most likely causes for this are:
@@ -130,18 +137,16 @@ The three most likely causes for this are:
 * Your battery could be running low. The SF2000 will still "turn on" when its battery is low on charge (the red light will still come on), but the device itself will actually fail to boot, just leaving you with a black screen. Turn the device off, and charge it fully (the stock battery takes 3.5 hours to charge from empty - the green charging light will not go out, so you'll have to time it yourself).
 
 ### When I connect the SF2000 to a TV via the A/V cable, the sound is very quiet/low - is that normal?
-It's "normal" for certain versions of the firmware, anyway! Older firmware versions had no issues with audio volume via A/V, but at least the `05.22` version does. `Zerter#4954` from Discord found a workaround:
+This was due to a bug in some earlier firmware versions; it was officially fixed in firmware 1.6, so if you're running a prior firmware version ([check here](https://vonmillhausen.github.io/sf2000/tools/firmwareVersionChecker.htm)), you can [upgrade to a newer firmware version](#firmwarebios-bisrvasd).
+
+Alternatively, `Zerter#4954` from Discord found a workaround if you don't want to upgrade:
 
 > when I did this the AV audio work normally: I had to load the game first then plug-in the 2.5mm to rca jack. [...] but when I quit then exit then tried the game again it returns to very low audio. [...] will need to do the work around again
 
 So you can try launching the game first, and _then_ plug in the A/V cable to get full volume on the TV.
 
-Alternatively, the issue was addressed in the `08.03`/`1.6V` firmware, so you could [try updating to that](#firmwarebios-bisrvasd).
-
 ### Game saves don't seem to be working for me? Save states are fine, but the built-in save function in games doesn't seem to work?
-Unfortunately, correct - with the stock firmware, the built-in save feature of emulated games does not work correctly, and the SF2000 won't store new save data after the first time it's created for a game. If you want to save your progress in a game on the SF2000's stock firmware, use save states instead.
-
-Note that the `08.03`/`1.6V` firmware _appears_ to have fixed this for GBA based on community reports, but not for other emulated systems.
+Unfortunately, correct - with the stock firmware, the built-in save feature of emulated games does not work correctly, and the SF2000 won't store new save data after the first time it's created for a game. If you want to save your progress in a game on the SF2000's stock firmware, use save states instead. Note that firmware 1.6 _appears_ to have fixed this for GBA based on community reports, but not for other emulated systems.
 
 ### I have a question that isn't answered here... who or where do I ask?
 If you have questions about the SF2000 you can't find the answer to, the best place to ask is in the `🐸data_frog_sf2000` channel in the [Retro Handhelds Discord server](https://discord.gg/retrohandhelds).
@@ -151,7 +156,7 @@ If you have questions about the SF2000 you can't find the answer to, the best pl
 ## Hardware
 
 ### CPU
-Although the main CPU of the SF2000 has literally had it's markings milled off by a routing tool, the community has determined that it's a HCSEMI B210, a single-core MIPS processor running at 810 MHz (or 918 MHz with the `08.03`/`1.6V` firmware). It appears to be a clone of an ALi Tech chip. [An SDK has been found](http://www.zcsd-tech.com//download/content-54.html) for it.
+Although the main CPU of the SF2000 has literally had it's markings milled off by a routing tool, the community has determined that it's a HCSEMI B210, a single-core MIPS processor running at 810 MHz (or 918 MHz with the 1.6 firmware onwards). It appears to be a clone of an ALi Tech chip. [An SDK has been found](http://www.zcsd-tech.com//download/content-54.html) for it.
 
 ### Display
 The SF2000 features a `240x320` IPS display panel (not OCA laminated), which has been rotated 90&deg; clockwise to give a `320x240` display. It demonstrates screen tearing for all emulators, running from the right of the console to the left due to the panel rotation.
@@ -179,7 +184,7 @@ The SF2000 takes a 18650 type rechargeable battery, which is easily user replace
 
 Also note that while you can technically charge the SF2000 while it is powered on, doing so using a charger that supports fast charging or power delivery has a high chance of blowing the charging module IC and killing the device (multiple community reports). For safest charging, use a charger that only supports a maximum output of 5v.
 
-The stock firmware's power monitoring system (which controls the battery level indicator on the main menu, along with when the device warns the user about a low battery condition) is poorly calibrated for the stock battery that comes with the device; as such, the SF2000 basically indicates it has a full battery at all times. `bnister` and `dteyn` from Discord worked together to identify the locations within the stock firmware where the calibrations are stored, and determined more appropriate calibration values for the stock battery. `dteyn` wrote a web-based tool which will patch an existing `bisrv.asd` file to use the new values; you can [find their "Data Frog SF2000 Battery Meter Fix" tool here](https://dteyn.github.io/sf2000/tools/batteryMeterFix.htm). They also have a Python script to do the patching specifically for the `1.6V`/`08.03` firmware - you can [find that script here](https://github.com/Dteyn/SF2000_Battery_Level_Patcher), along with much more detail about the issue and the solution.
+The stock firmware's power monitoring system (which controls the battery level indicator on the main menu, along with when the device warns the user about a low battery condition) is poorly calibrated for the stock battery that comes with the device; as such, the SF2000 basically indicates it has a full battery at all times. `bnister` and `dteyn` from Discord worked together to identify the locations within the stock firmware where the calibrations are stored, and determined more appropriate calibration values for the stock battery. `dteyn` wrote a web-based tool which will patch an existing `bisrv.asd` file to use the new values; you can [find their "Data Frog SF2000 Battery Meter Fix" tool here](https://dteyn.github.io/sf2000/tools/batteryMeterFix.htm). They also have a Python script to do the patching specifically for the 1.6 firmware - you can [find that script here](https://github.com/Dteyn/SF2000_Battery_Level_Patcher), along with much more detail about the issue and the solution.
 
 ### Wireless Connectivity
 The SF2000 does not feature WiFi or Bluetooth, but it _does_ have a 2.4Ghz antenna to support local wireless multiplayer using a compatible 2.4Ghz wireless controller for Player 2. The Y2 SFC wireless controller and the SF900 wireless controller have both been reported to work fine.
@@ -243,7 +248,7 @@ The name of the `.zfb` file is how the game is named in the SF2000 menu. The fou
 Emulator is FCEUmm (Git commit [`7cdfc7e`](https://github.com/libretro/libretro-fceumm/commit/7cdfc7e)). There are references in the firmware to different NES palettes, but there's no interface or configuration for the emulator itself to choose one. On the original firmware, the A and B buttons were swapped. See "[Button Mappings/Key Bindings](#button-mappingskey-bindings)" section below.
 
 ### SNES
-Emulator is Snes9x 2005 v1.36 (Git commit [`b94a804`](https://github.com/libretro/snes9x2005/commit/b94a804)). With the April 20th version of the firmware and onwards, SNES games often appear to run very slowly _on first launch_; you can [learn more about this issue and how to correct it here](#snes-games-run-really-slowly-whats-wrong).
+Emulator is Snes9x 2005 v1.36 (Git commit [`b94a804`](https://github.com/libretro/snes9x2005/commit/b94a804)). For most firmware versions before 1.71, SNES games often appear to run very slowly _on first launch_; you can [learn more about this issue and how to correct it here](#snes-games-run-really-slowly-whats-wrong).
 
 ### Genesis/Mega Drive
 Emulator is PicoDrive 1.91 (Git commit [`cbc93b6`](https://github.com/libretro/picodrive/commit/cbc93b6)). Works pretty well. This emulator is capable of loading Master System ROMs if placed in the user ROMs folder on the microSD card; Game Gear ROMs do not load. Some PAL-region games may run too fast; NTSC-region games seem to always run at the correct speed. On the original firmware, A was mapped to A, B was mapped to B, and RB was mapped to C for some reason. See "[Button Mappings/Key Bindings](#button-mappingskey-bindings)" section below.
@@ -257,7 +262,7 @@ Emulator is TGB Dual v0.8.3 (Git commit [`9be31d3`](https://github.com/libretro/
 ### Game Boy Advance
 Emulator is gpSP v0.91 (Git commit [`261b2db`](https://github.com/libretro/gpsp/commit/261b2db)). Performance is fairly poor. On the original firmware, A and B buttons are mapped correctly, but the GBA shoulder buttons are mapped to X and Y for some reason. See "[Button Mappings/Key Bindings](#button-mappingskey-bindings)" section below.
 
-While the SF2000 does include a copy of the real GBA BIOS file in the `bios` folder, there's a bug in the `05.22` firmware (and possibly earlier firmwares) that prevents that BIOS from ever actually being loaded. As such, gpSP _always_ falls back to the built-in "NORMMATT" BIOS instead (a reverse-engineered BIOS that is not identical to Nintendo's one). This has been noted to have some compatibility issues - for example, the main menu on "The Legend of Zelda - The Minish Cap" is broken on a stock SF2000 using the `05.22` firmware due to the NORMMATT BIOS. You can correct for this bug by copying the `gba_bios.bin` file from the `bios` folder to the two following locations (create any folders as needed - and credit to `bnister` for the finding!):
+While the SF2000 does include a copy of the real GBA BIOS file in the `bios` folder, there's a bug in the 1.5 firmware (and possibly earlier firmwares) that prevents that BIOS from ever actually being loaded. As such, gpSP _always_ falls back to the built-in "NORMMATT" BIOS instead (a reverse-engineered BIOS that is not identical to Nintendo's one). This has been noted to have some compatibility issues - for example, the main menu on "The Legend of Zelda - The Minish Cap" is broken on a stock SF2000 using the 1.5 firmware due to the NORMMATT BIOS. You can correct for this bug by copying the `gba_bios.bin` file from the `bios` folder to the two following locations (create any folders as needed - and credit to `bnister` for the finding!):
 
 - `GBA/mnt/sda1/bios/gba_bios.bin` (this fixes it for the main GBA game list)
 - `ROMS/mnt/sda1/bios/gba_bios.bin` (this fixes it for GBA games added to the user `ROMS` folder)
@@ -282,14 +287,12 @@ If you want to mess around with SF2000 save states, you can [do so using my SF20
 ### Default ROMs
 The default full firmware for the SF2000 comes with over 6000 ROMs across the seven supported systems. The manual suggests these are for "demonstration purposes" only, and should be deleted by the owner (with any failure to do so not being their responsibility) - despite the fact that the SF2000's menus are hard-coded for this specific list of ROMs. The ROM files themselves are a custom bundle format; the first `59,904 bytes` are an RGB565 image shown as a thumbnail beside the game when selected in a game-list, and the remainder of the file is a slightly mangled/obfuscated ZIP file containing the game's single ROM file. The only exception to this format are the arcade ROMs, which consist of a plain-old Final Burn Alpha ROM zip file, coupled with a `.zfb` file containing the thumbnail image and a pointer to the ROM zip file name.
 
-I was curious to see how the included ROMs matched up against the current "[No-Intro](https://no-intro.org/)" catalogue for each of the non-arcade systems, so I wrote a small script to extract the ROMs from the SF2000's bundles (`05.22` firmware), and compare the hashes against the current (June 9th, 2023) set of No-Intro DAT files. You can [find a big HTML file with all of the results here](/defaultRoms/defaultRomsNoIntroCheck.htm), and [a raw CSV file of the same data here](/defaultRoms/defaultRomsNoIntroCheck.csv). You can click most of the column headers in the HTML version to sort the table by that column. The NES ROMs had their first 16-bytes stripped to remove their "iNES" header (thanks for the tip, `bnister`!), and were compared against the "header-less" No-Intro NES dat file.
+I was curious to see how the included ROMs matched up against the current "[No-Intro](https://no-intro.org/)" catalogue for each of the non-arcade systems, so I wrote a small script to extract the ROMs from the SF2000's bundles (taken from the 1.5 full firmware image), and compare the hashes against the current (June 9th, 2023) set of No-Intro DAT files. You can [find a big HTML file with all of the results here](/defaultRoms/defaultRomsNoIntroCheck.htm), and [a raw CSV file of the same data here](/defaultRoms/defaultRomsNoIntroCheck.csv). You can click most of the column headers in the HTML version to sort the table by that column. The NES ROMs had their first 16-bytes stripped to remove their "iNES" header (thanks for the tip, `bnister`!), and were compared against the "header-less" No-Intro NES dat file.
 
 ---
 
 ## Firmware/BIOS (bisrv.asd)
-The firmware for the SF2000 is actually located on the microSD card, in a file called `bisrv.asd` located in the BIOS folder. This file is a monolithic binary blob, which contains the device's OS, the emulators, their settings... basically everything. Data Frog have issued some firmware updates for the device since launch; the updates have added new features (e.g., additional language support, favourites, history, etc.), but have also introduced bugs (e.g., some SNES games run very slowly until they are quit and launched again, etc.). Data Frog have published a YouTube video showing how to update the firmware on the device, which [you can find here](https://www.youtube.com/watch?v=j8dT2fdGfck); the video's description contains a link to where you can download the latest firmware. Note that Data Frog's official firmware update/reinstallation process involves fully erasing the device's microSD card and replacing its contents with a fresh set of files - this will also erase any user-created files including saves states or user-installed ROMs. You can learn more about save state files and how to back them up in [the Save States section](#save-states).
-
-**WARNING: The latest October 7th/1.7 firmware version has a critical issue with SNES save states; SNES save states are not created correctly, and will hang the device if you attempt to load one created using this firmware version. As such, it is highly recommended that you avoid the October 7th/1.7 firmware version.**
+The firmware for the SF2000 is actually located on the microSD card, in a file called `bisrv.asd` located in the `bios` folder. This file is a monolithic binary blob, which contains the device's OS, the emulators, their settings... basically everything. Data Frog have issued some firmware updates for the device since launch; the updates have added new features (e.g., additional language support, favourites, history, etc.), but have also occasionally introduced bugs (e.g., some SNES games run very slowly until they are quit and launched again, etc.). Data Frog have published a YouTube video showing how to update the firmware on the device, which [you can find here](https://www.youtube.com/watch?v=j8dT2fdGfck); the video's description contains a link to where you can download the latest firmware. Note that Data Frog's official firmware update/reinstallation process involves fully erasing the device's microSD card and replacing its contents with a fresh set of files - this will also erase any user-created files including saves states or user-installed ROMs. You can learn more about save state files and how to back them up in [the Save States section](#save-states).
 
 Note that Data Frog's official server for downloading firmware is _very_ slow, with typical transfers taking many hours to complete as their firmware images are full images including ROM files. If you don't care about the stock ROM files, an alternative method for downloading the latest firmware _without_ the ROM files is to use [Tadpole](https://github.com/EricGoldsteinNz/tadpole). Refer to Tadpole's documentation for more information.
 
@@ -300,9 +303,10 @@ Known firmware versions are currently (dates approximate):
 | Mid-March | ? | The original firmware that shipped with the first batch of devices |
 | April 20th | ? | The first official firmware update; fixed some button mappings for Genesis, added support for 15 new languages. Also partially broke SNES compatibility - many SNES games will run very slowly on first launch, but quitting and immediately re-launching the game will have it run at normal speed (normal for the SF2000, anyway) |
 | May 15th | ? | Added a built-in UI for global button mapping (which is broken in several ways, mainly SNES and Genesis controls are swapped, and no support for setting Player 2 controls), added a History feature, added a Favourites feature |
-| May 22nd | 1.5V | First firmware with an official version number. Fixed the SNES/Genesis swapped button mappings, and now sets Player 2 controls to be identical to Player 1 (no way to set independently). There's some evidence of undocumented emulation improvements; some GBA homebrew that was non-functional in previous firmwares now loads correctly, and some GBA titles see marginally improved performance |
-| August 3rd | 1.6V | The only official release note indicates that the issue with low sound volume when using A/V out was fixed. Aside from that, community members have noticed that the inability of the SF2000 to work with in-game saves appears to have been fixed for GBA (but not other emulators), and that the CPU clock has been changed from 810 MHz to 918 MHz (an overclock); this may be responsible for some community reports of slightly better performance for some games |
-| October 7th | 1.7 | No official release notes yet, but there is a new critical bug in SNES save-states - they're not created correctly, and attempting to load one created with this firmware version hangs the device. Other than that, the "have to load SNES games twice" bug appears to have been fixed, although the community has created [a fix for that](#snes-games-run-really-slowly-whats-wrong) for the other firmware versions already |
+| May 22nd | 1.5 | First firmware with an official version number. Fixed the SNES/Genesis swapped button mappings, and now sets Player 2 controls to be identical to Player 1 (no way to set independently). There's some evidence of undocumented emulation improvements; some GBA homebrew that was non-functional in previous firmwares now loads correctly, and some GBA titles see marginally improved performance |
+| August 3rd | 1.6 | The only official release note indicates that the issue with low sound volume when using A/V out was fixed. Aside from that, community members have noticed that the inability of the SF2000 to work with in-game saves appears to have been fixed for GBA (but not other emulators), and that the CPU clock has been changed from 810 MHz to 918 MHz (an overclock); this may be responsible for some community reports of slightly better performance for some games |
+| October 7th | 1.7 | The [SNES first-launch speed bug](#snes-games-run-really-slowly-whats-wrong) was fixed, however there is a new critical bug in SNES save-states - they're not created correctly, and attempting to load one created with this firmware version hangs the device. DO NOT USE THIS FIRMWARE VERSION! |
+| October 13th | 1.71 | This is a bugfix release - the bug with SNES save states introduced in 1.7 was fixed, so this firmware appears to be stable again. Analysis shows no other significant changes from 1.7 |
 
 If you want to check which version of the firmware you currently have on your SF2000, you can [use the Data Frog SF2000 Firmware Version Checker tool here](https://vonmillhausen.github.io/sf2000/tools/firmwareVersionChecker.htm).
 
@@ -314,7 +318,7 @@ The bootloader on the SF2000 (the bit of code embedded in the devices hardware; 
 It's strongly recommended that you fix the bug on your SF2000, as failure to do so can cause some headaches for you down the road with a non-booting device. There's a couple of ways to go about fixing it:
 
 #### If Your SF2000 Is Currently Able To Boot Normally
-If your SF2000 is currently able to boot normally (i.e., when you power it on, you get to the stock main menu), then you can permanently fix the bug in the device's hardware as follows (credit to `bnister` for both finding the root cause for the bug, and creating the permanent fix):
+If your SF2000 is currently able to boot normally (i.e., when you power it on, you get to the stock main menu), then you can permanently fix the bug in the device's hardware as follows (credit to `bnister` for both finding the root cause for the bug, and creating the permanent fix) - this only needs to be done _once_ per SF2000, and is not tied to the microSD card or BIOS in any way:
 
 1. Ensure your SF2000 is in a state where it boots normally when turned on (displays a boot logo, proceeds to the stock firmware main menu)
 2. Ensure your SF2000's battery is fully charged (having the device power off during the patching process will likely "brick" it, rendering it inoperable)
@@ -354,7 +358,7 @@ The image is _actually_ displayed at half-resolution on the internal display tho
 ---
 
 ## Resources
-The Resources folder on the microSD card contains all of the resources used by the device's firmware to construct the user interface at runtime. The following tables list the files from various firmware versions (the numbered columns, in approximate `mm.dd` format) and what they are used for, grouped by broad categories. Resolution and format given are for the latest firmware version only; details may be different for older firmwares. The icons in the firmware columns have the following meanings:
+The Resources folder on the microSD card contains all of the resources used by the device's firmware to construct the user interface at runtime. The following tables list the files from various firmware versions (the numbered columns, in approximate `mm.dd` format for firmwares we don't have official version numbers for, and regular version numbers for the rest) and what they are used for, grouped by broad categories. Resolution and format given are for the latest firmware version only; details may be different for older firmwares. The icons in the firmware columns have the following meanings:
 
 - ✨: file is new to this firmware version
 - ✅: file is unchanged this firmware version
@@ -362,167 +366,167 @@ The Resources folder on the microSD card contains all of the resources used by t
 - ❌: file is removed this firmware version
 
 ### Fonts
-| Filename | 03.15 | 04.20 | 05.15 | 05.22 | 08.03 | 10.07 | Description |
-| -------- | ----- | ----- | ----- | ----- | ----- | ----- | ----------- |
-| `Arial_cn.ttf` |  | ✨ | ✅ | ✅ | ✅ | ✅ | The "Arial" typeface, containing Latin, Greek, Cyrillic, Chinese, and Japanese characters. Duplicate of `yahei_Arial.ttf`, the single font file from the original firmware version |
-| `Arial_en.ttf` |  | ✨ | ✅ | ✅ | ✅ | ✅ | The "Arial" typeface, containing Latin, Greek, Cyrillic, Armenian, Hebrew and Arabic characters |
-| `Arial_jp.ttf` |  | ✨ | ✅ | ✅ | ✅ | ✅ | The "Arial" typeface, containing Latin, Greek, Cyrillic, Chinese and Japanese characters |
-| `Arial_kr.ttf` |  | ✨ | ✅ | ✅ | ✅ | ✅ | The "Arial" typeface, containing Latin, Greek, Cyrillic, Chinese, Japanese and Korean characters |
-| `Tahoma.ttf` |  | ✨ | ✅ | ✅ | ✅ | ✅ | The "Tahoma" typeface, containing Latin, Greek, Cyrillic, Armenian, Hebrew, Arabic and Thai characters  |
-| `yahei_Arial.ttf` | ✨ | ✅ | ✅ | ✅ | ✅ | ✅ | The "Arial" typeface, containing Latin, Greek, Cyrillic, Chinese, Japanese and Korean characters |
+| Filename | 03.15 | 04.20 | 05.15 | 1.5 | 1.6 | 1.7 | 1.71 | Description |
+| -------- | ----- | ----- | ----- | --- | --- | --- | ---- | ----------- |
+| `Arial_cn.ttf` |  | ✨ | ✅ | ✅ | ✅ | ✅ | ✅ | The "Arial" typeface, containing Latin, Greek, Cyrillic, Chinese, and Japanese characters. Duplicate of `yahei_Arial.ttf`, the single font file from the original firmware version |
+| `Arial_en.ttf` |  | ✨ | ✅ | ✅ | ✅ | ✅ | ✅ | The "Arial" typeface, containing Latin, Greek, Cyrillic, Armenian, Hebrew and Arabic characters |
+| `Arial_jp.ttf` |  | ✨ | ✅ | ✅ | ✅ | ✅ | ✅ | The "Arial" typeface, containing Latin, Greek, Cyrillic, Chinese and Japanese characters |
+| `Arial_kr.ttf` |  | ✨ | ✅ | ✅ | ✅ | ✅ | ✅ | The "Arial" typeface, containing Latin, Greek, Cyrillic, Chinese, Japanese and Korean characters |
+| `Tahoma.ttf` |  | ✨ | ✅ | ✅ | ✅ | ✅ | ✅ | The "Tahoma" typeface, containing Latin, Greek, Cyrillic, Armenian, Hebrew, Arabic and Thai characters  |
+| `yahei_Arial.ttf` | ✨ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | The "Arial" typeface, containing Latin, Greek, Cyrillic, Chinese, Japanese and Korean characters |
 
 ### Images (Used)
 As far as I am aware, all of the below images are actively used by the latest firmware version; happy to take any corrections if it turns out any of them are unused! Note that while the stock theme is based around a `640x480` resolution, the actual _display_ on the SF2000 is a `320x240` one. The OS on the device uses nearest-neighbour scaling for its images, giving the stock UI a somewhat aliased appearance. If you're planning to make your own theme for the SF2000, see my [Notes For Theme Creators](#notes-for-theme-creators) section below for some tips and tricks. I've written a generic image tool for the SF2000 - it lets you convert SF2000-formatted images to PNG files, and lets you convert PNG or JPEG images to SF2000 formats (which may be useful if you want to theme your device); you can [find this tool here](https://vonmillhausen.github.io/sf2000/tools/genericImageTool.htm).
 
-| Filename | Resolution | Format | 03.15 | 04.20 | 05.15 | 05.22 | 08.03 | 10.07 | Description | View |
-| -------- | ---------- | ------ | ----- | ----- | ----- | ----- | ----- | ----- | ----------- | ---- |
-| `aepic.nec` | 1008x164 | BGRA |  | ✨ | 🚩 | ✅ | ✅ | ✅ | User settings screen icons and labels in Korean | [view](/images/aepic.nec.png) |
-| `apisa.dlk` | 640x480 | RGB565 Little Endian | ✨ | ✅ | 🚩 | ✅ | ✅ | ✅ | Arcade game-list background | [view](/images/apisa.dlk.png) |
-| `appvc.ikb` | 150x214 | BRGA | ✨ | ✅ | ✅ | ✅ | ✅ | ✅ | Game art placeholder | [view](/images/appvc.png) |
-| `awusa.tax` | 1008x164 | BRGA |  | ✨ | 🚩 | ✅ | ✅ | ✅ | User settings screen icons and labels in Thai | [view](/images/awusa.tax.png) |
-| `bisrv.nec` | 640x480 | RGB565 Little Endian | ✨ | ✅ | ✅ | ✅ | ✅ | ✅ | In-game menu (position 3) | [view](/images/bisrv.png) |
-| `bttlve.kbp` | 60x144 | BGRA | ✨ | ✅ | ✅ | ✅ | ✅ | ✅ | Battery level indicator icons | [view](/images/bttlve.png) |
-| `c1eac.pal` | 640x480 | RGB565 Little Endian | ✨ | ✅ | ✅ | ✅ | ✅ | ✅ | SNES game-list background | [view](/images/c1eac.png) |
-| `cero.phl` | 640x480 | RGB565 Little Endian | ✨ | ✅ | ✅ | ✅ | ✅ | ✅ | Game Boy Color game-list background | [view](/images/cero.png) |
-| `certlm.msa` | 40x24 | BGRA | ✨ | ✅ | ✅ | ✅ | ✅ | ✅ | NES game-list indicator | [view](/images/certlm.png) |
-| `cketp.bvs` | 640x816 | RGB565 Little Endian |  |  | ✨ | ✅ | ✅ | ✅ | The console selection images at the bottom of the new button mapping feature screen | [view](/images/cketp.bvs.png) |
-| `d2d1.hgp` | 640x480 | RGB565 Little Endian | ✨ | ✅ | ✅ | ✅ | ✅ | ✅ | In-game menu (position 2) | [view](/images/d2d1.png) |
-| `dism.cef` | 640x480 | RGB565 Little Endian | ✨ | ✅ | ✅ | ✅ | ✅ | ✅ | In-game menu (position 1) | [view](/images/dism.png) |
-| `djctq.rsd` | 40x24 | BGRA | ✨ | ✅ | ✅ | ✅ | ✅ | ✅ | SNES game-list indicator | [view](/images/djctq.png) |
-| `djoin.nec` | 1008x164 | BRGA |  | ✨ | 🚩 | ✅ | ✅ | ✅ | User settings screen icons and labels in Spanish | [view](/images/djoin.nec.png) |
-| `dpskc.ctp` | 640x320 | RGB565 Little Endian | ✨ | ✅ | ✅ | ✅ | ✅ | ✅ | In-game menu save-state slots (positions 1, 2, 3 and 4) | [view](/images/dpskc.png) |
-| `drivr.ers` | 640x480 | RGB565 Little Endian | ✨ | ✅ | ✅ | ✅ | ✅ | ✅ | SNES main menu background | [view](/images/drivr.png) |
-| `dsuei.cpl` | 640x480 | RGB565 Little Endian | ✨ | ✅ | 🚩 | ✅ | ✅ | ✅ | User ROMs main menu background | [view](/images/dsuei.cpl.png) |
-| `dxdiag.bin` | 40x24 | BGRA | ✨ | ✅ | ✅ | ✅ | ✅ | ✅ | Genesis/Mega Drive game-list indicator | [view](/images/dxdiag.png) |
-| `dxkgi.ctp` | 1008x164 | BRGA | ✨ | ✅ | 🚩 | ✅ | ✅ | ✅ | User settings screen icons and labels in English | [view](/images/dxkgi.ctp.png) |
-| `dxva2.nec` | 640x480 | RGB565 Little Endian | ✨ | ✅ | ✅ | ✅ | ✅ | ✅ | Search keyboard (pressed) | [view](/images/dxva2.png) |
-| `ectte.bke` | 161x126 | BRGA | ✨ | ✅ | ✅ | ✅ | ✅ | ✅ | Main menu icon selection box | [view](/images/ectte.png) |
-| `efsui.stc` | 640x480 | RGB565 Little Endian | ✨ | ✅ | 🚩 | ✅ | ✅ | ✅ | Game Boy Advance game-list background | [view](/images/efsui.stc.png) |
-| `esent.bvs` | 1008x164 | BRGA |  | ✨ | 🚩 | ✅ | ✅ | ✅ | User settings screen icons and labels in Turkish | [view](/images/esent.bvs.png) |
-| `exaxz.hsp` | 152x1224 | BRGA | ✨ | 🚩 | ✅ | ✅ | ✅ | ✅ | Main menu "Games Exist" and "Start: Open" labels for all languages | [view](/images/exaxz.png) |
-| `fixas.ctp` | 640x480 | RGB565 Little Endian | ✨ | ✅ | ✅ | ✅ | ✅ | ✅ | NES main menu background | [view](/images/fixas.png) |
-| `fltmc.sta` | 640x480 | RGB565 Little Endian | ✨ | ✅ | ✅ | ✅ | ✅ | ✅ | Game Boy game-list background | [view](/images/fltmc.png) |
-| `fvecpl.ai` | 40x24 | BGRA | ✨ | ✅ | ✅ | ✅ | ✅ | ✅ | Game Boy game-list indicator | [view](/images/fvecpl.png) |
-| `gakne.ctp` | 576x256 | BGRA |  |  | ✨ | ✅ | ✅ | ✅ | A new copy of the English menu labels image, identical to older versions of `dxkgi.ctp` (which was changed entirely in `05.15`) | [view](/images/gakne.ctp.png) |
-| `gkavc.ers` | 576x256 | BGRA |  |  | ✨ | ✅ | ✅ | ✅ | A new copy of the Chinese menu labels image, identical to older versions of `itiss.ers` (which was changed entirely in `05.15`) | [view](/images/gkavc.ers.png) |
-| `gpsvc.bvs` | 392x80 | RGB565 Little Endian | ✨ | ✅ | ✅ | ✅ | ✅ | ✅ | In-game menu save-state slot (position 3) | [view](/images/gpsvc.png) |
-| `hctml.ers` | 640x480 | RGB565 Little Endian | ✨ | ✅ | ✅ | ✅ | ✅ | ✅ | Arcade main menu background | [view](/images/hctml.png) |
-| `hgcpl.cke` | 392x80 | RGB565 Little Endian | ✨ | ✅ | ✅ | ✅ | ✅ | ✅ | In-game menu save-state slot (position 2) | [view](/images/hgcpl.png) |
-| `hlink.bvs` | 640x480 | RGB565 Little Endian | ✨ | ✅ | ✅ | ✅ | ✅ | ✅ | Search keyboard (hover) | [view](/images/hlink.png) |
-| `htui.kcc` | 40x24 | BGRA | ✨ | ✅ | ✅ | ✅ | ✅ | ✅ | Game Boy Color game-list indicator | [view](/images/htui.png) |
-| `icm32.dll` | 40x24 | BGRA | ✨ | ✅ | ✅ | ✅ | ✅ | ✅ | Game Boy Advance game-list indicator | [view](/images/icm32.png) |
-| `icuin.cpl` | 640x480 | RGB565 Little Endian | ✨ | ✅ | ✅ | ✅ | ✅ | ✅ | Genesis/Mega Drive main menu background | [view](/images/icuin.png) |
-| `igc64.dll` | 217x37 | BGRA | ✨ | ✅ | ✅ | ✅ | ✅ | ✅ | "Yes" and "No" text, with "No" selected; used when being asked if you want to overwrite a save-game slot | [view](/images/igc64.png) |
-| `ihdsf.bke` | 640x480 | RGB565 Little Endian | ✨ | ✅ | ✅ | ✅ | ✅ | ✅ | Genesis/Mega Drive game-list background | [view](/images/ihdsf.png) |
-| `irftp.ctp` | 640x480 | RGB565 Little Endian | ✨ | ✅ | ✅ | ✅ | ✅ | ✅ | Game Boy Advance main menu background | [view](/images/irftp.png) |
-| `irmon.tax` | 1008x164 | BRGA |  | ✨ | 🚩 | ✅ | ✅ | ✅ | User settings screen icons and labels in Dutch | [view](/images/irmon.tax.png) |
-| `itiss.ers` | 1008x164 | BRGA | ✨ | ✅ | 🚩 | ✅ | ✅ | ✅ | User settings screen icons and labels in Chinese | [view](/images/itiss.ers.png) |
-| `jccatm.kbp` | 640x480 | RGB565 Little Endian | ✨ | ✅ | ✅ | ✅ | ✅ | ✅ | "Battery Empty" screen | [view](/images/jccatm.png) |
-| `ke89a.bvs` | 1008x164 | BRGA |  | ✨ | 🚩 | ✅ | ✅ | ✅ | User settings screen icons and labels in Portuguese | [view](/images/ke89a.bvs.png) |
-| `kmbcj.acp` | 640x480 | RGB565 Little Endian |  |  | ✨ | ✅ | ✅ | ✅ | The full-screen background image for the new button mapping screen | [view](/images/kmbcj.acp.png) |
-| `ksxbar.ax` | 392x80 | RGB565 Little Endian | ✨ | ✅ | ✅ | ✅ | ✅ | ✅ | In-game menu save-state slot (position 4) | [view](/images/ksxbar.png) |
-| `lfsvc.dll` | 640x480 | RGB565 Little Endian | ✨ | ✅ | ✅ | ✅ | ✅ | ✅ | Search game-list background | [view](/images/lfsvc.png) |
-| `lk7tc.bvs` | 52x192 | BGRA |  |  | ✨ | ✅ | ✅ | ✅ | Transparent labels for the button assignments in the new button mapping feature; these are the ones overlaid on the big SF2000 image showing the current assignments | [view](/images/lk7tc.bvs.png) |
-| `lkvax.aef` | 640x480 | RGB565 Little Endian |  |  | ✨ | ✅ | ✅ | ✅ | History game-list background | [view](/images/lkvax.aef.png) |
-| `mkhbc.rcv` | 640x1440 | RGB565 Little Endian |  |  | ✨ | ✅ | ✅ | ✅ | Six vertically-stacked images of the SF2000 with different buttons highlighted, used as part of the new button mapping feature's UI | [view](/images/mkhbc.rcv.png) |
-| `mksh.rcv` | 640x480 | RGB565 Little Endian | ✨ | ✅ | ✅ | ✅ | ✅ | ✅ | Search keyboard (normal) | [view](/images/mksh.png) |
-| `msdmo.gdb` | 392x80 | RGB565 Little Endian | ✨ | ✅ | ✅ | ✅ | ✅ | ✅ | In-game menu save-state slot (position 1) | [view](/images/msdmo.png) |
-| `msgsm.dll` | 40x24 | BGRA | ✨ | ✅ | ✅ | ✅ | ✅ | ✅ | Arcade game-list indicator | [view](/images/msgsm.png) |
-| `mssvp.nec` | 1008x164 | BRGA |  | ✨ | 🚩 | ✅ | ✅ | ✅ | User settings screen icons and labels in Japanese | [view](/images/mssvp.nec.png) |
-| `normidna.bin` | 40x24 | BGRA | ✨ | ✅ | ✅ | ✅ | ✅ | ✅ | Search game-list indicator | [view](/images/normidna.png) |
-| `ntdll.bvs` | 1008x164 | BRGA |  | ✨ | 🚩 | ✅ | ✅ | ✅ | User settings screen icons and labels in Polish | [view](/images/ntdll.bvs.png) |
-| `nvinf.hsp` | 16x240 | BGRA | ✨ | ✅ | ✅ | ✅ | ✅ | ✅ | Latin numbers 0 to 9 listed vertically, used for the number of games available in each main menu category | [view](/images/nvinf.hsp.png) |
-| `okcg2.old` | 32x32 | BGRA |  |  | ✨ | ✅ | ✅ | ✅ | The star icon that appears beside favourited games in the game-lists | [view](/images/okcg2.old.png) |
-| `pcadm.nec` | 1008x164 | BRGA |  | ✨ | 🚩 | ✅ | ✅ | ✅ | User settings screen icons and labels in Italian | [view](/images/pcadm.nec.png) |
-| `pwsso.occ` | 640x480 | RGB565 Little Endian | ✨ | ✅ | ✅ | ✅ | ✅ | ✅ | In-game menu (position 4) | [view](/images/pwsso.png) |
-| `qasf.bel` | 640x480 | RGB565 Little Endian | ✨ | ✅ | 🚩 | ✅ | ✅ | ✅ | User game-list background | [view](/images/qasf.bel.png) |
-| `qwave.bke` | 640x480 | RGB565 Little Endian | ✨ | ✅ | ✅ | ✅ | ✅ | ✅ | Game Boy Color main menu background | [view](/images/qwave.png) |
-| `rmapi.tax` | 1008x164 | BRGA |  | ✨ | 🚩 | ✅ | ✅ | ✅ | User settings screen icons and labels in German | [view](/images/rmapi.tax.png) |
-| `sdclt.occ` | 120x240 | RGB565 Little Endian | ✨ | 🚩 | 🚩 | ✅ | ✅ | ✅ | TV system selection icons | [view](/images/sdclt.occ.png) |
-| `sensc.bvs` | 1008x164 | BRGA |  | ✨ | 🚩 | ✅ | ✅ | ✅ | User settings screen icons and labels in French | [view](/images/sensc.bvs.png) |
-| `sfcdr.cpl` | 576x1344 | BRGA | ✨ | 🚩 | ✅ | ✅ | ✅ | ✅ | Main menu system logos | [view](/images/sfcdr.png) |
-| `subst.tax` | 1008x164 | BRGA |  | ✨ | 🚩 | ✅ | ✅ | ✅ | User settings screen icons and labels in Russian | [view](/images/subst.tax.png) |
-| `ucby4.aax` | 1008x164 | BRGA |  | ✨ | 🚩 | ✅ | ✅ | ✅ | User settings screen icons and labels in Arabic | [view](/images/ucby4.aax.png) |
-| `urlkp.bvs` | 640x480 | RGB565 Little Endian | ✨ | ✅ | ✅ | ✅ | ✅ | ✅ | NES game-list background | [view](/images/urlkp.png) |
-| `uyhbc.dck` | 640x480 | RGB565 Little Endian |  |  | ✨ | ✅ | ✅ | ✅ | Favourites game-list background | [view](/images/uyhbc.dck.png) |
-| `vidca.bvs` | 1008x164 | BRGA |  | ✨ | 🚩 | ✅ | ✅ | ✅ | User settings screen icons and labels in Hebrew | [view](/images/vidca.bvs.png) |
-| `vssvc.nec` | 1008x164 | BRGA |  | ✨ | 🚩 | ✅ | ✅ | ✅ | User settings screen icons and labels in Malay | [view](/images/vssvc.nec.png) |
-| `wshrm.nec` | 217x37 | BGRA | ✨ | ✅ | ✅ | ✅ | ✅ | ✅ | "Yes" and "No" text, with "Yes" selected; used when being asked if you want to overwrite a save-game slot | [view](/images/wshrm.png) |
-| `xajkg.hsp` | 640x480 | RGB565 Little Endian | ✨ | ✅ | ✅ | ✅ | ✅ | ✅ | Game Boy main menu background | [view](/images/xajkg.png) |
-| `ztrba.nec` | 64x320 | RGB565 Little Endian |  |  | ✨ | ✅ | ✅ | ✅ | Non-transparent labels for the button assignments in the new button mapping feature; these are the ones that pop up when you go to change a button assignment | [view](/images/ztrba.nec.png) |
+| Filename | Resolution | Format | 03.15 | 04.20 | 05.15 | 1.5 | 1.6 | 1.7 | 1.71 | Description | View |
+| -------- | ---------- | ------ | ----- | ----- | ----- | --- | --- | --- | ---- | ----------- | ---- |
+| `aepic.nec` | 1008x164 | BGRA |  | ✨ | 🚩 | ✅ | ✅ | ✅ | ✅ | User settings screen icons and labels in Korean | [view](/images/aepic.nec.png) |
+| `apisa.dlk` | 640x480 | RGB565 Little Endian | ✨ | ✅ | 🚩 | ✅ | ✅ | ✅ | ✅ | Arcade game-list background | [view](/images/apisa.dlk.png) |
+| `appvc.ikb` | 150x214 | BRGA | ✨ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | Game art placeholder | [view](/images/appvc.png) |
+| `awusa.tax` | 1008x164 | BRGA |  | ✨ | 🚩 | ✅ | ✅ | ✅ | ✅ | User settings screen icons and labels in Thai | [view](/images/awusa.tax.png) |
+| `bisrv.nec` | 640x480 | RGB565 Little Endian | ✨ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | In-game menu (position 3) | [view](/images/bisrv.png) |
+| `bttlve.kbp` | 60x144 | BGRA | ✨ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | Battery level indicator icons | [view](/images/bttlve.png) |
+| `c1eac.pal` | 640x480 | RGB565 Little Endian | ✨ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | SNES game-list background | [view](/images/c1eac.png) |
+| `cero.phl` | 640x480 | RGB565 Little Endian | ✨ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | Game Boy Color game-list background | [view](/images/cero.png) |
+| `certlm.msa` | 40x24 | BGRA | ✨ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | NES game-list indicator | [view](/images/certlm.png) |
+| `cketp.bvs` | 640x816 | RGB565 Little Endian |  |  | ✨ | ✅ | ✅ | ✅ | ✅ | The console selection images at the bottom of the new button mapping feature screen | [view](/images/cketp.bvs.png) |
+| `d2d1.hgp` | 640x480 | RGB565 Little Endian | ✨ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | In-game menu (position 2) | [view](/images/d2d1.png) |
+| `dism.cef` | 640x480 | RGB565 Little Endian | ✨ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | In-game menu (position 1) | [view](/images/dism.png) |
+| `djctq.rsd` | 40x24 | BGRA | ✨ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | SNES game-list indicator | [view](/images/djctq.png) |
+| `djoin.nec` | 1008x164 | BRGA |  | ✨ | 🚩 | ✅ | ✅ | ✅ | ✅ | User settings screen icons and labels in Spanish | [view](/images/djoin.nec.png) |
+| `dpskc.ctp` | 640x320 | RGB565 Little Endian | ✨ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | In-game menu save-state slots (positions 1, 2, 3 and 4) | [view](/images/dpskc.png) |
+| `drivr.ers` | 640x480 | RGB565 Little Endian | ✨ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | SNES main menu background | [view](/images/drivr.png) |
+| `dsuei.cpl` | 640x480 | RGB565 Little Endian | ✨ | ✅ | 🚩 | ✅ | ✅ | ✅ | ✅ | User ROMs main menu background | [view](/images/dsuei.cpl.png) |
+| `dxdiag.bin` | 40x24 | BGRA | ✨ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | Genesis/Mega Drive game-list indicator | [view](/images/dxdiag.png) |
+| `dxkgi.ctp` | 1008x164 | BRGA | ✨ | ✅ | 🚩 | ✅ | ✅ | ✅ | ✅ | User settings screen icons and labels in English | [view](/images/dxkgi.ctp.png) |
+| `dxva2.nec` | 640x480 | RGB565 Little Endian | ✨ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | Search keyboard (pressed) | [view](/images/dxva2.png) |
+| `ectte.bke` | 161x126 | BRGA | ✨ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | Main menu icon selection box | [view](/images/ectte.png) |
+| `efsui.stc` | 640x480 | RGB565 Little Endian | ✨ | ✅ | 🚩 | ✅ | ✅ | ✅ | ✅ | Game Boy Advance game-list background | [view](/images/efsui.stc.png) |
+| `esent.bvs` | 1008x164 | BRGA |  | ✨ | 🚩 | ✅ | ✅ | ✅ | ✅ | User settings screen icons and labels in Turkish | [view](/images/esent.bvs.png) |
+| `exaxz.hsp` | 152x1224 | BRGA | ✨ | 🚩 | ✅ | ✅ | ✅ | ✅ | ✅ | Main menu "Games Exist" and "Start: Open" labels for all languages | [view](/images/exaxz.png) |
+| `fixas.ctp` | 640x480 | RGB565 Little Endian | ✨ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | NES main menu background | [view](/images/fixas.png) |
+| `fltmc.sta` | 640x480 | RGB565 Little Endian | ✨ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | Game Boy game-list background | [view](/images/fltmc.png) |
+| `fvecpl.ai` | 40x24 | BGRA | ✨ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | Game Boy game-list indicator | [view](/images/fvecpl.png) |
+| `gakne.ctp` | 576x256 | BGRA |  |  | ✨ | ✅ | ✅ | ✅ | ✅ | A new copy of the English menu labels image, identical to older versions of `dxkgi.ctp` (which was changed entirely in the May 15th firmware) | [view](/images/gakne.ctp.png) |
+| `gkavc.ers` | 576x256 | BGRA |  |  | ✨ | ✅ | ✅ | ✅ | ✅ | A new copy of the Chinese menu labels image, identical to older versions of `itiss.ers` (which was changed entirely in the May 15th firmware) | [view](/images/gkavc.ers.png) |
+| `gpsvc.bvs` | 392x80 | RGB565 Little Endian | ✨ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | In-game menu save-state slot (position 3) | [view](/images/gpsvc.png) |
+| `hctml.ers` | 640x480 | RGB565 Little Endian | ✨ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | Arcade main menu background | [view](/images/hctml.png) |
+| `hgcpl.cke` | 392x80 | RGB565 Little Endian | ✨ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | In-game menu save-state slot (position 2) | [view](/images/hgcpl.png) |
+| `hlink.bvs` | 640x480 | RGB565 Little Endian | ✨ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | Search keyboard (hover) | [view](/images/hlink.png) |
+| `htui.kcc` | 40x24 | BGRA | ✨ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | Game Boy Color game-list indicator | [view](/images/htui.png) |
+| `icm32.dll` | 40x24 | BGRA | ✨ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | Game Boy Advance game-list indicator | [view](/images/icm32.png) |
+| `icuin.cpl` | 640x480 | RGB565 Little Endian | ✨ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | Genesis/Mega Drive main menu background | [view](/images/icuin.png) |
+| `igc64.dll` | 217x37 | BGRA | ✨ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | "Yes" and "No" text, with "No" selected; used when being asked if you want to overwrite a save-game slot | [view](/images/igc64.png) |
+| `ihdsf.bke` | 640x480 | RGB565 Little Endian | ✨ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | Genesis/Mega Drive game-list background | [view](/images/ihdsf.png) |
+| `irftp.ctp` | 640x480 | RGB565 Little Endian | ✨ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | Game Boy Advance main menu background | [view](/images/irftp.png) |
+| `irmon.tax` | 1008x164 | BRGA |  | ✨ | 🚩 | ✅ | ✅ | ✅ | ✅ | User settings screen icons and labels in Dutch | [view](/images/irmon.tax.png) |
+| `itiss.ers` | 1008x164 | BRGA | ✨ | ✅ | 🚩 | ✅ | ✅ | ✅ | ✅ | User settings screen icons and labels in Chinese | [view](/images/itiss.ers.png) |
+| `jccatm.kbp` | 640x480 | RGB565 Little Endian | ✨ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | "Battery Empty" screen | [view](/images/jccatm.png) |
+| `ke89a.bvs` | 1008x164 | BRGA |  | ✨ | 🚩 | ✅ | ✅ | ✅ | ✅ | User settings screen icons and labels in Portuguese | [view](/images/ke89a.bvs.png) |
+| `kmbcj.acp` | 640x480 | RGB565 Little Endian |  |  | ✨ | ✅ | ✅ | ✅ | ✅ | The full-screen background image for the new button mapping screen | [view](/images/kmbcj.acp.png) |
+| `ksxbar.ax` | 392x80 | RGB565 Little Endian | ✨ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | In-game menu save-state slot (position 4) | [view](/images/ksxbar.png) |
+| `lfsvc.dll` | 640x480 | RGB565 Little Endian | ✨ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | Search game-list background | [view](/images/lfsvc.png) |
+| `lk7tc.bvs` | 52x192 | BGRA |  |  | ✨ | ✅ | ✅ | ✅ | ✅ | Transparent labels for the button assignments in the new button mapping feature; these are the ones overlaid on the big SF2000 image showing the current assignments | [view](/images/lk7tc.bvs.png) |
+| `lkvax.aef` | 640x480 | RGB565 Little Endian |  |  | ✨ | ✅ | ✅ | ✅ | ✅ | History game-list background | [view](/images/lkvax.aef.png) |
+| `mkhbc.rcv` | 640x1440 | RGB565 Little Endian |  |  | ✨ | ✅ | ✅ | ✅ | ✅ | Six vertically-stacked images of the SF2000 with different buttons highlighted, used as part of the new button mapping feature's UI | [view](/images/mkhbc.rcv.png) |
+| `mksh.rcv` | 640x480 | RGB565 Little Endian | ✨ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | Search keyboard (normal) | [view](/images/mksh.png) |
+| `msdmo.gdb` | 392x80 | RGB565 Little Endian | ✨ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | In-game menu save-state slot (position 1) | [view](/images/msdmo.png) |
+| `msgsm.dll` | 40x24 | BGRA | ✨ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | Arcade game-list indicator | [view](/images/msgsm.png) |
+| `mssvp.nec` | 1008x164 | BRGA |  | ✨ | 🚩 | ✅ | ✅ | ✅ | ✅ | User settings screen icons and labels in Japanese | [view](/images/mssvp.nec.png) |
+| `normidna.bin` | 40x24 | BGRA | ✨ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | Search game-list indicator | [view](/images/normidna.png) |
+| `ntdll.bvs` | 1008x164 | BRGA |  | ✨ | 🚩 | ✅ | ✅ | ✅ | ✅ | User settings screen icons and labels in Polish | [view](/images/ntdll.bvs.png) |
+| `nvinf.hsp` | 16x240 | BGRA | ✨ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | Latin numbers 0 to 9 listed vertically, used for the number of games available in each main menu category | [view](/images/nvinf.hsp.png) |
+| `okcg2.old` | 32x32 | BGRA |  |  | ✨ | ✅ | ✅ | ✅ | ✅ | The star icon that appears beside favourited games in the game-lists | [view](/images/okcg2.old.png) |
+| `pcadm.nec` | 1008x164 | BRGA |  | ✨ | 🚩 | ✅ | ✅ | ✅ | ✅ | User settings screen icons and labels in Italian | [view](/images/pcadm.nec.png) |
+| `pwsso.occ` | 640x480 | RGB565 Little Endian | ✨ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | In-game menu (position 4) | [view](/images/pwsso.png) |
+| `qasf.bel` | 640x480 | RGB565 Little Endian | ✨ | ✅ | 🚩 | ✅ | ✅ | ✅ | ✅ | User game-list background | [view](/images/qasf.bel.png) |
+| `qwave.bke` | 640x480 | RGB565 Little Endian | ✨ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | Game Boy Color main menu background | [view](/images/qwave.png) |
+| `rmapi.tax` | 1008x164 | BRGA |  | ✨ | 🚩 | ✅ | ✅ | ✅ | ✅ | User settings screen icons and labels in German | [view](/images/rmapi.tax.png) |
+| `sdclt.occ` | 120x240 | RGB565 Little Endian | ✨ | 🚩 | 🚩 | ✅ | ✅ | ✅ | ✅ | TV system selection icons | [view](/images/sdclt.occ.png) |
+| `sensc.bvs` | 1008x164 | BRGA |  | ✨ | 🚩 | ✅ | ✅ | ✅ | ✅ | User settings screen icons and labels in French | [view](/images/sensc.bvs.png) |
+| `sfcdr.cpl` | 576x1344 | BRGA | ✨ | 🚩 | ✅ | ✅ | ✅ | ✅ | ✅ | Main menu system logos | [view](/images/sfcdr.png) |
+| `subst.tax` | 1008x164 | BRGA |  | ✨ | 🚩 | ✅ | ✅ | ✅ | ✅ | User settings screen icons and labels in Russian | [view](/images/subst.tax.png) |
+| `ucby4.aax` | 1008x164 | BRGA |  | ✨ | 🚩 | ✅ | ✅ | ✅ | ✅ | User settings screen icons and labels in Arabic | [view](/images/ucby4.aax.png) |
+| `urlkp.bvs` | 640x480 | RGB565 Little Endian | ✨ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | NES game-list background | [view](/images/urlkp.png) |
+| `uyhbc.dck` | 640x480 | RGB565 Little Endian |  |  | ✨ | ✅ | ✅ | ✅ | ✅ | Favourites game-list background | [view](/images/uyhbc.dck.png) |
+| `vidca.bvs` | 1008x164 | BRGA |  | ✨ | 🚩 | ✅ | ✅ | ✅ | ✅ | User settings screen icons and labels in Hebrew | [view](/images/vidca.bvs.png) |
+| `vssvc.nec` | 1008x164 | BRGA |  | ✨ | 🚩 | ✅ | ✅ | ✅ | ✅ | User settings screen icons and labels in Malay | [view](/images/vssvc.nec.png) |
+| `wshrm.nec` | 217x37 | BGRA | ✨ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | "Yes" and "No" text, with "Yes" selected; used when being asked if you want to overwrite a save-game slot | [view](/images/wshrm.png) |
+| `xajkg.hsp` | 640x480 | RGB565 Little Endian | ✨ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | Game Boy main menu background | [view](/images/xajkg.png) |
+| `ztrba.nec` | 64x320 | RGB565 Little Endian |  |  | ✨ | ✅ | ✅ | ✅ | ✅ | Non-transparent labels for the button assignments in the new button mapping feature; these are the ones that pop up when you go to change a button assignment | [view](/images/ztrba.nec.png) |
 
 ### Images (Unused)
 To the best of my knowledge, the following image files are currently __unused__ by the `20230515` firmware, and were probably left over from previous devices (the SF2000 shares a bit of lineage with some USB-stick devices) or development. The images marked "Alternate UI" below appear to have been for a UI where the systems were scrolled through horizontally, and the "shortcut" games for each system were scrolled vertically.
 
-| Filename | Resolution | Format | 03.15 | 04.20 | 05.15 | 05.22 | 08.03 | 10.07 | Description | View |
-| -------- | ---------- | ------ | ----- | ----- | ----- | ----- | ----- | ----- | ----------- | ---- |
-| `aeinv.bke` | 640x480 | RGB565 Little Endian | ✨ | ✅ | ✅ | ✅ | ✅ | ✅ | Alternate UI: Genesis/Mega Drive main menu background | [view](/images/unused/aeinv.bke.png) |
-| `aepic.ers` | 640x480 | RGB565 Little Endian | ✨ | ✅ | ✅ | ✅ | ✅ | ✅ | Alternate UI: User main menu background | [view](/images/unused/aepic.ers.png) |
-| `c1e.pal` | 640x480 | RGB565 Little Endian | ✨ | ✅ | ✅ | ✅ | ✅ | ✅ | CPS2 game-list background | [view](/images/unused/c1e.pal.png) |
-| `cca.bvs` | 640x480 | RGB565 Little Endian | ✨ | ✅ | ✅ | ✅ | ✅ | ✅ | In-game menu (position 1; Chinese language hardcoded) | [view](/images/unused/cca.bvs.png) |
-| `dectMap.key` | 640x480 | RGB565 Little Endian | ✨ | ✅ | ✅ | ✅ | ✅ | ✅ | Button test screen (active) | [view](/images/unused/dectMap.key.png) |
-| `desk.cpl` | 640x480 | RGB565 Little Endian | ✨ | ✅ | ✅ | ✅ | ✅ | ✅ | Eight-game selection screen | [view](/images/unused/desk.cpl.png) |
-| `djoin.hsp` | 640x480 | RGB565 Little Endian | ✨ | ✅ | ✅ | ✅ | ✅ | ✅ | Alternate UI: Arcade main menu background | [view](/images/unused/djoin.hsp.png) |
-| `fcont.ctp` | 640x480 | RGB565 Little Endian | ✨ | ✅ | ✅ | ✅ | ✅ | ✅ | Alternate UI: User main menu background | [view](/images/unused/fcont.ctp.png) |
-| `fdbil.ph` | 1100x120 | BGRA | ✨ | ✅ | ✅ | ✅ | ✅ | ✅ | Large icons for each system, including systems not supported by the SF2000 (selected) | [view](/images/unused/fdbil.ph.png) |
-| `gpapi.bvs` | 640x480 | RGB565 Little Endian | ✨ | ✅ | ✅ | ✅ | ✅ | ✅ | In-game menu (position 5; looks like it was for some kind of button layout changing UI) | [view](/images/unused/gpapi.bvs.png) |
-| `ihds.bke` | 640x480 | RGB565 Little Endian | ✨ | ✅ | ✅ | ✅ | ✅ | ✅ | Genesis/Mega Drive game-list background, with baked-in thumbnail placeholder | [view](/images/unused/ihds.bke.png) |
-| `kdill.hsp` | 640x480 | RGB565 Little Endian | ✨ | ✅ | ✅ | ✅ | ✅ | ✅ | Alternate UI: Game Boy Advance main menu background | [view](/images/unused/kdill.hsp.png) |
-| `logilda.be` | 40x24 | BGRA | ✨ | ✅ | ✅ | ✅ | ✅ | ✅ | CPS1 game-list indicator | [view](/images/unused/logilda.be.png) |
-| `mfc64.emc` | 40x24 | BGRA | ✨ | ✅ | ✅ | ✅ | ✅ | ✅ | CPS2 game-list indicator | [view](/images/unused/mfc64.emc.png) |
-| `mfpmp.ers` | 640x480 | RGB565 Little Endian | ✨ | ✅ | ✅ | ✅ | ✅ | ✅ | Alternate UI: Arcade main menu background | [view](/images/unused/mfpmp.ers.png) |
-| `mhg4s.ihg` | 400x192 | RGB565 Little Endian |  |  | ✨ | ✅ | ✅ | ✅ | Background and buttons for a "warning" prompt with "OK", "Yes" and "No" buttons. Also has rounded edges stored in a separate image file, `zaqrc.olc` | [view](/images/unused/mhg4s.ihg.png) |
-| `mrtac.klo` | 40x24 | BGRA | ✨ | ✅ | ✅ | ✅ | ✅ | ✅ | Neo Geo game-list indicator | [view](/images/unused/mrtac.klo.png) |
-| `msdtc.bke` | 640x480 | RGB565 Little Endian | ✨ | ✅ | ✅ | ✅ | ✅ | ✅ | Alternate UI: Game Boy Advance main menu background | [view](/images/unused/msdtc.bke.png) |
-| `mswbv.cpl` | 640x480 | RGB565 Little Endian | ✨ | ✅ | ✅ | ✅ | ✅ | ✅ | Alternate UI: Game Boy Advance main menu background | [view](/images/unused/mswbv.cpl.png) |
-| `nettrace.dll` | 40x24 | BGRA | ✨ | ✅ | ✅ | ✅ | ✅ | ✅ | Unknown game-list indicator (grey joystick with yellow buttons) | [view](/images/unused/nettrace.dll.png) |
-| `nsibm.ctp` | 640x480 | RGB565 Little Endian | ✨ | ✅ | ✅ | ✅ | ✅ | ✅ | Alternate UI: Arcade main menu background | [view](/images/unused/nsibm.ctp.png) |
-| `nvinfohsp` | 640x480 | RGB565 Little Endian | ✨ | ✅ | ✅ | ✅ | ✅ | ✅ | Alternate UI: Genesis/Mega Drive main menu background (note: there's no extension separator for this file, I suspect the file name is typo'd in the filesystem!) | [view](/images/unused/nvinfohsp.png) |
-| `pcadm.hsp` | 640x480 | RGB565 Little Endian | ✨ | ✅ | ✅ | ✅ | ✅ | ✅ | Alternate UI: User main menu background (NTSC TV system selected) | [view](/images/unused/pcadm.hsp.png) |
-| `plasy.ers` | 640x480 | RGB565 Little Endian | ✨ | ✅ | ✅ | ✅ | ✅ | ✅ | Alternate UI: Game Boy Advance main menu background | [view](/images/unused/plasy.ers.png) |
-| `rmapi.cpl` | 640x480 | RGB565 Little Endian | ✨ | ✅ | ✅ | ✅ | ✅ | ✅ | Alternate UI: User main menu background (English UI language selected) | [view](/images/unused/rmapi.cpl.png) |
-| `seltMap.key` | 640x480 | RGB565 Little Endian | ✨ | ✅ | ✅ | ✅ | ✅ | ✅ | Button test screen | [view](/images/unused/seltMap.key.png) |
-| `spmpm.gdp` | 640x480 | RGB565 Little Endian | ✨ | ✅ | ✅ | ✅ | ✅ | ✅ | Alternate UI: NES game-list background, with baked-in thumbnail placeholder | [view](/images/unused/spmpm.gdp.png) |
-| `subst.bke` | 640x480 | RGB565 Little Endian | ✨ | ✅ | ✅ | ✅ | ✅ | ✅ | Alternate UI: Arcade main menu background | [view](/images/unused/subst.bke.png) |
-| `tsmcf.cpl` | 640x480 | RGB565 Little Endian | ✨ | ✅ | ✅ | ✅ | ✅ | ✅ | Alternate UI: Arcade main menu background | [view](/images/unused/tsmcf.cpl.png) |
-| `url.bvs` | 640x480 | RGB565 Little Endian | ✨ | ✅ | ✅ | ✅ | ✅ | ✅ | CPS1 game-list background | [view](/images/unused/url.bvs.png) |
-| `werui.ioc` | 320x240 | RGB565 Little Endian | ✨ | ✅ | ✅ | ✅ | ✅ | ✅ | "NODATA" save-state thumbnail placeholder image, with a "horror" style typeface | [view](/images/unused/werui.ioc.png) |
-| `wshom.ocx` | 1100x120 | BGRA | ✨ | ✅ | ✅ | ✅ | ✅ | ✅ | Large icons for each system, including systems not supported by the SF2000 (normal) | [view](/images/unused/wshom.ocx.png) |
-| `x86e.hgp` | 640x480 | RGB565 Little Endian | ✨ | ✅ | ✅ | ✅ | ✅ | ✅ | Neo Geo game-list background | [view](/images/unused/x86e.hgp.png) |
-| `zaqrc.olc` | 8x224 | BGRA |  |  | ✨ | ✅ | ✅ | ✅ | Rounded ends that pair with the warning dialogue stored in `mhg4s.ihg` | [view](/images/zaqrc.olc.png) |
+| Filename | Resolution | Format | 03.15 | 04.20 | 05.15 | 1.5 | 1.6 | 1.7 | 1.71 | Description | View |
+| -------- | ---------- | ------ | ----- | ----- | ----- | --- | --- | --- | ---- | ----------- | ---- |
+| `aeinv.bke` | 640x480 | RGB565 Little Endian | ✨ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | Alternate UI: Genesis/Mega Drive main menu background | [view](/images/unused/aeinv.bke.png) |
+| `aepic.ers` | 640x480 | RGB565 Little Endian | ✨ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | Alternate UI: User main menu background | [view](/images/unused/aepic.ers.png) |
+| `c1e.pal` | 640x480 | RGB565 Little Endian | ✨ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | CPS2 game-list background | [view](/images/unused/c1e.pal.png) |
+| `cca.bvs` | 640x480 | RGB565 Little Endian | ✨ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | In-game menu (position 1; Chinese language hardcoded) | [view](/images/unused/cca.bvs.png) |
+| `dectMap.key` | 640x480 | RGB565 Little Endian | ✨ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | Button test screen (active) | [view](/images/unused/dectMap.key.png) |
+| `desk.cpl` | 640x480 | RGB565 Little Endian | ✨ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | Eight-game selection screen | [view](/images/unused/desk.cpl.png) |
+| `djoin.hsp` | 640x480 | RGB565 Little Endian | ✨ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | Alternate UI: Arcade main menu background | [view](/images/unused/djoin.hsp.png) |
+| `fcont.ctp` | 640x480 | RGB565 Little Endian | ✨ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | Alternate UI: User main menu background | [view](/images/unused/fcont.ctp.png) |
+| `fdbil.ph` | 1100x120 | BGRA | ✨ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | Large icons for each system, including systems not supported by the SF2000 (selected) | [view](/images/unused/fdbil.ph.png) |
+| `gpapi.bvs` | 640x480 | RGB565 Little Endian | ✨ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | In-game menu (position 5; looks like it was for some kind of button layout changing UI) | [view](/images/unused/gpapi.bvs.png) |
+| `ihds.bke` | 640x480 | RGB565 Little Endian | ✨ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | Genesis/Mega Drive game-list background, with baked-in thumbnail placeholder | [view](/images/unused/ihds.bke.png) |
+| `kdill.hsp` | 640x480 | RGB565 Little Endian | ✨ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | Alternate UI: Game Boy Advance main menu background | [view](/images/unused/kdill.hsp.png) |
+| `logilda.be` | 40x24 | BGRA | ✨ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | CPS1 game-list indicator | [view](/images/unused/logilda.be.png) |
+| `mfc64.emc` | 40x24 | BGRA | ✨ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | CPS2 game-list indicator | [view](/images/unused/mfc64.emc.png) |
+| `mfpmp.ers` | 640x480 | RGB565 Little Endian | ✨ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | Alternate UI: Arcade main menu background | [view](/images/unused/mfpmp.ers.png) |
+| `mhg4s.ihg` | 400x192 | RGB565 Little Endian |  |  | ✨ | ✅ | ✅ | ✅ | ✅ | Background and buttons for a "warning" prompt with "OK", "Yes" and "No" buttons. Also has rounded edges stored in a separate image file, `zaqrc.olc` | [view](/images/unused/mhg4s.ihg.png) |
+| `mrtac.klo` | 40x24 | BGRA | ✨ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | Neo Geo game-list indicator | [view](/images/unused/mrtac.klo.png) |
+| `msdtc.bke` | 640x480 | RGB565 Little Endian | ✨ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | Alternate UI: Game Boy Advance main menu background | [view](/images/unused/msdtc.bke.png) |
+| `mswbv.cpl` | 640x480 | RGB565 Little Endian | ✨ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | Alternate UI: Game Boy Advance main menu background | [view](/images/unused/mswbv.cpl.png) |
+| `nettrace.dll` | 40x24 | BGRA | ✨ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | Unknown game-list indicator (grey joystick with yellow buttons) | [view](/images/unused/nettrace.dll.png) |
+| `nsibm.ctp` | 640x480 | RGB565 Little Endian | ✨ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | Alternate UI: Arcade main menu background | [view](/images/unused/nsibm.ctp.png) |
+| `nvinfohsp` | 640x480 | RGB565 Little Endian | ✨ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | Alternate UI: Genesis/Mega Drive main menu background (note: there's no extension separator for this file, I suspect the file name is typo'd in the filesystem!) | [view](/images/unused/nvinfohsp.png) |
+| `pcadm.hsp` | 640x480 | RGB565 Little Endian | ✨ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | Alternate UI: User main menu background (NTSC TV system selected) | [view](/images/unused/pcadm.hsp.png) |
+| `plasy.ers` | 640x480 | RGB565 Little Endian | ✨ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | Alternate UI: Game Boy Advance main menu background | [view](/images/unused/plasy.ers.png) |
+| `rmapi.cpl` | 640x480 | RGB565 Little Endian | ✨ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | Alternate UI: User main menu background (English UI language selected) | [view](/images/unused/rmapi.cpl.png) |
+| `seltMap.key` | 640x480 | RGB565 Little Endian | ✨ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | Button test screen | [view](/images/unused/seltMap.key.png) |
+| `spmpm.gdp` | 640x480 | RGB565 Little Endian | ✨ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | Alternate UI: NES game-list background, with baked-in thumbnail placeholder | [view](/images/unused/spmpm.gdp.png) |
+| `subst.bke` | 640x480 | RGB565 Little Endian | ✨ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | Alternate UI: Arcade main menu background | [view](/images/unused/subst.bke.png) |
+| `tsmcf.cpl` | 640x480 | RGB565 Little Endian | ✨ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | Alternate UI: Arcade main menu background | [view](/images/unused/tsmcf.cpl.png) |
+| `url.bvs` | 640x480 | RGB565 Little Endian | ✨ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | CPS1 game-list background | [view](/images/unused/url.bvs.png) |
+| `werui.ioc` | 320x240 | RGB565 Little Endian | ✨ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | "NODATA" save-state thumbnail placeholder image, with a "horror" style typeface | [view](/images/unused/werui.ioc.png) |
+| `wshom.ocx` | 1100x120 | BGRA | ✨ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | Large icons for each system, including systems not supported by the SF2000 (normal) | [view](/images/unused/wshom.ocx.png) |
+| `x86e.hgp` | 640x480 | RGB565 Little Endian | ✨ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | Neo Geo game-list background | [view](/images/unused/x86e.hgp.png) |
+| `zaqrc.olc` | 8x224 | BGRA |  |  | ✨ | ✅ | ✅ | ✅ | ✅ | Rounded ends that pair with the warning dialogue stored in `mhg4s.ihg` | [view](/images/zaqrc.olc.png) |
 
 ### Other Files
 These are other files that have been identified, which don't fit into the other categories. Non-Latin characters in the files are encoded in UTF-8.
 
-| Filename | 03.15 | 04.20 | 05.15 | 05.22 | 08.03 | 10.07 | Description |
-| -------- | ----- | ----- | ----- | ----- | ----- | ----- | ----------- |
-| `Archive.sys` | ✨ | 🚩 | ✅ | ✅ | ✅ | ✅ | Stores the settings for UI language and TV system. Two 32-bit words (4-bytes), little endian. The first is UI language; `0x00000000` is English, `0x01000000` is Chinese, etc.. The second is the TV system setting; `0x00000000` is NTSC, `0x01000000` is PAL. Note the "🚩" icon here indicates the format of the data, or the permissible values were changed (as opposed to the data itself, which will vary from device to device based on user settings) |
-| `bfrjd.odb` |  | ✨ | 🚩 | ✅ | ✅ | ✅ | UI strings in Korean |
-| `bxvtb.sby` |  | ✨ | 🚩 | ✅ | ✅ | ✅ | UI strings in Thai |
-| `dufdr.cwr` |  | ✨ | 🚩 | ✅ | ✅ | ✅ | UI strings in Turkish |
-| `eknjo.ofd` |  | ✨ | 🚩 | ✅ | ✅ | ✅ | UI strings in Spanish |
-| `Favorites.bin` |  |  | ✨ | ✅ | ✅ | ✅ | Used to store the list of ROMs added to the Favorites list; only appears after the first game is favourited after installing the 05.15 or later firmware. User ROMs cannot be added to favourites, only built-in games |
-| `fhshl.skb` | ✨ | ✅ | 🚩 | ✅ | ✅ | ✅ | UI strings in English |
-| `Foldername.ini` | ✨ | 🚩 | 🚩 | ✅ | ✅ | ✅ | Used to control menu rotation for the main menu; see below for more notes on this |
-| `History.bin` |  |  | ✨ | ✅ | ✅ | ✅ | Used to store the history of played ROMs; only appears after the first game is played after installing the 05.15 or later firmware. User ROMs are not added to history, only built-in games. If a built-in game that is referenced in history is removed from the device, the device will crash when trying to view the History screen. You can delete the History.bin file to clear the device's history; there is no built-in functionality to do so |
-| `jsnno.uby` |  | ✨ | 🚩 | ✅ | ✅ | ✅ | UI strings in Dutch |
-| `kcbn7.avc` |  | ✨ | ❌ |  |  |  | Duplicate copy of `bisrv.asd`, the main firmware for the device which is found in the BIOS folder  |
-| `KeyMapInfo.kmp` |  |  | ✨ | ✅ | ✅ | ✅ | Used to store the user-assignable global button mappings for each emulated system |
-| `lf9lb.cut` |  | ✨ | 🚩 | ✅ | ✅ | ✅ | UI strings in Portuguese |
-| `ntrcq.oba` |  | ✨ | 🚩 | ✅ | ✅ | ✅ | UI strings in Japanese |
-| `ouenj.dut` |  | ✨ | 🚩 | ✅ | ✅ | ✅ | UI strings in Polish |
-| `qdbec.ofd` |  | ✨ | 🚩 | ✅ | ✅ | ✅ | UI strings in Italian |
-| `sgotd.cwt` |  | ✨ | 🚩 | ✅ | ✅ | ✅ | UI strings in French |
-| `snbqj.uby` |  | ✨ | 🚩 | ✅ | ✅ | ✅ | UI strings in German |
-| `t2act.sgf` | ✨ | ✅ | 🚩 | ✅ | ✅ | ✅ | UI strings in Chinese |
-| `Test.zsf` |  | ✨ | ❌ |  |  |  | A SNES ROM, which displays a controller test program |
-| `tvctu.uby` |  | ✨ | 🚩 | ✅ | ✅ | ✅ | UI strings in Russian |
-| `vdaz5.bjk` |  | ✨ | 🚩 | ✅ | ✅ | ✅ | UI strings in Arabic |
-| `wtrxj.lbd` |  | ✨ | 🚩 | ✅ | ✅ | ✅ | UI strings in Malay |
-| `xjebd.clq` |  | ✨ | 🚩 | ✅ | ✅ | ✅ | UI strings in Hebrew |
+| Filename | 03.15 | 04.20 | 05.15 | 1.5 | 1.6 | 1.7 | 1.71 | Description |
+| -------- | ----- | ----- | ----- | --- | --- | --- | ---- | ----------- |
+| `Archive.sys` | ✨ | 🚩 | ✅ | ✅ | ✅ | ✅ | ✅ | Stores the settings for UI language and TV system. Two 32-bit words (4-bytes), little endian. The first is UI language; `0x00000000` is English, `0x01000000` is Chinese, etc.. The second is the TV system setting; `0x00000000` is NTSC, `0x01000000` is PAL. Note the "🚩" icon here indicates the format of the data, or the permissible values were changed (as opposed to the data itself, which will vary from device to device based on user settings) |
+| `bfrjd.odb` |  | ✨ | 🚩 | ✅ | ✅ | ✅ | ✅ | UI strings in Korean |
+| `bxvtb.sby` |  | ✨ | 🚩 | ✅ | ✅ | ✅ | ✅ | UI strings in Thai |
+| `dufdr.cwr` |  | ✨ | 🚩 | ✅ | ✅ | ✅ | ✅ | UI strings in Turkish |
+| `eknjo.ofd` |  | ✨ | 🚩 | ✅ | ✅ | ✅ | ✅ | UI strings in Spanish |
+| `Favorites.bin` |  |  | ✨ | ✅ | ✅ | ✅ | ✅ | Used to store the list of ROMs added to the Favorites list; only appears after the first game is favourited after installing the 05.15 or later firmware. User ROMs cannot be added to favourites, only built-in games |
+| `fhshl.skb` | ✨ | ✅ | 🚩 | ✅ | ✅ | ✅ | ✅ | UI strings in English |
+| `Foldername.ini` | ✨ | 🚩 | 🚩 | ✅ | ✅ | ✅ | ✅ | Used to control menu rotation for the main menu; see below for more notes on this |
+| `History.bin` |  |  | ✨ | ✅ | ✅ | ✅ | ✅ | Used to store the history of played ROMs; only appears after the first game is played after installing the 05.15 or later firmware. User ROMs are not added to history, only built-in games. If a built-in game that is referenced in history is removed from the device, the device will crash when trying to view the History screen. You can delete the History.bin file to clear the device's history; there is no built-in functionality to do so |
+| `jsnno.uby` |  | ✨ | 🚩 | ✅ | ✅ | ✅ | ✅ | UI strings in Dutch |
+| `kcbn7.avc` |  | ✨ | ❌ |  |  |  |  | Duplicate copy of `bisrv.asd`, the main firmware for the device which is found in the BIOS folder  |
+| `KeyMapInfo.kmp` |  |  | ✨ | ✅ | ✅ | ✅ | ✅ | Used to store the user-assignable global button mappings for each emulated system |
+| `lf9lb.cut` |  | ✨ | 🚩 | ✅ | ✅ | ✅ | ✅ | UI strings in Portuguese |
+| `ntrcq.oba` |  | ✨ | 🚩 | ✅ | ✅ | ✅ | ✅ | UI strings in Japanese |
+| `ouenj.dut` |  | ✨ | 🚩 | ✅ | ✅ | ✅ | ✅ | UI strings in Polish |
+| `qdbec.ofd` |  | ✨ | 🚩 | ✅ | ✅ | ✅ | ✅ | UI strings in Italian |
+| `sgotd.cwt` |  | ✨ | 🚩 | ✅ | ✅ | ✅ | ✅ | UI strings in French |
+| `snbqj.uby` |  | ✨ | 🚩 | ✅ | ✅ | ✅ | ✅ | UI strings in German |
+| `t2act.sgf` | ✨ | ✅ | 🚩 | ✅ | ✅ | ✅ | ✅ | UI strings in Chinese |
+| `Test.zsf` |  | ✨ | ❌ |  |  |  |  | A SNES ROM, which displays a controller test program |
+| `tvctu.uby` |  | ✨ | 🚩 | ✅ | ✅ | ✅ | ✅ | UI strings in Russian |
+| `vdaz5.bjk` |  | ✨ | 🚩 | ✅ | ✅ | ✅ | ✅ | UI strings in Arabic |
+| `wtrxj.lbd` |  | ✨ | 🚩 | ✅ | ✅ | ✅ | ✅ | UI strings in Malay |
+| `xjebd.clq` |  | ✨ | 🚩 | ✅ | ✅ | ✅ | ✅ | UI strings in Hebrew |
 
 #### Foldername.ini
-This file controls some of the UI settings for the main menu. It's a plain-text file, but not an actual INI file. It's contents from the `05.22` firmware (just as an example) are as follows:
+This file controls some of the UI settings for the main menu. It's a plain-text file, but not an actual INI file. It's contents from the 1.5 firmware (just as an example) are as follows:
 
 ```
 SF2000
@@ -550,7 +554,7 @@ And here's my current understanding of what each line is used for:
 - `17`: The number of languages supported by the firmware
 - `FFFFFF`: Hexadecimal colour (RGB) for the general game-list texts, and the `x/yyy` game count in the top-right corner of each game-list
 - `FF8000 ROMS`: The first defined main menu section (the sections that are scrolled vertically on the main menu). Internally they are numbered from 0; so the `ROMS` section (user ROMs and settings) is 0, `FC` (NES) is 1, `SFC` (SNES) is 2, etc.. The `FF8000` is the hexadecimal colour (RGB) to display the text of the currently selected/highlighted game in the list; the default colour is orange. _Side note:_ after the `ARCADE` section, there's two additional `ROMS` sections; the firmware is hard-coded to have ten sections. The SF2000 appears to share its firmware with other similar devices, and some of those devices feature different menu sections (e.g., "CPS1", "Neo Geo", etc.). I suspect that the best of those systems has ten sections in its main menu, which doesn't match up with the eight sections on the SF2000 (seven supported systems + the user ROMs/settings section). As the firmware requires ten sections to be defined, they just repeated the `ROMS` section to fill in the remaining places. Like I say, that's just a guess!
-- `8 7 0`: This is used to control the main menu rotation. `8` tells the firmware how many main menu sections are actually in-use on this device; for the SF2000 that's seven supported consoles + the user ROMs/settings section, for eight total. `7` tells the firmware which menu section to default to when the device boots up, which is why by default it always starts in the `ARCADE` section. `0` tells the firmware which section to display the special "user settings" menu on (the one with History, Favourites, TV System, Language, etc.). So for example, if you wanted the SF2000 to start up on the user ROMs/settings screen instead of Arcade, you could change this line to read `8 0 0`
+- `8 7 0`: This is used to control the main menu rotation. `8` tells the firmware how many main menu sections are actually in-use on this device; for the SF2000 that's seven supported consoles + the user ROMs/settings section, for eight total. `7` tells the firmware which menu section to default to when the device boots up, which is why by default it always starts in the `ARCADE` section. `0` tells the firmware which section to display the special "user settings" menu on (the one with History, Favourites, TV System, Language, etc.). So for example, if you wanted the SF2000 to start up on the user ROMs/settings screen instead of Arcade, you could change this line to read `8 0 0`; or if you wanted the user ROMs/settings screen to be the _only_ screen available (e.g., if you were intending to hand the device to someone unfamiliar with retro emulation, and you wanted to reduce sources of confusion for them), you could set it to `1 0 0` (suggestion from `wyverino`)
 - `24 184 144 208`: These numbers control the position and size of the game artwork in each system's game-list. The first two numbers are the X and Y coordinates from the top-left corner of the screen for where to start drawing the artwork; the second two numbers are the width and height of the artwork to draw. Note that the SF2000 doesn't do any image scaling; the dimensions are for the rectangular area the device will begin adding each pixel of the source artwork to. If the artwork's dimensions don't exactly match the dimensions specified here, the artwork will not display properly
 - `40 24`: The width and height of the icon shown beside the currently selected/highlighted game in a game-list. Again, these are the dimensions of the rectangular area the SF2000 draws the pixel data into, so if these numbers don't match the dimensions of the list indicator image, the image will not display properly
 
@@ -615,26 +619,26 @@ If you want to do it using [Audacity](https://www.audacityteam.org/), the steps 
 
 `dteyn` has also created a Python script called `Kerokero` which can take a `.WAV` file, trim it if it's longer than 90 seconds, and convert it to a `pagefile.sys` for you - you can [find Kerokero here](https://github.com/Dteyn/SF2000_BGM_Tool).
 
-| Filename | 03.15 | 04.20 | 05.15 | 05.22 | 08.03 | 10.07 | Description | Listen |
-| -------- | ----- | ----- | ----- | ----- | ----- | ----- | ----------- | ------ |
-| `c2fkec.pgt` | ✨ | ✅ | 🚩 | ✅ | ✅ | ✅ | "Popping" sound that is played when moving around the search keyboard | [listen](/sounds/c2fkec.pgt.mp3) |
-| `dpnet.dll` | ✨ | ✅ | ✅ | ✅ | ✅ | ✅ | "Downwards Zap" sound, unknown usage | [listen](/sounds/dpnet.dll.mp3) |
-| `dsreg.bvs` | ✨ | ✅ | ✅ | ✅ | ✅ | ✅ | "Upwards Bleeping" sound, unknown usage | [listen](/sounds/dsreg.bvs.mp3) |
-| `help.lis` | ✨ | ✅ | ✅ | ✅ | ✅ | ✅ | "Double Buzzer" sound, unknown usage | [listen](/sounds/help.lis.mp3) |
-| `mfsvr.nkf` | ✨ | ✅ | 🚩 | ✅ | ✅ | ✅ | "Beep" sound that is played when entering a letter on the search keyboard | [listen](/sounds/mfsvr.nkf.mp3) |
-| `nyquest.gdb` | ✨ | ✅ | 🚩 | ✅ | ✅ | ✅ | "Whooshing" sound that is played when switching between emulated systems on the main menu, between the "Resume", "Quit", "Load" and "Save" options on the in-game menu, and scrolling by pages within a system's game-list | [listen](/sounds/nyquest.gdb.mp3) |
-| `oldversion.kbe` | ✨ | ✅ | 🚩 | ✅ | ✅ | ✅ | "Three Note Upward Chime" sound that is played when deleting a letter on the search keyboard | [listen](/sounds/oldversion.kbe.mp3) |
-| `pagefile.sys` | ✨ | ✅ | 🚩 | ✅ | ✅ | ✅ | Main menu background music. If you don't like background music, and would rather just have silence, you can [find a replacement silent `pagefile.sys` here](/sounds/silentMusic/pagefile.sys) - just replace the one in the `Resources` folder (don't forget to backup the original file first, in case you ever want that jaunty tune again!) | [listen](/sounds/pagefile.sys.mp3) |
-| `swapfile.sys` | ✨ | ✅ | ✅ | ✅ | ✅ | ✅ | "Squishy" sound played when navigating horizontally through "shortcut" games on the main menu, or vertically within a system's game-list | [listen](/sounds/swapfile.sys.mp3) |
+| Filename | 03.15 | 04.20 | 05.15 | 1.5 | 1.6 | 1.7 | 1.71 | Description | Listen |
+| -------- | ----- | ----- | ----- | --- | --- | --- | ---- | ----------- | ------ |
+| `c2fkec.pgt` | ✨ | ✅ | 🚩 | ✅ | ✅ | ✅ | ✅ | "Popping" sound that is played when moving around the search keyboard | [listen](/sounds/c2fkec.pgt.mp3) |
+| `dpnet.dll` | ✨ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | "Downwards Zap" sound, unknown usage | [listen](/sounds/dpnet.dll.mp3) |
+| `dsreg.bvs` | ✨ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | "Upwards Bleeping" sound, unknown usage | [listen](/sounds/dsreg.bvs.mp3) |
+| `help.lis` | ✨ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | "Double Buzzer" sound, unknown usage | [listen](/sounds/help.lis.mp3) |
+| `mfsvr.nkf` | ✨ | ✅ | 🚩 | ✅ | ✅ | ✅ | ✅ | "Beep" sound that is played when entering a letter on the search keyboard | [listen](/sounds/mfsvr.nkf.mp3) |
+| `nyquest.gdb` | ✨ | ✅ | 🚩 | ✅ | ✅ | ✅ | ✅ | "Whooshing" sound that is played when switching between emulated systems on the main menu, between the "Resume", "Quit", "Load" and "Save" options on the in-game menu, and scrolling by pages within a system's game-list | [listen](/sounds/nyquest.gdb.mp3) |
+| `oldversion.kbe` | ✨ | ✅ | 🚩 | ✅ | ✅ | ✅ | ✅ | "Three Note Upward Chime" sound that is played when deleting a letter on the search keyboard | [listen](/sounds/oldversion.kbe.mp3) |
+| `pagefile.sys` | ✨ | ✅ | 🚩 | ✅ | ✅ | ✅ | ✅ | Main menu background music. If you don't like background music, and would rather just have silence, you can [find a replacement silent `pagefile.sys` here](/sounds/silentMusic/pagefile.sys) - just replace the one in the `Resources` folder (don't forget to backup the original file first, in case you ever want that jaunty tune again!) | [listen](/sounds/pagefile.sys.mp3) |
+| `swapfile.sys` | ✨ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | "Squishy" sound played when navigating horizontally through "shortcut" games on the main menu, or vertically within a system's game-list | [listen](/sounds/swapfile.sys.mp3) |
 
 If you would like to silence all the _UI_ sounds (everything other than the background music), `dteyn` has created a [Silent Sounds Pack](https://github.com/Dteyn/sf2000/raw/main/sounds/silentSounds/SF2000_Silent_Sounds_Pack.zip) (direct link to `.zip`). It contains eight replacement silent audio files - just drop them into the `Resources` folder on the microSD card, replacing the eight current files, and say goodbye to the SF2000's UI noises.
 
 ### Unknown Files
 These are files that I have not yet determined what they do; if anyone has any information on these, do post about it in the Data Frog channel in the Retro Handhelds Discord server please!
 
-| Filename | 03.15 | 04.20 | 05.15 | 05.22 | 08.03 | 10.07 | Description |
-| -------- | ----- | ----- | ----- | ----- | ----- | ----- | ----------- |
-| `kcnuv.lit` | ✨ | ✅ | ✅ | ✅ | ✅ | ✅ | UNKNOWN; a bunch of 4-byte binary chunks (e.g., `0xC4 0x00 0x00 0x00`), followed by a list of .NES ROM file names. Very similar to the `.bvs`/`.nec`/`.tax` files detailed above, but doesn't have the same type of "header" they have |
+| Filename | 03.15 | 04.20 | 05.15 | 1.5 | 1.6 | 1.7 | 1.71 | Description |
+| -------- | ----- | ----- | ----- | --- | --- | --- | ---- | ----------- |
+| `kcnuv.lit` | ✨ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | UNKNOWN; a bunch of 4-byte binary chunks (e.g., `0xC4 0x00 0x00 0x00`), followed by a list of .NES ROM file names. Very similar to the `.bvs`/`.nec`/`.tax` files detailed above, but doesn't have the same type of "header" they have |
 
 ### Notes For Theme Creators
 This section isn't really about the `Resources` files per-se, but it's tangentially related. The fact that the SF2000's UI resources are pulled from the microSD card opens up the door to "theming" the device, which is great. However, if you do decide you want to make a theme for the SF2000, here's a few things I've found that you may want to bear in mind:
@@ -680,6 +684,8 @@ All of these are linked above already in their relevant sections, but just in ca
 ---
 
 ## Document Version History
+- `20231019 - 1.43`: Refactored [the CFW FAQ](#is-there-any-custom-firmware) to make the hcRTOS and multicore efforts more distinct. Refactored [the shortcuts FAQ](#how-do-i-change-the-four-shortcutsgames-listed-on-each-systems-main-menu-page) to mention Tadpole first (easier for most folks). Refactored [the slow SNES FAQ](#snes-games-run-really-slowly-whats-wrong) in light of 1.71. Refactored [the quiet A/V output FAQ](#when-i-connect-the-sf2000-to-a-tv-via-the-av-cable-the-sound-is-very-quietlow---is-that-normal) to suggest firmware updating first. Added details about the new 1.71 firmware version to the [Firmware](#firmwarebios-bisrvasd) and [Resources](#resources) sections, and did a lot of little edits throughout the doc as well to standardise on Data Frog's version numbering (seems to be what most folks refer to). Added a note that [the permanent bootload bugfix](#if-your-sf2000-is-currently-able-to-boot-normally) only needs to be applied once per device. Added another modification example to the analysis of [`Foldername.ini`](#foldernameini) courtesy of `wyverino`.
+
 - `20231014 - 1.42`: Have now confirmed that no resource files changed with the new October 7th/1.7 firmware, so have updated the tables in the [Resources](#resources) section to reflect this. Also added a reference to `detyn`'s Battery Meter Fix tool to [the FAQ on stuff new SF2000 owners can do](#i-just-got-my-sf2000-what-modding-can-i-do-with-it).
 
 - `20231012 - 1.41`: Added basic information about the new (and critically broken) October 7th/1.7 firmware version to the [Firmware](#firmwarebios-bisrvasd) section (I'm waiting for my official copy to finish downloading before updating the tables in the [Resources](#resources) sections).
@@ -694,9 +700,9 @@ All of these are linked above already in their relevant sections, but just in ca
 
 - `20230903 - 1.36`: Added links to `detyn`'s new Battery Meter Fix tool to both the [Battery](#battery) section and [Tools and Links](#tools-and-links). Updated the [custom firmware FAQ](#is-there-any-custom-firmware) with the latest progress notes.
 
-- `20230829 - 1.35`: Added a [MicroSD Card](#microsd-card) section to [Hardware](#hardware) to provide some detail about the SF2000's slightly unusual microSD card situation. Added detail about the [Neo Geo Unibios Menu](#neo-geo-unibios-menu) discovery to the [Arcade](#arcade) section (thanks `nanchon18#2262`!). Updated the custom firmware FAQ with the latest details. Updated the "what modding can I do" FAQ to strongly suggest fixing the [bootloader bug](#bootloader-bug) before doing any other modding to the device; also added a note that the Tadpole tool can perform a lot of the modding tasks. Updated the "quiet A/V sound" FAQ with details about the fix in the `08.03`/`1.6V` firmware. Updated the "in game saves don't work" FAQ with details about this apparently being fixed for GBA in the `08.03`/`1.6V` firmware. Added a note to the [Battery](#battery) section about the SF2000's poorly calibrated power monitoring curve, along with a link to `dteyn`'s SF2000 Battery Level Patcher script (also added a link to that in the [Tools and Links](#tools-and-links) section). Data Frog has now officially released the `August 3rd`/`08.03`/`1.6V` firmware, so added that to the [Firmware](#firmwarebios-bisrvasd) section; also updated all of the tables in the [Resources](#resources) section to include the new firmware. Finally, renamed this "Version History" section to "Document Version History", to help prevent any confusion in regards to what the version numbers in this section refer to (they're not related to firmware).
+- `20230829 - 1.35`: Added a [MicroSD Card](#microsd-card) section to [Hardware](#hardware) to provide some detail about the SF2000's slightly unusual microSD card situation. Added detail about the [Neo Geo Unibios Menu](#neo-geo-unibios-menu) discovery to the [Arcade](#arcade) section (thanks `nanchon18#2262`!). Updated the custom firmware FAQ with the latest details. Updated the "what modding can I do" FAQ to strongly suggest fixing the [bootloader bug](#bootloader-bug) before doing any other modding to the device; also added a note that the Tadpole tool can perform a lot of the modding tasks. Updated the "quiet A/V sound" FAQ with details about the fix in the 1.6 firmware. Updated the "in game saves don't work" FAQ with details about this apparently being fixed for GBA in the 1.6 firmware. Added a note to the [Battery](#battery) section about the SF2000's poorly calibrated power monitoring curve, along with a link to `dteyn`'s SF2000 Battery Level Patcher script (also added a link to that in the [Tools and Links](#tools-and-links) section). Data Frog has now officially released the 1.6 firmware, so added that to the [Firmware](#firmwarebios-bisrvasd) section; also updated all of the tables in the [Resources](#resources) section to include the new firmware. Finally, renamed this "Version History" section to "Document Version History", to help prevent any confusion in regards to what the version numbers in this section refer to (they're not related to firmware).
 
-- `20230819 - 1.34`: Updated the custom firmware FAQ answer with the latest progress notes. Replaced the bootloader bug FAQ with a more generic FAQ covering the main situations under which the SF2000 fails to boot correctly. Added a brief note on the mysterious new `August 3rd` BIOS that has started appearing on some newer devices.
+- `20230819 - 1.34`: Updated the custom firmware FAQ answer with the latest progress notes. Replaced the bootloader bug FAQ with a more generic FAQ covering the main situations under which the SF2000 fails to boot correctly. Added a brief note on the mysterious new 1.6 firmware that has started appearing on some newer devices.
 
 - `20230804 - 1.33`: Updated the custom firmware FAQ answer with the latest progress notes.
 
@@ -742,11 +748,11 @@ All of these are linked above already in their relevant sections, but just in ca
 
 - `20230526 - 1.13`: Updated Audacity instructions to support latest version of Audacity. Added a BIOS CRC32 patcher tool for the reckless and brave. Added a note about `Foldername.ini` text colours reverting after loading a game (thanks `Zerter#4954`!)
 
-- `20230525 - 1.12`: Added a section about the internals of the `Foldername.ini` file. Added a note to the Arcade section about the "inrom" column in `adcockm`'s metadata document. Added a small firmware note for the `05.22` about community-spotted GBA performance improvements. Added specific emulator versions and Git commit links for each emulator (thanks `bnister` and `notv37`!). Added specific steps for producing SF2000-format audio files using Audacity.
+- `20230525 - 1.12`: Added a section about the internals of the `Foldername.ini` file. Added a note to the Arcade section about the "inrom" column in `adcockm`'s metadata document. Added a small 1.5 firmware note about community-spotted GBA performance improvements. Added specific emulator versions and Git commit links for each emulator (thanks `bnister` and `notv37`!). Added specific steps for producing SF2000-format audio files using Audacity.
 
 - `20230524 - 1.11`: Added my new [Generic Image Tool](https://vonmillhausen.github.io/sf2000/tools/genericImageTool.htm). Added more exceptional information from `adcockm` in regards to arcade emulation on the SF2000, and cleaned up the old info accordingly. Corrected some typos related to `bisrv.asd` (thanks `luke7352`!). Usage of `nvinf.hsp` was tracked down to the numbers of games available on the main menu pages (thanks `kid_sinn#9691`!).
 
-- `20230522 - 1.10`: Updated resource tables for the new `05.22` firmware (no changes); added a table with details about known firmware versions. Added a "Tools & Links" section.
+- `20230522 - 1.10`: Updated resource tables for the new 1.5 firmware (no changes); added a table with details about known firmware versions. Added a "Tools & Links" section.
 
 - `20230516 - 1.9`: Updated most of the Resources file lists to include firmware-related information (added, (un)changed, removed). Added new image resources for the latest May 15th firmware. Updated some images files previews to contain the fake name extensions as well. Added detail about the removal of per-game button maps from May 15th firmware. Renamed the sound previews to contain the fake name extensions as well.
 

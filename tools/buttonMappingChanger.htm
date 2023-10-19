@@ -116,7 +116,7 @@
                   mappingTableOffset = 0;
                   mappingConsoles = ["NES", "SNES", "Genesis/Mega Drive, Master System", "Game Boy, Game Boy Color", "Game Boy Advance", "Arcade"];
                   step1BRequired = true;
-                  setMessage("info", "fileMessages", "INFO: May 22nd <code>bisrv.asd</code> detected.");
+                  setMessage("info", "fileMessages", "INFO: Version 1.5 <code>bisrv.asd</code> detected.");
                   break;
 
                 // August 3rd BIOS...
@@ -124,7 +124,7 @@
                   mappingTableOffset = 0;
                   mappingConsoles = ["NES", "SNES", "Genesis/Mega Drive, Master System", "Game Boy, Game Boy Color", "Game Boy Advance", "Arcade"];
                   step1BRequired = true;
-                  setMessage("info", "fileMessages", "INFO: August 3rd <code>bisrv.asd</code> detected.");
+                  setMessage("info", "fileMessages", "INFO: Version 1.6 <code>bisrv.asd</code> detected.");
                   break;
                 
                 // October 7th BIOS...
@@ -132,7 +132,15 @@
                   mappingTableOffset = 0;
                   mappingConsoles = ["NES", "SNES", "Genesis/Mega Drive, Master System", "Game Boy, Game Boy Color", "Game Boy Advance", "Arcade"];
                   step1BRequired = true;
-                  setMessage("warning", "fileMessages", "WARNING: October 7th <code>bisrv.asd</code> detected; this version has known issues with SNES save states and is not recommended for use.");
+                  setMessage("warning", "fileMessages", "WARNING: Version 1.7 <code>bisrv.asd</code> detected; this version has known issues with SNES save states and is not recommended for use.");
+                  break;
+                
+                // October 13th BIOS...
+                case "10.13":
+                  mappingTableOffset = 0;
+                  mappingConsoles = ["NES", "SNES", "Genesis/Mega Drive, Master System", "Game Boy, Game Boy Color", "Game Boy Advance", "Arcade"];
+                  step1BRequired = true;
+                  setMessage("info", "fileMessages", "INFO: Version 1.71 <code>bisrv.asd</code> detected.");
                   break;
 
                 default:
@@ -361,7 +369,7 @@
               // bytes are in here. If they do other weird stuff in the future,
               // it'll probably be here that needs to change!
               var buttonByteOrder = ['X', 'Y' ,'L', 'A', 'B', 'R'];
-              if (mappingConsoles[currentConsole] == "Game Boy Advance" && ["05.15", "05.22", "08.03", "10.07"].includes(firmwareVersion)) {
+              if (mappingConsoles[currentConsole] == "Game Boy Advance" && ["05.15", "05.22", "08.03", "10.07", "10.13"].includes(firmwareVersion)) {
                 buttonByteOrder = ['L', 'R', 'X', 'A', 'B', 'Y'];
               }
 
@@ -501,7 +509,7 @@
                 // the bytes are in here. If they do other weird stuff in the
                 // future, it'll probably be here that needs to change!
                 var buttonByteOrder = ['X', 'Y' ,'L', 'A', 'B', 'R'];
-                if (mappingConsoles[currentConsole] == "Game Boy Advance" && ["05.15", "05.22", "08.03", "10.07"].includes(firmwareVersion)) {
+                if (mappingConsoles[currentConsole] == "Game Boy Advance" && ["05.15", "05.22", "08.03", "10.07", "10.13"].includes(firmwareVersion)) {
                   buttonByteOrder = ['L', 'R', 'X', 'A', 'B', 'Y'];
                 }
                 
@@ -538,6 +546,6 @@
       }
     </script>
     <hr>
-    <p><a rel="license" href="https://creativecommons.org/publicdomain/zero/1.0/">CC0</a>: public domain. Version 1.4, 20231012.1</p>
+    <p><a rel="license" href="https://creativecommons.org/publicdomain/zero/1.0/">CC0</a>: public domain. Version 1.5, 20231019.1</p>
   </body>
 </html>

@@ -70,17 +70,22 @@
 
                 // May 22nd BIOS...
                 case "05.22":
-                  setMessage("warning", "bisrvMessages", "May 22nd <code>bisrv.asd</code> detected. Newer firmware is available, see the link above for more information.");
+                  setMessage("warning", "bisrvMessages", "Version 1.5 <code>bisrv.asd</code> detected. Newer firmware is available, see the link above for more information.");
                   break;
                 
                 // August 3rd BIOS...
                 case "08.03":
-                  setMessage("info", "bisrvMessages", "August 3rd <code>bisrv.asd</code> detected. This is the latest known <em>stable</em> official firmware version.");
+                  setMessage("warning", "bisrvMessages", "Version 1.6 <code>bisrv.asd</code> detected. Newer firmware is available, see the link above for more information.");
                   break;
                 
                 // October 7th BIOS...
                 case "10.07":
-                  setMessage("error", "bisrvMessages", "October 7th <code>bisrv.asd</code> detected. While this is the latest known official firmware version, it has a critical issue with SNES save states, and is not recommended for use. Current recommended official firmware version is August 3rd/1.6. See the link above for more information.");
+                  setMessage("error", "bisrvMessages", "Version 1.7 <code>bisrv.asd</code> detected. This firmware version has a critical issue with SNES save states, and is not recommended for use. See the link above for more information.");
+                  break;
+
+                // October 13th BIOS...
+                case "10.13":
+                  setMessage("info", "bisrvMessages", "Version 1.71 <code>bisrv.asd</code> detected. This is the latest known official firmware version.");
                   break;
 
                 default:
@@ -102,6 +107,6 @@
       }
     </script>
     <hr>
-    <p><a rel="license" href="https://creativecommons.org/publicdomain/zero/1.0/">CC0</a>: public domain. Version 1.1, 20231012.1</p>
+    <p><a rel="license" href="https://creativecommons.org/publicdomain/zero/1.0/">CC0</a>: public domain. Version 1.2, 20231019.1</p>
   </body>
 </html>

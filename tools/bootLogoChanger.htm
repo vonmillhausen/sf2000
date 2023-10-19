@@ -81,19 +81,25 @@
                 // May 22nd BIOS...
                 case "05.22":
                   logoOffset = 0x9BB098;
-                  setMessage("info", "bisrvMessages", "INFO: May 22nd <code>bisrv.asd</code> detected.");
+                  setMessage("info", "bisrvMessages", "INFO: Version 1.5 <code>bisrv.asd</code> detected.");
                   break;
                 
                 // August 3rd BIOS...
                 case "08.03":
                   logoOffset = 0x9B3530;
-                  setMessage("info", "bisrvMessages", "INFO: August 3rd <code>bisrv.asd</code> detected.");
+                  setMessage("info", "bisrvMessages", "INFO: Version 1.6 <code>bisrv.asd</code> detected.");
                   break;
 
                 // October 7th BIOS...
                 case "10.07":
                   logoOffset = 0x9B1FE8;
-                  setMessage("warning", "bisrvMessages", "WARNING: October 7th <code>bisrv.asd</code> detected; this version has known issues with SNES save states and is not recommended for use.");
+                  setMessage("warning", "bisrvMessages", "WARNING: Version 1.7 <code>bisrv.asd</code> detected; this version has known issues with SNES save states and is not recommended for use.");
+                  break;
+                
+                // October 13th BIOS...
+                case "10.13":
+                  logoOffset = 0x9B3618;
+                  setMessage("info", "bisrvMessages", "INFO: Version 1.71 <code>bisrv.asd</code> detected.");
                   break;
 
                 default:
@@ -232,6 +238,6 @@
       }
     </script>
     <hr>
-    <p><a rel="license" href="https://creativecommons.org/publicdomain/zero/1.0/">CC0</a>: public domain. Version 1.4, 20231012.1</p>
+    <p><a rel="license" href="https://creativecommons.org/publicdomain/zero/1.0/">CC0</a>: public domain. Version 1.5, 20231019.1</p>
   </body>
 </html>

@@ -12,6 +12,9 @@
   Just like the tools themselves, this file should be considered CC0 Public
   Domain (https://creativecommons.org/publicdomain/zero/1.0/)
 
+  Version 1.6: Added support for the (hopefully not broken) October 13th BIOS in
+    getFirmwareHash() and knownHash()
+
   Version 1.5: Added support for the (broken) October 7th BIOS in
     getFirmwareHash() and knownHash()
 
@@ -134,7 +137,7 @@ function getFirmwareHash(data) {
           break;
         
         case 0x356638:
-          // Seems to match October 7th layout...
+          // Seems to match October 7th/13th layout...
           dataCopy[0x356638] = 0x00;
           dataCopy[0x356640] = 0x00;
           dataCopy[0x3566D8] = 0x00;
@@ -290,7 +293,10 @@ function knownHash(hash) {
       return "08.03";
     
     case "b88458bf2c25d3a34ab57ee149f36cfdc6b8a5138d5c6ed147fbea008b4659db":
-      return "10.07"
+      return "10.07";
+    
+    case "08bd07ab3313e3f00b922538516a61b5846cde34c74ebc0020cd1a0b557dd54b":
+      return "10.13";
 
     default:
       return false;

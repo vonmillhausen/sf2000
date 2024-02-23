@@ -10,6 +10,7 @@
     <h1>Data Frog SF2000 Save State Tool</h1>
     <p>The SF2000 supports save states for games, but it bundles the save state data into a custom format including a thumbnail and metadata; this bundle can't be directly used as save state data for other emulator platforms (e.g., Retroarch). This tool allows you to extract raw save-state data and thumbnails from SF2000 save-state bundles, in case you want to use them with the same emulator on another device; it also allows you to take save states from another device, and convert them to a format the SF2000 can parse. Please note this tool is provided as-is; make sure you have backups of anything you care about before potentially replacing any files on your SF2000's microSD card! 🙂</p>
     <p>This tool makes use of the <a href="https://github.com/nodeca/pako">pako</a> JavaScript library.</p>
+    <div id="platformNote"></div>
     <div id="initialWarning"></div>
     <hr>
     <div id="steps">
@@ -36,6 +37,9 @@
       var thumbWidth;         // Integer width of a save state thumbnail
       var thumbHeight;        // Integer height of a save state thumbnail
       var romFileGood;        // Boolean indicating if a chosen save state file appears to be binary or not
+
+      // Display a note about platform compatibility for save states...
+      setMessage("warning", "platformNote", "<strong><em>NOTE:</em></strong> The SF2000 is uses a MIPS processor; as a result, save states created on the SF2000 will likely only ever work on other MIPS devices, and will likely <strong>never</strong> work on any other kind of device (e.g., PCs, Android devices, Rockchip devices, ARM devices, etc.).")
 
       // Display our initial warning note...
       setMessage("warning", "initialWarning", "<strong><em>NOTE:</em></strong> This tool will <em>not</em> convert save states from one emulator's format to another; it <em>only</em> gives you either the raw save state data the SF2000 generated (when converting <em>from</em> the SF2000), or allows you to take any random file and shove it into the container format the SF2000 uses for save states (when converting <em>to</em> the SF2000)… whether or not the SF2000 is able to understand the file you give it is up to the SF2000, not to me! If you're converting save states to the SF2000, and the SF2000 doesn't work with whatever kind of save state you provided, there's nothing I can do about that.<br><br>You can <a href=\"https://vonmillhausen.github.io/sf2000/#emulators\" target=\"_blank\" rel=\"noreferrer noopener\">find a reference to all the specific emulators and versions used by the SF2000 here</a>; you'll probably only have success if you're using at least the same emulator, if not also the same version. Also, to have any chance of success, you must be using the exact same ROM on both devices, and make sure save state compression is turned off if your save state is coming from Retroarch!");
@@ -674,6 +678,6 @@
       }
     </script>
     <hr>
-    <p><a rel="license" href="https://creativecommons.org/publicdomain/zero/1.0/">CC0</a>: public domain. Version 1.2, 20230626.1</p>
+    <p><a rel="license" href="https://creativecommons.org/publicdomain/zero/1.0/">CC0</a>: public domain. Version 1.3, 20240223.1</p>
   </body>
 </html>

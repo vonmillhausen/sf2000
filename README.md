@@ -77,7 +77,7 @@ Some downsides to the device: There's a decent amount of screen-tearing, due to 
 So is the "Data Frog" any good? Only you can answer that question for yourself. There are certainly more powerful devices out there, more fully featured devices, devices with better hardware, etc. - but almost all of those devices cost a lot more than the SF2000 (which often sells for just $15 to $20). At the end of the day, you have to look at the features offered at the given price-point, and only then can you decide if you're interested in the device or not.
 
 ### Is there any custom firmware?
-As of February 23rd 2024, **no**, not yet; however, some already-useful advancements have been made which may be of interest. Two main development efforts have been made:
+As of April 1st 2024, **no**, not yet; however, some already-useful advancements have been made which may be of interest. Two main development efforts have been made:
 
 #### hcRTOS (true CFW)
 Earlier this year, an SDK for the CPU in the SF2000 was been identified. Theoretically, this would allow a full custom firmware to be built and compiled for the device. The developers working on custom firmware spent some considerable time and effort working on porting Retroarch (as it seemed like it would be the quickest route to a custom firmware with support for many systems), however they ran into several problems. It appears that the SDK was unfinished and of low quality - core features like video and audio drivers were missing (and thus had to be developed from scratch), and overall system stability of the produced builds very low. When crashed happened with running cores (which was frequently) no useful debugging information was produced, and so tracking down the source of issues became a major time-sink. Additionally, most of the experimental builds when they did work had audio and/or video performance issues, and most also caused the SF2000 to run "hot", which would likely have impacted the lifespan of the device and thus are not recommended for usage beyond a few minutes at a time. [A GitLab repo](https://git.maschath.de/ignatz/hcrtos) was set up by `ignatzdraconis` for the work based on this SDK, however work on developing a full custom firmware using this SDK has been parked for now.
@@ -148,7 +148,7 @@ So you can try launching the game first, and _then_ plug in the A/V cable to get
 Unfortunately, correct - with the stock firmware, the built-in save feature of emulated games does not work correctly, and the SF2000 won't store new save data after the first time it's created for a game. If you want to save your progress in a game on the SF2000's stock firmware, use save states instead. Note that firmware 1.6 _appears_ to have fixed this for GBA based on community reports, but not for other emulated systems.
 
 ### What's the GB300?
-The GB300 is essentially an SF2000 in a vertical form-factor. There are some differences though - it has a worse quality screen, lacks hardware support for wireless controllers, and is incompatible with SF2000 firmware due to the different display panel being used. Some folks from the SF2000 dev community have already produced some tools and things for the GB300 - I won't be covering the device myself, but I will put a few links in the [Tools and Links](#tools-and-links) section below to get you started, and you should really hop (pun intended) into the `🐸data_frog_sf2000` channel in the [Retro Handhelds Discord server](https://discord.gg/retrohandhelds) and do some searches there (specifically you should also check out the `Gb300 dev` thread in that channel).
+The GB300 is essentially an SF2000 in a vertical form-factor. There are some differences though - it has a worse quality screen, lacks hardware support for wireless controllers, and is incompatible with SF2000 firmware due to the different display panel being used. Some folks from the SF2000 dev community have already produced some tools and things for the GB300 - I won't be covering the device myself, but I will put a few links in the [Tools and Links](#tools-and-links) section below to get you started, and you should really hop (pun intended) into the `🐸data_frog_sf2000` channel in the [Retro Handhelds Discord server](https://discord.gg/retrohandhelds) and do some searches there (specifically you should also check out the `Gb300 dev` thread in that channel). `nummacway` has also put together [a great page detailing the differences between the SF2000 and GB300](https://nummacway.github.io/gb300/), well worth checking out.
 
 ### I have a question that isn't answered here... who or where do I ask?
 If you have questions about the SF2000 you can't find the answer to, the best place to ask is in the `🐸data_frog_sf2000` channel in the [Retro Handhelds Discord server](https://discord.gg/retrohandhelds).
@@ -156,6 +156,7 @@ If you have questions about the SF2000 you can't find the answer to, the best pl
 ---
 
 ## Hardware
+You'll find brief overviews of all the main hardware components below; for more specific engineering detail, `GrGadam` has put together a page with the full details (and other info), [which you can find here](https://grgadam.github.io/sf2000).
 
 ### CPU
 Although the main CPU of the SF2000 has literally had it's markings milled off by a routing tool, the community has determined that it's a HCSEMI B210, a single-core MIPS processor running at 810 MHz (or 918 MHz with the 1.6 firmware onwards). It appears to be a clone of an ALi Tech chip. [An SDK has been found](http://www.zcsd-tech.com//download/content-54.html) for it.
@@ -301,7 +302,7 @@ I was curious to see how the included ROMs matched up against the current "[No-I
 ## Firmware/BIOS (bisrv.asd)
 The firmware for the SF2000 is actually located on the microSD card, in a file called `bisrv.asd` located in the `bios` folder. This file is a monolithic binary blob, which contains the device's OS, the emulators, their settings... basically everything. Data Frog have issued some firmware updates for the device since launch; the updates have added new features (e.g., additional language support, favourites, history, etc.), but have also occasionally introduced bugs (e.g., some SNES games run very slowly until they are quit and launched again, etc.). Data Frog have published a YouTube video showing how to update the firmware on the device, which [you can find here](https://www.youtube.com/watch?v=j8dT2fdGfck); the video's description contains a link to where you can download the latest firmware. Note that Data Frog's official firmware update/reinstallation process involves fully erasing the device's microSD card and replacing its contents with a fresh set of files - this will also erase any user-created files including saves states or user-installed ROMs. You can learn more about save state files and how to back them up in [the Save States section](#save-states).
 
-Note that Data Frog's official server for downloading firmware is _very_ slow, with typical transfers taking many hours to complete as their firmware images are full images including ROM files. If you don't care about the stock ROM files, an alternative method for downloading the latest firmware _without_ the ROM files is to use [Tadpole](https://github.com/EricGoldsteinNz/tadpole). Refer to Tadpole's documentation for more information.
+Note that Data Frog's official server for downloading firmware is _very_ slow, with typical transfers taking many hours to complete as their firmware images are full images including ROM files. If you don't care about the stock ROM files, an alternative method for downloading the latest firmware _without_ the ROM files is to use [Tadpole](https://github.com/EricGoldsteinNz/tadpole). Refer to Tadpole's documentation for more information. You can also [download ROM-free copies of various firmware versions compiled by `Dteyn` here](https://github.com/Dteyn/Datafrog_SF2000_Vanilla).
 
 Known firmware versions are currently (dates approximate):
 
@@ -666,10 +667,13 @@ All of these are linked above already in their relevant sections, but just in ca
 - [Data Frog's firmware update tutorial](https://www.youtube.com/watch?v=j8dT2fdGfck)
 - [Data Frog SF2000 Battery Meter Fix by Dteyn](https://dteyn.github.io/sf2000/tools/batteryMeterFix.htm)
 - [Dteyn's SF2000 Projects](https://dteyn.github.io/sf2000_projects.htm) (a collection of tools for the SF2000 made by `Dteyn`)
+- [Firmware Downloads (Without ROMs) by `Dteyn`](https://github.com/Dteyn/Datafrog_SF2000_Vanilla)
 - [Firmware Version Checker](https://vonmillhausen.github.io/sf2000/tools/firmwareVersionChecker.htm)
 - [FROGTOOL](https://github.com/tzlion/frogtool) (for updating the built-in game lists)
 - [GB300 Boot Logo Changer](https://dteyn.github.io/sf2000/tools/bootLogoChangerGB300.htm) (boot logo changer for the GB300 by `Dteyn`)
+- [GB300 vs. SF2000 Info](https://nummacway.github.io/gb300/) (great page by `nummacway` detailing the differences between the SF2000 and GB300 devices)
 - [Generic Image Tool](https://vonmillhausen.github.io/sf2000/tools/genericImageTool.htm)
+- [`GrGadam`'s SF2000 Info Page](https://grgadam.github.io/sf2000)
 - [`ignatzdraconis`'s GitLab Repo](https://git.maschath.de/ignatz/hcrtos)
 - [Kerokero - SF2000 BGM Tool by Dteyn](https://github.com/Dteyn/SF2000_BGM_Tool)
 - [`kobil`'s GitLab Repo](https://gitlab.com/kobily/sf2000_multicore)
@@ -685,11 +689,14 @@ All of these are linked above already in their relevant sections, but just in ca
 - [Silent background music file](/sounds/silentMusic/pagefile.sys) (replace the file in the `Resources` folder on the microSD card)
 - [Silent Sounds Pack by Dtyen](https://github.com/Dteyn/sf2000/raw/main/sounds/silentSounds/SF2000_Silent_Sounds_Pack.zip) (direct link to zip; replaces _all_ non-music UI sounds with silence)
 - [Tadpole](https://github.com/EricGoldsteinNz/tadpole) (a general SF2000 management tool)
+- [ZFBSpardaTool](https://github.com/SpardaHunter/ZFBimagesToolSparda) (a tool for creating `.zfb` files for use with multicore builds)
 - [ZFBTool](https://github.com/Dteyn/ZFBTool) (a tool for creating `.zfb` files for pairing custom thumbnails with arcade ROMs)
 
 ---
 
 ## Document Version History
+- `20240401 - 1.48`: Updated date in [the custom firmware FAQ](#is-there-any-custom-firmware). Added links to `nummacway`'s GB300 info page. Added links to `GrGadam`'s SF2000 info page. Added links to `Dteyn`'s ROM-free SF2000 firmware downloads.
+
 - `20240223 - 1.47`: Updated [the CFW FAQ](#is-there-any-custom-firmware) with a more recent date. Added a basic FAQ answer about the [GB300](#whats-the-gb300). Added links to `.ericgoldstein`'s SF2000 setup guide. Now hosting the bootloader bugfix file directly, as Discord no longer allow hotlinking to files stored on their platform. Added a link to `Dteyn`'s SF2000 projects page. Added a link to `Dteyn`'s GB300 boot logo changer tool. Added a link to `johnnyonno`'s SF2000Renamers tool. Added a note to [the Save State Tool](https://vonmillhausen.github.io/sf2000/tools/saveStateTool.htm) to indicate that save states created on the SF2000 will likely only ever work with MIPS devices.
 
 - `20231210 - 1.46`: Added a sub-section to [Hardware](#hardware) about [the USB-C port](#usb-c-port), along with a mention of the hardware hack to add USB-C to USB-C charging support (thanks for the suggestion, `@uli42`). Minor updates to [the custom firmware FAQ](#is-there-any-custom-firmware). Updates to the [Arcade](#arcade) section to note that the specific version of FBA on the SF2000 is a custom build with internal tweaks made by the firmware's developer. Made a minor correction to the [.zfb Files](#zfb-files) section (had resolution dimensions swapped by mistake). Added a note to the [Default ROMs](#default-roms) section with the specific dimensions of the thumbnail image they contain. Added links to `amir16yp`'s corrected Hebrew menu translations.

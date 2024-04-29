@@ -474,17 +474,17 @@ To the best of my knowledge, the following image files are currently __unused__ 
 | `fcont.ctp` | 640x480 | RGB565 Little Endian | ✨ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | Alternate UI: User main menu background | [view](/images/unused/fcont.ctp.png) |
 | `fdbil.ph` | 1100x120 | BGRA | ✨ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | Large icons for each system, including systems not supported by the SF2000 (selected) | [view](/images/unused/fdbil.ph.png) |
 | `gpapi.bvs` | 640x480 | RGB565 Little Endian | ✨ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | In-game menu (position 5; looks like it was for some kind of button layout changing UI) | [view](/images/unused/gpapi.bvs.png) |
-| `gpsvc.bvs` | 392x80 | RGB565 Little Endian | ✨ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | In-game menu save-state slot (position 3) | [view](/images/gpsvc.png) |
-| `hgcpl.cke` | 392x80 | RGB565 Little Endian | ✨ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | In-game menu save-state slot (position 2) | [view](/images/hgcpl.png) |
+| `gpsvc.bvs` | 392x80 | RGB565 Little Endian | ✨ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | In-game menu save-state slot (position 3) | [view](/images/unused/gpsvc.png) |
+| `hgcpl.cke` | 392x80 | RGB565 Little Endian | ✨ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | In-game menu save-state slot (position 2) | [view](/images/unused/hgcpl.png) |
 | `ihds.bke` | 640x480 | RGB565 Little Endian | ✨ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | Genesis/Mega Drive game-list background, with baked-in thumbnail placeholder | [view](/images/unused/ihds.bke.png) |
 | `kdill.hsp` | 640x480 | RGB565 Little Endian | ✨ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | Alternate UI: Game Boy Advance main menu background | [view](/images/unused/kdill.hsp.png) |
-| `ksxbar.ax` | 392x80 | RGB565 Little Endian | ✨ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | In-game menu save-state slot (position 4) | [view](/images/ksxbar.png) |
+| `ksxbar.ax` | 392x80 | RGB565 Little Endian | ✨ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | In-game menu save-state slot (position 4) | [view](/images/unused/ksxbar.png) |
 | `logilda.be` | 40x24 | BGRA | ✨ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | CPS1 game-list indicator | [view](/images/unused/logilda.be.png) |
 | `mfc64.emc` | 40x24 | BGRA | ✨ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | CPS2 game-list indicator | [view](/images/unused/mfc64.emc.png) |
 | `mfpmp.ers` | 640x480 | RGB565 Little Endian | ✨ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | Alternate UI: Arcade main menu background | [view](/images/unused/mfpmp.ers.png) |
 | `mhg4s.ihg` | 400x192 | RGB565 Little Endian |  |  | ✨ | ✅ | ✅ | ✅ | ✅ | Background and buttons for a "warning" prompt with "OK", "Yes" and "No" buttons. Also has rounded edges stored in a separate image file, `zaqrc.olc` | [view](/images/unused/mhg4s.ihg.png) |
 | `mrtac.klo` | 40x24 | BGRA | ✨ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | Neo Geo game-list indicator | [view](/images/unused/mrtac.klo.png) |
-| `msdmo.gdb` | 392x80 | RGB565 Little Endian | ✨ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | In-game menu save-state slot (position 1) | [view](/images/msdmo.png) |
+| `msdmo.gdb` | 392x80 | RGB565 Little Endian | ✨ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | In-game menu save-state slot (position 1) | [view](/images/unused/msdmo.png) |
 | `msdtc.bke` | 640x480 | RGB565 Little Endian | ✨ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | Alternate UI: Game Boy Advance main menu background | [view](/images/unused/msdtc.bke.png) |
 | `mswbv.cpl` | 640x480 | RGB565 Little Endian | ✨ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | Alternate UI: Game Boy Advance main menu background | [view](/images/unused/mswbv.cpl.png) |
 | `nettrace.dll` | 40x24 | BGRA | ✨ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | Unknown game-list indicator (grey joystick with yellow buttons) | [view](/images/unused/nettrace.dll.png) |

@@ -25,7 +25,7 @@
     <script type="text/javascript">
 
       // Global variables...
-      var bisrvData;    // Used to store the binary data from the bisrv.asd file
+      let bisrvData;    // Used to store the binary data from the bisrv.asd file
 
       // Display our initial warning message
       setMessage("warning", "initialWarning", "<strong><em>WARNING:</em></strong> This tool will just blindly modify bytes <code>0x18c</code> to <code>0x18f</code> of whatever input file you provide; correct usage of this tool is therefore up to you, not me! 🤣");
@@ -47,7 +47,7 @@
 
         // If we're here then we should be good - read in our file and store its
         // contents in bisrvData, then patch the CRC32 bytes...
-        var frBisrv = new FileReader();
+        const frBisrv = new FileReader();
         frBisrv.readAsArrayBuffer(file);
         frBisrv.onload = function(event) {
 
@@ -64,7 +64,7 @@
 
       function stepTwo() {
         // Start building our HTML...
-        var html = "<section id=\"downloadSection\"><h2>Step 2: Download Patched <code>bisrv.asd</code></h2><p>Click the download button for the patched <code>bisrv.asd</code> file; use it to replace the one in the <code>bios</code> folder on your SF2000's microSD card.</p><div id=\"downloadSectionMessages\"></div>";
+        let html = "<section id=\"downloadSection\"><h2>Step 2: Download Patched <code>bisrv.asd</code></h2><p>Click the download button for the patched <code>bisrv.asd</code> file; use it to replace the one in the <code>bios</code> folder on your SF2000's microSD card.</p><div id=\"downloadSectionMessages\"></div>";
 
         // Add our download button...
         html += "<div class=\"controlContainer\"><div class=\"control\"><input id=\"downloadButton\" type=\"button\" value=\"Download\"></div></div>";
@@ -74,13 +74,13 @@
         document.getElementById("steps").insertAdjacentHTML("beforeend", html);
 
         // Attach our event handler to our download button...
-        var dButton = document.getElementById("downloadButton");
+        const dButton = document.getElementById("downloadButton");
         dButton.addEventListener("click", function() {
           downloadToBrowser(bisrvData, "application/octet-stream", "bisrv.asd");
         });
       }
     </script>
     <hr>
-    <p><a rel="license" href="https://creativecommons.org/publicdomain/zero/1.0/">CC0</a>: public domain. Version 1.1, 20230626.1</p>
+    <p><a rel="license" href="https://creativecommons.org/publicdomain/zero/1.0/">CC0</a>: public domain. Version 1.2, 20240514.1</p>
   </body>
 </html>

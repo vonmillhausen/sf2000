@@ -24,15 +24,17 @@
     <script type="text/javascript">
 
       // Global variables...
-      var bisrvData;    // Used to store the binary data from the bisrv.asd file
-      var logoOffset;   // Will contain the offset of the boot logo within the bisrv.asd file
-      var newLogoData;  // Used to store the little-endian RGB565 binary data of the new boot logo
+      let bisrvData;              // Used to store the binary data from the bisrv.asd file
+      let logoOffset;             // Will contain the offset of the boot logo within the bisrv.asd file
+      let newLogoData;            // Used to store raw ImageData of the new boot logo
+      let ditherEnabled = false;  // Holds whether the user wants to enable dithering for RGB565 mode or not
+      let ditherStrength = 0.2;   // Holds the selected dither strength value - 0.2 seems to be a good general balance
 
       // This function is triggered when the person selects a file in Step 1...
       function bisrvLoad(file) {
 
         // Read in the contents of the selected file as array buffer...
-        var frBisrv = new FileReader();
+        const frBisrv = new FileReader();
         frBisrv.readAsArrayBuffer(file);
         frBisrv.onload = function(event) {
 
@@ -48,13 +50,14 @@
           bisrvData = new Uint8Array(event.target.result);
 
           // We'll do a hash-check against it...
-          hashResult = getFirmwareHash(bisrvData);
+          const hashResult = getFirmwareHash(bisrvData);
 
-          // The result could be either a Promise if it had a bisrv.asd-like structure and we got
-          // a hash, or false otherwise... let's check!
+          // The result could be either a Promise if it had a bisrv.asd-like
+          // structure and we got a hash, or false otherwise... let's check!
           if (hashResult instanceof Promise) {
 
-            // We got a Promise! Wait for it to finish so we get our bisrv.asd hash...
+            // We got a Promise! Wait for it to finish so we get our bisrv.asd
+            // hash...
             hashResult.then(function(dataHash) {
 
               // Check the hash against all the known good ones...
@@ -103,14 +106,15 @@
                   break;
 
                 default:
-                  // Huh... wasn't false so had bisrv.asd structure, but didn't return
-                  // a known hash... a new BIOS version? Unknown anyway!
+                  // Huh... wasn't false so had bisrv.asd structure, but didn't
+                  // return a known hash... a new BIOS version? Unknown anyway!
                   console.log(dataHash);
                   setMessage("error", "bisrvMessages", "ERROR: While the file you've selected does appear to be generally structured like the SF2000's <code>bisrv.asd</code> BIOS file, the specifics of your file don't match any known SF2000 BIOS version. As such, this tool cannot safely modify the selected file.");
                   return;
               }
 
-              // If we're here we've got a good file, so onwards to Step 2 (image selection)...
+              // If we're here we've got a good file, so onwards to Step 2
+              // (image selection)...
               stepTwo();
             });
           }
@@ -132,20 +136,27 @@
         // file is an image, and that it has the correct dimensions of 256x100
         // pixels; if it is, we convert the image data to an SF2000 format and
         // move on to Step 3. First, let's start building our HTML...
-        var html = "<section id=\"imageSection\"><h2>Step 2: Select New Logo Image File</h2><p>Select the image file you want to use as the new boot logo. It must be 256 pixels wide and 100 pixels tall. Only PNG and JPEG image types are supported. For PNG files, transparency is ignored; also, you might want to make sure your PNG image has any embedded gamma or colour profile information removed first using a metadata scrubbing tool, otherwise the colour output from <i>this</i> tool might be incorrect. The image is displayed centred on a black background, so you may want to factor that into your design as well.</p><div id=\"imageMessages\"></div>";
+        let html = "<section id=\"imageSection\"><h2>Step 2: Select New Logo Image File</h2><p>Select the image file you want to use as the new boot logo. It must be 256 pixels wide and 100 pixels tall. Only PNG and JPEG image types are supported. For PNG files, transparency is handled by drawing the image on a black background; also, you might want to make sure your PNG image has any embedded gamma or colour profile information removed first using a metadata scrubbing tool, otherwise the colour output from <i>this</i> tool might be incorrect. On the SF2000, the boot logo is displayed centred on a black background, so you may want to factor that into your design as well.</p><div id=\"imageMessages\"></div>";
 
-        // Add our file chooser...
-        html += "<div class=\"controlContainer\"><label class=\"control\"><input id=\"inputImage\" type=\"file\"></label></div>";
+        // Add our file chooser and dithering controls...
+        html += "<form id=\"imageForm\" class=\"controlContainer\"><div class=\"control\">";
+        html += "<label class=\"control\"><input id=\"inputImage\" type=\"file\"></label>";
+        html += "<div class=\"control\"><label for=\"ditherEnabled\">Dithering: <input type=\"checkbox\" id=\"ditherEnabled\" name=\"ditherEnabled\"" + (ditherEnabled == true ? " checked" : "") + "></label> <label for=\"ditherStrength\">Strength: <select id=\"ditherStrength\" name=\"ditherStrength\"><option" + (ditherStrength == 0.1 ? " selected" : "") + ">0.1</option><option" + (ditherStrength == 0.2 ? " selected" : "") + ">0.2</option><option" + (ditherStrength == 0.3 ? " selected" : "") + ">0.3</option><option" + (ditherStrength == 0.5 ? " selected" : "") + ">0.5</option><option" + (ditherStrength == 0.75 ? " selected" : "") + ">0.75</option><option" + (ditherStrength == 1.0 ? " selected" : "") + ">1</option><option" + (ditherStrength == 2.0 ? " selected" : "") + ">2</option></select></label></div>";
+        html += "</div></form>";
+
+        // Next we'll add our image preview...
+        html += "<div id=\"previewContainer\" class=\"controlContainer\" style=\"display: none;\"><div class=\"control\"><canvas id=\"processFilePreview\" width=\"256\" height=\"100\"></canvas></div></div>";
 
         // Close our section...
         html += "</section>";
 
-        // Finally, add a <hr> separator after the last step, and append the new step...
+        // Finally, add a <hr> separator after the last step, and append the new
+        // step...
         document.getElementById("steps").insertAdjacentHTML("beforeend", "<hr>");
         document.getElementById("steps").insertAdjacentHTML("beforeend", html);
 
         // Attach our event handler to our new file input control...
-        var userImageInput = document.getElementById("inputImage");
+        const userImageInput = document.getElementById("inputImage");
         userImageInput.addEventListener("change", function() {
 
           // The user has chosen a new file; it should be either a PNG or JPEG
@@ -154,17 +165,24 @@
           // First let's clear any old messages...
           document.getElementById("imageMessages").innerHTML = "";
 
+          // ... and make sure our preview image is hidden...
+          document.getElementById("previewContainer").style.display = "none";
+
+          // ... and clear our newLogoData object ...
+          newLogoData = new ImageData(1, 1);
+
           // And clear up any HTML already added after the current step...
           while(document.getElementById("imageSection").nextSibling) {
             document.getElementById("imageSection").nextSibling.remove();
           }
 
           // Now let's read in the file...
-          var frImage = new FileReader();
+          const frImage = new FileReader();
           frImage.readAsDataURL(event.target.files[0]);
           frImage.onload = function(event) {
 
-            // The file is loaded; let's check to make sure we got a PNG or JPEG...
+            // The file is loaded; let's check to make sure we got a PNG or
+            // JPEG...
             if (!event.target.result.includes("data:image/png;") && !event.target.result.includes("data:image/jpeg;")) {
 
               // Whoops! Doesn't look like the user provided a PNG or a JPEG!
@@ -172,36 +190,60 @@
               return;
             }
             
-            // Now we're going to load the file's data into an Image object, so we can
-            // access the raw image data...
-            var img = new Image;
+            // Now we're going to load the file's data into an Image object, so
+            // we can access the raw image data...
+            const img = new Image;
             img.src = event.target.result;
             img.onload = function(event) {
 
               // Check to make sure the image has the correct dimensions for a
               // boot logo...
               if (img.width != 256 || img.height != 100) {
-                setMessage("error", "imageMessages", "ERROR: The selected image does not have dimensions of 256x100px!");
+                setMessage("error", "imageMessages", "ERROR: The selected image does not have dimensions of 256 x 100!");
                 return;
               }
 
-              // We need to scale the image to the internal resolution used by
-              // the SF2000 (512x200)...
-              var imageData = scaleImage(imageToImageData(img), 512, 200, "Nearest Neighbour");
+              // If we're here, the image is good - store its data in our
+              // global...
+              newLogoData = imageToImageData(img, false);
 
-              // Next we'll convert the image data to little-endian RGB565
-              // format for the SF2000...
-              newLogoData = imageDataToRgb565(imageData);
+              // And finally, let's show our preview image...
+              document.getElementById("previewContainer").style.display = "flex";
+              renderPreview();
 
               // On to Step 3!
               stepThree();
             }
           }
         });
+
+        // And finally, attach an event handler to the overall form - we'll use
+        // this to get the dithering settings, and as the trigger for updating
+        // the preview image accordingly...
+        const imageForm = document.getElementById("imageForm");
+        imageForm.addEventListener("change", function() {
+
+          // Get the state of all of our form controls...
+          const formData = Object.fromEntries(new FormData(imageForm));
+
+          // Set our general globals from the current form state...
+          //if (formData.ditherEnabled !== undefined) {ditherEnabled = true;}
+          //else if (imageFormat == "RGB565") {ditherEnabled = false;}
+          ditherEnabled = formData.ditherEnabled ? true : false;
+          ditherStrength = formData.ditherStrength? parseFloat(formData.ditherStrength) : ditherStrength;
+
+          // Finally render an updated preview...
+          renderPreview();
+        });
       }
 
+      // This function is where we display our download button, which patches
+      // the provided bisrv.asd with the updated logo data, and sends it to the
+      // user's browser as a download...
       function stepThree() {
-        var html = "<section id=\"downloadSection\"><h2>Step 3: Download Updated <code>bisrv.asd</code></h2><p>Click the download button for the updated <code>bisrv.asd</code> file; use it to replace the one in the <code>bios</code> folder on your SF2000's microSD card.</p><div id=\"downloadMessages\"></div>";
+
+        // As usual, start building up our HTML...
+        let html = "<section id=\"downloadSection\"><h2>Step 3: Download Updated <code>bisrv.asd</code></h2><p>Click the download button for the updated <code>bisrv.asd</code> file; use it to replace the one in the <code>bios</code> folder on your SF2000's microSD card.</p><div id=\"downloadMessages\"></div>";
 
         // Add our download button...
         html += "<div class=\"controlContainer\"><div class=\"control\"><input id=\"userDownload\" type=\"button\" value=\"Download\"></div></div>";
@@ -209,35 +251,59 @@
         // Close our section...
         html += "</section>";
 
-        // Finally, add a <hr> separator after the last step, and append the new step...
+        // Finally, add a <hr> separator after the last step, and append the new
+        // step...
         document.getElementById("steps").insertAdjacentHTML("beforeend", "<hr>");
         document.getElementById("steps").insertAdjacentHTML("beforeend", html);
 
         // Let's add the event handler for our Download button...
-        var dButton = document.getElementById("userDownload");
+        const dButton = document.getElementById("userDownload");
         dButton.addEventListener("click", function() {
 
-          // So, we should have the original bisrv.asd data in bisrvData; and we should have
-          // the offset to the original logo data in logoOffset; and finally, we should have
-          // our new logo's binary data in newLogoData. All we need to do is replace the old
-          // data bytes with the new bytes, re-calculate the CRC32 bytes for the modified
-          // file and set them in the data, and send the data to the user's browser. Easy!
+          // So, we should have the original bisrv.asd data in bisrvData; and we
+          // should have the offset to the original logo data in logoOffset; and
+          // finally, we should have our new logo's binary data in newLogoData.
+          // All we need to do is convert the new logo to RGB565 format (using
+          // whatever dithering options are set), and then replace the old data
+          // bytes with the new bytes, re-calculate the CRC32 bytes for the
+          // modified file and set them in the data, and send the data to the
+          // user's browser. Easy!
 
-          // First, replace the logo data...
-          for (var i = 0; i < newLogoData.length; i++) {
-            bisrvData[logoOffset + i] = newLogoData[i];
+          // First, get the RGB565 version of the logo; this is a *bit* messy,
+          // as we take the user's raw input image, convert it to binary RGB565
+          // data, then convert it back to an ImageData object so we can upscale
+          // it with a 2x nearest neighbour upscale, and then convert the result
+          // *back* to an RGB565 binary array... dumb, but it works!
+          const convertedImage = imageDataToRgb565(scaleImage(rgb565ToImageData(imageDataToRgb565(newLogoData, ditherEnabled, ditherStrength), 256, 100), 512, 200, "Nearest Neighbour"));
+
+          // Now replace the old logo data in the bisrv.asd file...
+          for (let i = 0; i < convertedImage.length; i++) {
+            bisrvData[logoOffset + i] = convertedImage[i];
           }
 
-          // Next, we calculate a new CRC32 for the updated bisrv.asd and apply it...
+          // Next, patch the CRC32 value in the bisrv.asd to account for the new
+          // logo data...
           patchCRC32(bisrvData);
 
-          // And finally, send the data to the user's browser as a file download...
+          // And finally, send the updated bisrv.asd data to the user's browser
+          // as a file download...
           downloadToBrowser(bisrvData, "application/octet-stream", "bisrv.asd");
-
         });
+      }
+
+      // This utility function renders a preview of the final image...
+      function renderPreview() {
+        if (newLogoData.data.length > 4) {
+          let convertedImageData = imageDataToRgb565(newLogoData, ditherEnabled, ditherStrength);
+          convertedImageData = rgb565ToImageData(convertedImageData, 256, 100);
+          const previewCanvas = document.getElementById("processFilePreview");
+          const previewContext = previewCanvas.getContext("2d");
+          previewContext.clearRect(0, 0, 256, 100);
+          previewContext.putImageData(convertedImageData, 0, 0);
+        }
       }
     </script>
     <hr>
-    <p><a rel="license" href="https://creativecommons.org/publicdomain/zero/1.0/">CC0</a>: public domain. Version 1.5, 20231019.1</p>
+    <p><a rel="license" href="https://creativecommons.org/publicdomain/zero/1.0/">CC0</a>: public domain. Version 1.6, 20240514.1</p>
   </body>
 </html>

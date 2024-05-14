@@ -11,6 +11,10 @@
   Just like the tools themselves, this file should be considered CC0 Public
   Domain (https://creativecommons.org/publicdomain/zero/1.0/)
 
+  Version 1.1: Added a max-width to the body element, and auto margins to center
+    things again (just stops the page being too wide on full-screen desktop
+    browsers).
+
   Version 1.0: Initial version
 
 */
@@ -44,6 +48,8 @@ body {
   background-color: var(--background);
   color: var(--text);
   font-family: -apple-system, BlinkMacSystemFont, avenir next, avenir, segoe ui, helvetica neue, helvetica, Cantarell, Ubuntu, roboto, noto, arial, sans-serif;
+  max-width: 80em;
+  margin: 0 auto;
 }
 
 a, a:visited, a:hover, a:active { color: inherit; }

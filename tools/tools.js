@@ -12,6 +12,17 @@
   Just like the tools themselves, this file should be considered CC0 Public
   Domain (https://creativecommons.org/publicdomain/zero/1.0/)
 
+  Version 1.7: Added ordered dithering support to imageDataToRgb565(). Also
+    swapped out the Gaussian resampling function in scaleImage() for a higher
+    quality algorithm based on a semi-custom hybrid between a looped 50%
+    bilinear downsampling scheme and a Hermite interpolation resampler. Added a
+    "keepAlpha" argument to imageToImageData() (defaults to true) - if false,
+    the provided image is drawn on a black background, removing any alpha
+    channel; this was added as a utility for the boot logo changer. Also
+    generally tidied up the code here and there (changed vars to lets/consts,
+    replaced the SVG icons with simple emoji, fixed a few small logic edge
+    cases, etc.)
+
   Version 1.6: Added support for the (hopefully not broken) October 13th BIOS in
     getFirmwareHash() and knownHash()
 
@@ -44,17 +55,17 @@
 // 0x18f with an updated CRC32 calculated on bytes 512 to the end of the
 // array. Credit to `bnister` for this code!
 function patchCRC32(data) {
-  var c;
-  var tabCRC32 = new Int32Array(256);
-  for (var i = 0; i < 256; i++) {
+  let c;
+  const tabCRC32 = new Int32Array(256);
+  for (let i = 0; i < 256; i++) {
     c = i << 24;
-    for (var j = 0; j < 8; j++) {
+    for (let j = 0; j < 8; j++) {
       c = c & (1 << 31) ? c << 1 ^ 0x4c11db7 : c << 1;
     }
     tabCRC32[i] = c;
   }
   c = ~0;
-  for (var i = 512; i < data.length; i++) {
+  for (let i = 512; i < data.length; i++) {
     c = c << 8 ^ tabCRC32[c >>> 24 ^ data[i]];
   }
   data[0x18c] = c & 255;
@@ -71,7 +82,7 @@ function getFirmwareHash(data) {
   // we're going to be manipulating that data before generating our hash, but we
   // don't want to modify the original object at all... so we'll create a copy,
   // and work only on the copy...
-  var dataCopy = data.slice();
+  const dataCopy = data.slice();
 
   // Only really worthwhile doing this for big bisrv.asd files...
   if (dataCopy.length > 12600000) {
@@ -87,9 +98,9 @@ function getFirmwareHash(data) {
     // level indicator. These unfortunately can't be searched for - they're just
     // in specific known locations for specific firmware versions...
     // Location: Approximately 0x35A8F8 (about 25% of the way through the file)
-    var prePowerCurve = findSequence([0x11, 0x05, 0x00, 0x02, 0x24], dataCopy);
+    const prePowerCurve = findSequence([0x11, 0x05, 0x00, 0x02, 0x24], dataCopy);
     if (prePowerCurve > -1) {
-      var powerCurveFirstByteLocation = prePowerCurve + 5;
+      const powerCurveFirstByteLocation = prePowerCurve + 5;
       switch (powerCurveFirstByteLocation) {
         case 0x35A8F8:
           // Seems to match mid-March layout...
@@ -156,11 +167,11 @@ function getFirmwareHash(data) {
     // Next identify the emulator button mappings (if they exist), and blank
     // them out too...
     // Location: Approximately 0x8D6200 (about 75% of the way through the file)
-    var preButtonMapOffset = findSequence([0x00, 0x00, 0x00, 0x71, 0xDB, 0x8E, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00], dataCopy);
+    const preButtonMapOffset = findSequence([0x00, 0x00, 0x00, 0x71, 0xDB, 0x8E, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00], dataCopy);
     if (preButtonMapOffset > -1) {
-      var postButtonMapOffset = findSequence([0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x02, 0x00, 0x00, 0x00, 0x02, 0x00, 0x00, 0x00], dataCopy, preButtonMapOffset);
+      const postButtonMapOffset = findSequence([0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x02, 0x00, 0x00, 0x00, 0x02, 0x00, 0x00, 0x00], dataCopy, preButtonMapOffset);
       if (postButtonMapOffset > -1) {
-        for (var i = preButtonMapOffset + 16; i < postButtonMapOffset; i++) {
+        for (let i = preButtonMapOffset + 16; i < postButtonMapOffset; i++) {
           dataCopy[i] = 0x00;
         }
       }
@@ -174,10 +185,10 @@ function getFirmwareHash(data) {
 
     // Next identify the boot logo position, and blank it out too...
     // Location: Approximately 0x9B3520 (about 80% of the way through the file)
-    var badExceptionOffset = findSequence([0x62, 0x61, 0x64, 0x5F, 0x65, 0x78, 0x63, 0x65, 0x70, 0x74, 0x69, 0x6F, 0x6E, 0x00, 0x00, 0x00], dataCopy);
+    const badExceptionOffset = findSequence([0x62, 0x61, 0x64, 0x5F, 0x65, 0x78, 0x63, 0x65, 0x70, 0x74, 0x69, 0x6F, 0x6E, 0x00, 0x00, 0x00], dataCopy);
     if (badExceptionOffset > -1) {
-      var bootLogoStart = badExceptionOffset + 16;
-      for (var i = bootLogoStart; i < (bootLogoStart + 204800); i++) {
+      const bootLogoStart = badExceptionOffset + 16;
+      for (let i = bootLogoStart; i < (bootLogoStart + 204800); i++) {
         dataCopy[i] = 0x00;
       }
     }
@@ -189,10 +200,10 @@ function getFirmwareHash(data) {
     // CPU cycles, in case folks want to patch those bytes to correct SNES
     // first-launch issues on newer firmwares...
     // Location: Approximately 0xC0A170 (about 99% of the way through the file)
-    var preSNESBytes = findSequence([0x00, 0x00, 0x00, 0x80, 0x00, 0x00, 0x00, 0x80], dataCopy);
+    const preSNESBytes = findSequence([0x00, 0x00, 0x00, 0x80, 0x00, 0x00, 0x00, 0x80], dataCopy);
     if (preSNESBytes > -1) {
-      var snesAudioBitrateBytes = preSNESBytes + 8;
-      var snesCPUCyclesBytes = snesAudioBitrateBytes + 8;
+      const snesAudioBitrateBytes = preSNESBytes + 8;
+      const snesCPUCyclesBytes = snesAudioBitrateBytes + 8;
       dataCopy[snesAudioBitrateBytes] = 0x00;
       dataCopy[snesAudioBitrateBytes + 1] = 0x00;
       dataCopy[snesCPUCyclesBytes] = 0x00;
@@ -208,9 +219,8 @@ function getFirmwareHash(data) {
     // against some known values...
     return crypto.subtle.digest("SHA-256", dataCopy.buffer)
     .then(function(digest) {
-      var array = Array.from(new Uint8Array(digest));
-      var hash = array.map(byte => ("00" + byte.toString(16)).slice(-2)).join("");
-      return hash;
+      const array = Array.from(new Uint8Array(digest));
+      return array.map(byte => ("00" + byte.toString(16)).slice(-2)).join("");
     })
     .catch(function(error) {
       return false;
@@ -224,26 +234,21 @@ function getFirmwareHash(data) {
 // This function searches for array needle in array haystack starting at offset
 // and returns the zero-based index of the first match found, or -1 if not
 // found...
-function findSequence(needle, haystack, offset) {
-
-  // If offset is not provided, default to 0...
-  offset = offset || 0;
+function findSequence(needle, haystack, offset = 0) {
 
   // Loop through the haystack array starting from the offset...
-  for (var i = offset; i < haystack.length - needle.length + 1; i++) {
+  for (let i = offset; i < haystack.length - needle.length + 1; i++) {
 
     // Assume a match until proven otherwise...
-    var match = true;
+    let match = true;
 
     // Loop through the needle array and compare each byte...
-    for (var j = 0; j < needle.length; j++) {
-
+    for (let j = 0; j < needle.length; j++) {
       if (haystack[i + j] !== needle[j]) {
         // Mismatch found, break the inner loop and continue the outer loop...
         match = false;
         break;
       }
-
     }
 
     // If match is still true after the inner loop, we have found a match;
@@ -261,7 +266,7 @@ function findSequence(needle, haystack, offset) {
 // download...
 function downloadToBrowser(data, type, name) {
   // Send the data to the user's browser as a file download...
-  var link = document.createElement("a");
+  const link = document.createElement("a");
   link.href = window.URL.createObjectURL(new Blob([data], {type: type}));
   link.download = name;
   link.style.display = "none";
@@ -304,33 +309,103 @@ function knownHash(hash) {
 }
 
 // Takes in an ImageData object, and returns a Uint8Array object containing the
-// data in little-endian RGB565 format...
-function imageDataToRgb565(input) {
+// data in little-endian RGB565 format. Optionally supports applying ordered
+// dithering to the input...
+function imageDataToRgb565(input, dither = false, ditherStrength = 0.2) {
+
+  // Pre-define a Bayer 8x8 matrix for ordered dithering (if enabled); also,
+  // this matrix was shamelessly yoinked from the Wikipedia example!
+  const bayerMatrix = [
+    [ 0, 32,  8, 40,  2, 34, 10, 42],
+    [48, 16, 56, 24, 50, 18, 58, 26],
+    [12, 44,  4, 36, 14, 46,  6, 38],
+    [60, 28, 52, 20, 62, 30, 54, 22],
+    [ 3, 35, 11, 43,  1, 33,  9, 41],
+    [51, 19, 59, 27, 49, 17, 57, 25],
+    [15, 47,  7, 39, 13, 45,  5, 37],
+    [63, 31, 55, 23, 61, 29, 53, 21]
+  ];
 
   // Loop through the image data, and convert it to little-endian RGB565. First,
   // we'll store the raw RGB565-converted integers in an array, one entry per
   // pixel...
-  var intArray = [];
-  var pixelCount = 0;
-  for (var i = 0; i < input.data.length; i += 4){
+  const intArray = [];
+  for (let i = 0; i < input.data.length; i += 4){
 
     // Read in the raw source RGB colours from the image data stream...
-    var red = input.data[i];
-    var green = input.data[i+1];
-    var blue = input.data[i+2];
+    let red = input.data[i];
+    let green = input.data[i+1];
+    let blue = input.data[i+2];
 
-    // Use some shifting and masking to get a big-endian version of the RGB565
-    // colour and store it in our array before moving on...
-    intArray[pixelCount] = ((red & 248)<<8) + ((green & 252)<<3) + (blue>>3);
-    pixelCount++;
+    // Check if we're going to dither or not...
+    if (dither) {
+
+      // We are! The ordered dither algorithm is kinda messy, but essentially we
+      // just end up slightly brightening/darkening our source colour pixels,
+      // using the matrix defined above - this essentially adds a kind of
+      // "noise" to the image, which stops banding being as apparent when
+      // dropping down to RGB565. The first thing we need to do is calculate our
+      // X and Y coordinates within the Bayer matrix for the current source
+      // image pixel...
+      const bayerX = (i / 4) % input.width % 8;
+      const bayerY = (Math.floor(i / 4 / input.width)) % 8;
+
+      // The Wikipedia Bayer matrix was designed to work with colour values that
+      // range from 0 to 63... which is great for our RGB565 green colour
+      // channel, but not for red or blue - so we scale the matrix values to
+      // range from 0 to 31 for those two colour channels. Also, we want to both
+      // lighten *and* darken our source input values, so to do that we subtract
+      // roughly half the *possible* maximum from each value - 16 for red and
+      // blue (half of 31, rounded up), and 32 for green (half of 63, rounded
+      // up); note I'm using actual values of 18 and 36 instead of 16 and 32, as
+      // I found that the Wikipedia matrix tended towards lightening more than
+      // darkening, so I'm compensating by offsetting downwards a little more...
+      const bayerValueRedBlue = (bayerMatrix[bayerY][bayerX] / 63 * 31) - 18;
+      const bayerValueGreen = bayerMatrix[bayerY][bayerX] - 36;
+
+      // Now we apply the ordered dithering itself; basically this "adds" the
+      // Bayer matrix values to red, green and blue (which might lighten or
+      // darken the pixel, depending on the specific value), and then uses that
+      // value as a percentage of 255 (the highest possible value) to scale our
+      // *actual* RGB565 output values for the pixel (which is a maximum of 31
+      // for red and blue, and 63 for green). We also scale the whole effect by
+      // ditherStrength, so that we can adjust how strong or weak the overall
+      // dithering noise is (too strong and its distracting, too weak and it
+      // mightn't effectively cover up banding in the output image). We scale
+      // the green colour channel half as much as red and blue, as otherwise at
+      // high dither strengths the image would take on an increasingly green
+      // color cast...
+      red =   Math.round(31 * (Math.min(255, Math.max(0, red   + (bayerValueRedBlue * ditherStrength))) / 255));
+      green = Math.round(63 * (Math.min(255, Math.max(0, green + (bayerValueGreen   * ditherStrength * 0.5))) / 255));
+      blue =  Math.round(31 * (Math.min(255, Math.max(0, blue  + (bayerValueRedBlue * ditherStrength))) / 255));
+
+      // As a result of the multiplying above, it's possible our red, green and
+      // blue values are now outside of the 0-31/63 ranges that are allowed for
+      // our RGB565 output - so we need to clamp the values, just in case...
+      red = Math.min(31, Math.max(0, red));
+      green = Math.min(63, Math.max(0, green));
+      blue = Math.min(31, Math.max(0, blue));
+
+      // And finally, we take our values and convert them to an int representing
+      // the RGB565 value, that will eventually be stuffed into our output
+      // Uint8Array object...
+      intArray[i / 4] = (red << 11) + (green << 5) + blue;
+    }
+    else {
+
+      // We're not dithering, so all we need to do is use some shifting and
+      // masking to get a big-endian version of the RGB565 colour and store it
+      // in our array before moving on...
+      intArray[i / 4] = ((red & 248)<<8) + ((green & 252)<<3) + (blue>>3);
+    }
   }
 
   // Create a data buffer and a data view; we'll use the view to convert our int
   // array data to little-endian format (the "true" below) to be stored in the
   // buffer...
-  var buffer = new ArrayBuffer(intArray.length * 2);
-  var dataView = new DataView(buffer);
-  for (var i = 0; i < intArray.length; i++) {
+  const buffer = new ArrayBuffer(intArray.length * 2);
+  const dataView = new DataView(buffer);
+  for (let i = 0; i < intArray.length; i++) {
     dataView.setInt16(i * 2, intArray[i], true);
   }
 
@@ -344,8 +419,8 @@ function imageDataToBgra(input) {
 
   // This is pretty simple - we just loop through the input data (which is in
   // RGBA format), and swap the Red and Blue channels to output BGRA instead...
-  output = new Uint8Array(input.data.length);
-  for (var i = 0; i < input.data.length; i += 4) {
+  const output = new Uint8Array(input.data.length);
+  for (let i = 0; i < input.data.length; i += 4) {
     output[i]     = input.data[i + 2];
     output[i + 1] = input.data[i + 1];
     output[i + 2] = input.data[i];
@@ -360,25 +435,25 @@ function rgb565ToImageData(input, width, height) {
 
   // Create an output ImageData object of the specified dimensions; it'll
   // default to transparent black, but we'll fill it with our input data...
-  output = new ImageData(width, height);
-  outputIndex = 0;
-  for (var i = 0; i < input.length; i += 2) {
+  const output = new ImageData(width, height);
+  let outputIndex = 0;
+  for (let i = 0; i < input.length; i += 2) {
 
     // Check to make sure we haven't run out of space in our output buffer...
     if (outputIndex < output.data.length) {
 
       // Read in two bytes, representing one RGB565 pixel in little-endian
       // format...
-      var byte1 = input[i];
-      var byte2 = input[i + 1];
+      const byte1 = input[i];
+      const byte2 = input[i + 1];
 
       // Extract the red, green and blue components from them. The first five
       // bits of byte2 are red, the first three bits of byte1 and the last
       // three bits of byte 2 are green, and the last five bits of byte1 are
       // blue...
-      var red = (byte2 & 0b11111000) >> 3;
-      var green = ((byte1 & 0b11100000) >> 5) | ((byte2 & 0b00000111) << 3);
-      var blue = byte1 & 0b00011111;
+      let red = (byte2 & 0b11111000) >> 3;
+      let green = ((byte1 & 0b11100000) >> 5) | ((byte2 & 0b00000111) << 3);
+      let blue = byte1 & 0b00011111;
 
       // These values are in 5-bit/6-bit ranges; we need to scale them to 8-bit
       // ranges for the colours to look right...
@@ -422,9 +497,9 @@ function bgraToImageData(input, width, height) {
 
   // Create an output ImageData object of the specified dimensions; it'll
   // default to transparent black, but we'll fill it with our input data...
-  output = new ImageData(width, height);
-  outputIndex = 0;
-  for (var i = 0; i < input.length; i += 4) {
+  const output = new ImageData(width, height);
+  let outputIndex = 0;
+  for (let i = 0; i < input.length; i += 4) {
 
     // Check to make sure we haven't run out of space in our output buffer...
     if (outputIndex < output.data.length) {
@@ -461,193 +536,302 @@ function bgraToImageData(input, width, height) {
 
 // This function takes in a Javascript Image object, and outputs it as an
 // ImageData object instead...
-function imageToImageData(image) {
+function imageToImageData(image, keepAlpha = true) {
 
   // Create a virtual canvas, and load it up with our image file...
-  var canvas = document.createElement("canvas");
-  var context = canvas.getContext("2d");
+  const canvas = document.createElement("canvas");
+  const context = canvas.getContext("2d");
   canvas.width = image.width;
   canvas.height = image.height;
 
   // Draw our image to the canvas, which will allow us to get data about the
-  // image...
+  // image. If the user doesn't want to keep the alpha channel, draw the image
+  // on a black background...
+  if (!keepAlpha) {
+    context.fillStyle = "black";
+    context.fillRect(0, 0, image.width, image.height);
+  }
   context.drawImage(image, 0, 0, image.width, image.height);
-  var imageData = context.getImageData(0, 0, image.width, image.height);
+  const imageData = context.getImageData(0, 0, image.width, image.height);
 
   // Return the ImageData object...
   return imageData;
 }
 
-// This function takes in an ImageData object, and returns a new ImageData
-// object containing a scaled version of the original image. The new image's
-// width, height and scaling method are also specified...
-function scaleImage(input, newWidth, newHeight, method) {
+// This function takes in an ImageData object "input", and returns a new
+// ImageData object containing a scaled version of the original image resized to
+// "newWidth" and "newHeight". Two different scaling methods are supported:
+// "Nearest Neighbour", and "Bilinear", although specifically when downscaling,
+// "Bilinear" is just a friendly name for two different scaling
+// filters/techniques that are used in a hybrid approach - halve-to-target, and
+// Hermite interpolation...
+function scaleImage(input, newWidth, newHeight, method, downscaleFilter = "hermite") {
 
-  // Utility function which takes in an ImageData object, and returns
-  // a (partially) upscaled version using bilinear filtering...
+  // Utility function which takes in an ImageData object, and returns a scaled
+  // version using bilinear filtering...
   function _bilinear(imageData, newWidth, newHeight) {
-    var canvas = document.createElement("canvas");
-    var context = canvas.getContext("2d");
-    canvas.width = imageData.width;
-    canvas.height = imageData.height;
-    context.putImageData(imageData, 0, 0);
 
-    var outCanvas = document.createElement("canvas");
-    var outContext = outCanvas.getContext("2d");
-    outContext.imageSmoothingEnabled = true;
-    outContext.imageSmoothingQuality = "high";
-    outCanvas.width = newWidth;
-    outCanvas.height = newHeight;
-    outContext.drawImage(canvas, 0, 0, canvas.width, canvas.height, 0, 0, newWidth, newHeight);
-
-    return outContext.getImageData(0, 0, newWidth, newHeight);
-  }
-
-  // Utility function which takes in an ImageData object, and returns
-  // a (partially) downscaled version using gaussian resampling...
-  // [Side note: I asked Bing AI for this function; ain't technology grand!]
-  function _gaussian(imageData, newWidth, newHeight) {
-
-    // Get the original width and height of the image data
-    let oldWidth = imageData.width;
-    let oldHeight = imageData.height;
-
-    // Get the pixel data array of the image data
-    let oldData = imageData.data;
-
-    // Create a new pixel data array for the scaled image data
-    let newData = new Uint8ClampedArray(newWidth * newHeight * 4);
-
-    // Calculate the scaling factor along each axis
-    let scaleX = newWidth / oldWidth;
-    let scaleY = newHeight / oldHeight;
-
-    // Calculate the radius of the Gaussian kernel based on the scaling factor
-    let radiusX = Math.ceil(1 / scaleX);
-    let radiusY = Math.ceil(1 / scaleY);
-
-    // Calculate the size of the Gaussian kernel along each axis
-    let sizeX = radiusX * 2 + 1;
-    let sizeY = radiusY * 2 + 1;
-
-    // Create a Gaussian kernel array
-    let kernel = new Float32Array(sizeX * sizeY);
-
-    // Calculate the standard deviation of the Gaussian distribution based on
-    // the radius
-    let sigmaX = radiusX / 3;
-    let sigmaY = radiusY / 3;
-
-    // Calculate the inverse of the variance of the Gaussian distribution along
-    // each axis
-    let invVarX = 1 / (2 * sigmaX * sigmaX);
-    let invVarY = 1 / (2 * sigmaY * sigmaY);
-
-    // Calculate the normalization factor for the Gaussian kernel
-    let norm = Math.sqrt(2 * Math.PI * sigmaX * sigmaY);
-
-    // Loop through each element in the Gaussian kernel array
-    for (let ky = -radiusY; ky <= radiusY; ky++) {
-      for (let kx = -radiusX; kx <= radiusX; kx++) {
-        // Calculate the index of the element in the Gaussian kernel array
-        let k = (ky + radiusY) * sizeX + (kx + radiusX);
-
-        // Calculate the value of the element using the Gaussian formula
-        kernel[k] = Math.exp(-(kx * kx) * invVarX - (ky * ky) * invVarY) / norm;
-      }
+    // Just in case, let's check to see if imageData's dimensions are already at
+    // the target width and height - if they are, there's no need to do anything
+    // to it, and we can just return it as-is...
+    if (imageData.width == newWidth && imageData.height == newHeight) {
+      return imageData;
     }
 
-    // Loop through each pixel in the new image data
-    for (let y = 0; y < newHeight; y++) {
-      for (let x = 0; x < newWidth; x++) {
-        // Calculate the corresponding coordinates in the old image data
-        let oldX = x / scaleX;
-        let oldY = y / scaleY;
+    // If we're here, then nope - we have some scaling to do! Create a canvas
+    // object and draw our input ImageData object to it...
+    const inputCanvas = document.createElement("canvas");
+    const inputContext = inputCanvas.getContext("2d");
+    inputCanvas.width = imageData.width;
+    inputCanvas.height = imageData.height;
+    inputContext.putImageData(imageData, 0, 0);
 
-        // Initialize the RGBA values of the pixel to zero
-        let r7 = 0;
-        let g7 = 0;
-        let b7 = 0;
-        let a7 = 0;
+    // Create another canvas object with the target dimensions, and draw the
+    // inputCanvas to it at target dimensions; this utilises the browser's
+    // native bilinear filtering...
+    const outputCanvas = document.createElement("canvas");
+    const outputContext = outputCanvas.getContext("2d");
+    outputContext.imageSmoothingEnabled = true;
+    outputContext.imageSmoothingQuality = "high";
+    outputCanvas.width = newWidth;
+    outputCanvas.height = newHeight;
+    outputContext.drawImage(inputCanvas, 0, 0, inputCanvas.width, inputCanvas.height, 0, 0, newWidth, newHeight);
 
-        // Initialize the sum of the kernel values to zero
-        let sum = 0;
+    // Return an ImageData object pulled from the output canvas...
+    return outputContext.getImageData(0, 0, newWidth, newHeight);
+  }
 
-        // Loop through each element in the Gaussian kernel array
-        for (let ky = -radiusY; ky <= radiusY; ky++) {
-          for (let kx = -radiusX; kx <= radiusX; kx++) {
-            // Calculate the index of the element in the Gaussian kernel array
-            let k = (ky + radiusY) * sizeX + (kx + radiusX);
+  // Utility function which takes in an ImageData object, and returns a
+  // downscaled version using a technique that involves downscaling the input's
+  // width and height repeatedly by half until doing so again would take the
+  // image below the target dimensions. The result is then blended with the next
+  // scale down based on how close the target dimensions are to the current or
+  // next scale - this essentially gives an effect like mip-mapping in 3D games.
+  // This method is fast, doesn't introduce image distortion, and works great
+  // with alpha channels... but can give "soft" images if the target image
+  // dimensions are just under native scale (or a 50% downscale threshold), and
+  // can give a "harsh" image if the target dimensions are just above a
+  // downscale threshold. I try to mitigate the latter by blending in an
+  // additional downscale when we get close to a downscale threshold. This
+  // function and sub-functions are based on the following JSFiddle code, but
+  // with my own modifications: https://jsfiddle.net/1b68eLdr/93089/
+  function _halveToTarget(imageData, newWidth, newHeight) {
 
-            // Get the value of the element in the Gaussian kernel array
-            let w = kernel[k];
+    // This sub-function takes two ImageData objects (assumed to be of identical
+    // dimensions) and blends their RGBA data together based on the passed-in
+    // amount (between 0 and 1 inclusive) of how much of imageDataOne should be
+    // in the blend. An amount of 1 means the result will be purely
+    // imageDataOne, while an amount of 0 means the result will be purely
+    // imageDataTwo. Numbers between 0 and 1 will give an appropriate mix of the
+    // two. The result of the blend is then returned as an ImageData object...
+    function blendImageDatas(imageDataOne, imageDataTwo, amountImageDataOne){
+      const blendedData = new ImageData(imageDataOne.width, imageDataOne.height);
+      const amountImageDataTwo = 1 - amountImageDataOne;
+      for (let i = 0; i < imageDataOne.data.length; i += 4) {
+        blendedData.data[i    ] = (imageDataOne.data[i    ] * amountImageDataOne) + (imageDataTwo.data[i    ] * amountImageDataTwo);
+        blendedData.data[i + 1] = (imageDataOne.data[i + 1] * amountImageDataOne) + (imageDataTwo.data[i + 1] * amountImageDataTwo);
+        blendedData.data[i + 2] = (imageDataOne.data[i + 2] * amountImageDataOne) + (imageDataTwo.data[i + 2] * amountImageDataTwo);
+        blendedData.data[i + 3] = (imageDataOne.data[i + 3] * amountImageDataOne) + (imageDataTwo.data[i + 3] * amountImageDataTwo);
+      }
+      return blendedData;
+    }
 
-            // Calculate the coordinates of the pixel in the old image data that
-            // corresponds to this element
-            let x1 = Math.round(oldX + kx);
-            let y1 = Math.round(oldY + ky);
+    // First, let's just copy imageData, and work on the copy instead - just in
+    // case we don't want to modify the input directly (it's passed by reference
+    // because it's an object - thanks JavaScript!)
+    let inputData = new ImageData(imageData.width, imageData.height);
+    inputData.data.set(imageData.data);
 
-            // Clamp the coordinates to the valid range
-            x1 = Math.max(0, Math.min(x1, oldWidth - 1));
-            y1 = Math.max(0, Math.min(y1, oldHeight - 1));
+    // Now let's reduce the input's width and height (independently) until doing
+    // so again would take the input's dimensions below the target dimensions;
+    // we'll use plain-old browser bilinear filtering to do this...
+    while (newWidth <= Math.round(inputData.width * 0.5)) {
+      inputData = _bilinear(inputData, Math.round(inputData.width * 0.5), inputData.height);
+    }
+    while (newHeight <= Math.round(inputData.height * 0.5)) {
+      inputData = _bilinear(inputData, inputData.width, Math.round(inputData.height * 0.5));
+    }
 
-            // Get the index of the pixel in the old pixel data array
-            let i1 = (y1 * oldWidth + x1) * 4;
+    // Now, inputData either exactly matches the dimensions of newWidth AND
+    // newHeight (in which case we're done), OR one or more of inputData's
+    // dimensions is greater than newWidth/newHeight. In that case, we want to
+    // generate the next level down for the dimensions that't aren't equal, and
+    // then blend between inputData (which is too detailed) and the next level
+    // down (which is too soft) based on how far away from the next level down
+    // we are - this essentially gives an effect like mip-mapping, and will help
+    // to ensure that transitions across 50% downscale thresholds aren't too
+    // jarring...
+    if (newWidth < inputData.width || newHeight < inputData.height) {
 
-            // Get the RGBA values of the pixel in the old pixel data array
-            let r1 = oldData[i1];
-            let g1 = oldData[i1 + 1];
-            let b1 = oldData[i1 + 2];
-            let a1 = oldData[i1 + 3];
+      // OK, one or more of inputData's dimensions is greater than
+      // newWidth/newHeight, so we're going to be doing some blending. First we
+      // need to generate the next scale of image downwards - just like before,
+      // we'll do each dimension separately...
+      let blendData = new ImageData(inputData.width, inputData.height);
+      blendData.data.set(inputData.data);
+      if (newWidth < inputData.width) {
+        blendData = _bilinear(blendData, Math.round(blendData.width * 0.5), blendData.height);
+      }
+      if (newHeight < inputData.height) {
+        blendData = _bilinear(blendData, blendData.width, Math.round(blendData.height * 0.5));
+      }
 
-            // Multiply the RGBA values by the kernel value and add them to the
-            // pixel values
-            r7 += r1 * w;
-            g7 += g1 * w;
-            b7 += b1 * w;
-            a7 += a1 * w;
+      // Now we have the next level of downscale, we need to work out where
+      // our target width and height lie between inputData's width and height,
+      // and blendData's width and height - that'll tell us what proportion of
+      // each image should be in the final blend between the two. Once we've
+      // worked that out, we blend inputData with blendData accordingly
+      // (blendData gets upscaled to inputData's resolution first, to make the
+      // blending less complicated)...
+      let axisBeingBlended = 0;
+      let widthFactor = 0;
+      let heightFactor = 0;
+      if (inputData.width - blendData.width != 0) {
+        widthFactor = (newWidth - blendData.width) / (inputData.width - blendData.width);
+        axisBeingBlended += 1;
+      }
+      if (inputData.height - blendData.height != 0) {
+        heightFactor = (newHeight - blendData.height) / (inputData.height - blendData.height);
+        axisBeingBlended += 1;
+      }
+      inputData = blendImageDatas(inputData, _bilinear(blendData, inputData.width, inputData.height), (widthFactor + heightFactor) / axisBeingBlended);
+    }
 
-            // Add the kernel value to the sum
-            sum += w;
+    // Finally, return imageData as scaled to the final desired width and height
+    // (it may not currently exactly those dimensions)...
+    return _bilinear(inputData, newWidth, newHeight);
+  }
+
+  // Utility function that takes in an ImageData object, and returns a
+  // downscaled version using a technique called Hermite interpolation. This
+  // method is a little slow, produces very high-quality output and works great
+  // with alpha channels... but it can introduce a little image distortion with
+  // high-frequency inputs, as well as some light aliasing on very fine details.
+  // To mitigate this, I've modified it to use a hybrid approach - I scale the
+  // image image to twice the target width and height using _halveToTarget
+  // (defined above), even if this means upscaling the input image first, and
+  // *then* I downscale the result using Hermite interpolation. The result is a
+  // bit slower again (as the input gets rescaled several times), but produced
+  // excellent results with zero distortion across all of my test images, even
+  // those with huge downscale ratios and very fine details (starfields). The
+  // core of this function is based on the following JSFiddle code, but again
+  // with some modifications by myself: https://jsfiddle.net/9g9Nv/442/
+  function _hermite(imageData, newWidth, newHeight){
+
+    // So the very first thing we do is rescale the input to twice the desired
+    // width and height using _halveToTarget and bilinear filtering (which may
+    // involve upscaling the input), before we use Hermite interpolation to
+    // downscale to the final target resolution - this hybrid approach appears
+    // to give excellent results for a slight speed penalty. We just call our
+    // main scaleImage() function, and force it to use "halveToTarget" instead
+    // of the default "hermite" method (don't want to be stuck in an infinite
+    // loop!). We'll do all our work on a copy of the input, just in case
+    // we don't want to modify that in the calling code...
+    let inputData = new ImageData(imageData.width, imageData.height);
+    inputData.data.set(imageData.data);
+    inputData = scaleImage(inputData, newWidth * 2, newHeight * 2, "Bilinear", "halveToTarget");
+
+    // OK, now it's on to the main Hermite interpolation; thanks to the original
+    // author of the JSFiddle! I've just cleaned up their code a little to fit
+    // within my use-case here. I'm not a "maths" person, and so the
+    // underpinnings of Hermite interpolation go over my head (I'm talking about
+    // the Wikipedia article here)... but from reading the code below, what I
+    // believe is happening is that it loops through the input data, and breaks
+    // it up into little rectangular chunks, where each chunk will become one
+    // pixel in the output image. It goes through each pixel of the chunk, and
+    // accumulates a weighted version of its RGBA data into a buffer (the gr_X
+    // variables). Once it's finished going through the chunk, it takes the
+    // accumulation buffer and uses the total weight to calculate a final RGBA
+    // for the matching pixel in the output buffer and stores it. The bit that's
+    // over my head is why the weighting is calculated the way it is... I'll
+    // leave that as an exercise to the more mathematically inclined, and just
+    // say silent thanks to the JSFiddle author again! I've renamed their
+    // original variables to match my own understanding as best I can, in case
+    // it helps to parse it a bit better...
+    const ratioWidth = inputData.width / newWidth;
+    const ratioWidthHalf = Math.ceil(ratioWidth / 2);
+    const ratioHeight = inputData.height / newHeight;
+    const ratioHeightHalf = Math.ceil(ratioHeight / 2);
+    const output = new ImageData(newWidth, newHeight);
+
+    // Loop through our desired output (as we're calculating the final value
+    // of each output pixel directly)...
+    for (let outputY = 0; outputY < newHeight; outputY++) {
+      for (let outputX = 0; outputX < newWidth; outputX++) {
+
+        let currentWeight = 0;
+        let totalWeightRGB = 0;
+        let totalWeightAlpha = 0;
+        let accumulatorRed = 0;
+        let accumulatorGreen = 0;
+        let accumulatorBlue = 0;
+        let accumulatorAlpha = 0;
+        const center_y = (outputY + 0.5) * ratioHeight;
+
+        // Calculate the borders of the "chunk" of input that'll be weighted
+        // down to a single output pixel...
+        const inputChunkLeftEdge = Math.floor(outputX * ratioWidth);
+        const inputChunkRightEdge = Math.min(Math.ceil((outputX + 1) * ratioWidth), inputData.width);
+        const inputChunkTopEdge = Math.floor(outputY * ratioHeight);
+        const inputChunkBottomEdge = Math.min(Math.ceil((outputY + 1) * ratioHeight), inputData.height);
+
+        // Now loop through the input rows within that chunk...
+        for (let inputY = inputChunkTopEdge; inputY < inputChunkBottomEdge; inputY++) {
+
+          // These three lines I'm not sure about, to be honest...
+          const dy = Math.abs(center_y - (inputY + 0.5)) / ratioHeightHalf;
+          const center_x = (outputX + 0.5) * ratioWidth;
+          const w0 = dy * dy;
+
+          // And loop through the input columns within those rows...
+          for (let inputX = inputChunkLeftEdge; inputX < inputChunkRightEdge; inputX++) {
+
+            // Again, these lines are similar to the three above; I know "w" is
+            // used in the Hermite weighting calculation...
+            const dx = Math.abs(center_x - (inputX + 0.5)) / ratioWidthHalf;
+            const w = Math.sqrt(w0 + dx * dx);
+            if (w >= 1) {
+              continue;
+            }
+
+            // This line is where the Hermite weighting is calculated...
+            currentWeight = 2 * w * w * w - 3 * w * w + 1;
+
+            // Now we use the weighting to fractions of the source pixel RGBA
+            // data in our accumulators; we also add the weight of the current
+            // pixel to a weight accumulator...
+            const pos_x = 4 * (inputX + inputY * inputData.width);
+            accumulatorAlpha += currentWeight * inputData.data[pos_x + 3];
+            totalWeightAlpha += currentWeight;
+            if (inputData.data[pos_x + 3] < 255) {
+              currentWeight = currentWeight * inputData.data[pos_x + 3] / 250;
+            }
+            accumulatorRed += currentWeight * inputData.data[pos_x];
+            accumulatorGreen += currentWeight * inputData.data[pos_x + 1];
+            accumulatorBlue += currentWeight * inputData.data[pos_x + 2];
+            totalWeightRGB += currentWeight;
           }
         }
 
-        // Divide the RGBA values by the sum to get an average value
-        r7 /= sum;
-        g7 /= sum;
-        b7 /= sum;
-        a7 /= sum;
-
-        // Round the RGBA values to integers
-        r7 = Math.round(r7);
-        g7 = Math.round(g7);
-        b7 = Math.round(b7);
-        a7 = Math.round(a7);
-
-        // Get the index of the pixel in the new pixel data array
-        let j = (y * newWidth + x) * 4;
-
-        // Set the RGBA values of the pixel in the new pixel data array
-        newData[j]     = r7;
-        newData[j + 1] = g7;
-        newData[j + 2] = b7;
-        newData[j + 3] = a7;
+        // Now that we've finished accumulating the weighted RGBA data for that
+        // entire source "chunk", we divide it by the total weight and store the
+        // result in our output ImageData object...
+        const pixelIndex = (outputX + outputY * newWidth) * 4;
+        output.data[pixelIndex    ] = accumulatorRed / totalWeightRGB;
+        output.data[pixelIndex + 1] = accumulatorGreen / totalWeightRGB;
+        output.data[pixelIndex + 2] = accumulatorBlue / totalWeightRGB;
+        output.data[pixelIndex + 3] = accumulatorAlpha / totalWeightAlpha;
       }
     }
-
-    // Create and return a new ImageData object with the new pixel data array
-    // and dimensions
-    return new ImageData(newData, newWidth, newHeight);
+    
+    // And that's it - output now contains the downscaled image, so return it!
+    return output;
   }
-
-  // Get the original width and height...
-  var width = input.width;
-  var height = input.height;
 
   // Before we consider doing *any* scaling, let's check to make sure the new
   // dimensions are different from the old ones; if they're not, there's no
   // point in doing any scaling!
-  if (width == newWidth && height == newHeight) {
+  if (input.width == newWidth && input.height == newHeight) {
     return input;
   }
 
@@ -659,43 +843,33 @@ function scaleImage(input, newWidth, newHeight, method) {
     // If the method is "Nearest Neighbour"...
     case "Nearest Neighbour":
 
-      // Create a new canvas element to draw the scaled image (we'll use the
-      // canvas to get our output ImageData object)...
-      var canvas = document.createElement("canvas");
-      var context = canvas.getContext("2d");
-
-      // Set the canvas size to the new dimensions...
-      canvas.width = newWidth;
-      canvas.height = newHeight;
-
-      // Create a new image data object to store the scaled pixel data...
-      var scaledData = context.createImageData(newWidth, newHeight);
+      // Create a new ImageData object to store the scaled pixel data...
+      const outputData = new ImageData(newWidth, newHeight);
 
       // Loop through each pixel of the new image...
-      for (var y = 0; y < newHeight; y++) {
-        for (var x = 0; x < newWidth; x++) {
+      for (let outputY = 0; outputY < newHeight; outputY++) {
+        for (let outputX = 0; outputX < newWidth; outputX++) {
 
-          // Calculate the index of the new pixel in the scaled data array...
-          var index = (y * newWidth + x) * 4;
+          // Calculate the index of the new pixel in the output data...
+          const outputIndex = (outputY * newWidth + outputX) * 4;
 
           // Calculate the x and y coordinates of the corresponding pixel in
-          // the original image...
-          var x2 = Math.floor(x * width / newWidth);
-          var y2 = Math.floor(y * height / newHeight);
+          // the original image, and it's index within input's data...
+          const inputX = Math.floor(outputX * input.width / newWidth);
+          const inputY = Math.floor(outputY * input.height / newHeight);
+          const inputIndex = (inputY * input.width + inputX) * 4;
 
-          // Calculate the index of the original pixel in the data array...
-          var index2 = (y2 * width + x2) * 4;
-
-          // Copy the color values from the original pixel to the new pixel...
-          scaledData.data[index]     = input.data[index2];     // Red
-          scaledData.data[index + 1] = input.data[index2 + 1]; // Green
-          scaledData.data[index + 2] = input.data[index2 + 2]; // Blue
-          scaledData.data[index + 3] = input.data[index2 + 3]; // Alpha
+          // Copy the color values from the input pixel to the output pixel...
+          outputData.data[outputIndex]     = input.data[inputIndex];     // Red
+          outputData.data[outputIndex + 1] = input.data[inputIndex + 1]; // Green
+          outputData.data[outputIndex + 2] = input.data[inputIndex + 2]; // Blue
+          outputData.data[outputIndex + 3] = input.data[inputIndex + 3]; // Alpha
         }
       }
 
       // Finally, return the scaled ImageData object...
-      return scaledData;
+      return outputData;
+      break;
 
     // If the method is "Bilinear"...
     case "Bilinear":
@@ -704,66 +878,73 @@ function scaleImage(input, newWidth, newHeight, method) {
       // you're *upscaling* an image, but if you're *downscaling* an image
       // by more than half the original's width/height, then true bilinear
       // filtering creates just as much of an aliased mess as nearest
-      // neighbour filtering. Most image editing apps therefore cheat and
-      // use a resampling algorithm when downscaling, and bilinear filtering
-      // when upscaling... so that's what we're going to do here too! We'll
-      // use gaussian resampling for any image axis that's being downscaled,
-      // and bilinear for any axis that's being upscaled; this should give
-      // the user a result that's much closer to what they'd expect to see...
+      // neighbour filtering once you get down to downscaling by more than half
+      // the dimensions of the original image. Most image editing apps therefore
+      // cheat and use a resampling algorithm when downscaling, and bilinear
+      // filtering when upscaling... so that's what we're going to do here too!
+      // We'll use a hybrid of bilinear and Hermite interpolation for any image
+      // axis that's being downscaled, and bilinear for any axis that's being
+      // upscaled; this should give the user a result that's much closer to what
+      // they'd expect to see from a graphics app like Photoshop or similar...
+      let upscaling = false, downscaling = false;
+      if (newWidth > input.width || newHeight > input.height) { upscaling = true; }
+      if (newWidth < input.width || newHeight < input.height) { downscaling = true; }
 
-      // Let's see which kind of scaling scenario we're in...
-      if (newWidth > width && newHeight > height) {
-
-        // All dimensions being upscaled, so we'll use bilinear filtering for
-        // everything...
+      // Now we'll process the image differently depending on whether or not
+      // we're only upscaling, only downscaling, or doing a mix of upscaling and
+      // downscaling. In the case of a mix, we do the upscaling part first, and
+      // the downscaling part second, as it'll give a slightly sharper result...
+      if (upscaling && !downscaling) {
+        // Upscale only...
         return _bilinear(input, newWidth, newHeight);
       }
-      else if (newWidth < width && newHeight < height) {
-
-        // All dimensions being downscaled, so we'll use gaussian resampling
-        // for everything...
-        return _gaussian(input, newWidth, newHeight);
+      else if (downscaling && !upscaling) {
+        // Downscale only - run the input through either our halve-to-target or
+        // Hermite filter...
+        switch (downscaleFilter){
+          case "hermite":
+            return _hermite(input, newWidth, newHeight);
+            break;
+          case "halveToTarget":
+            return _halveToTarget(input, newWidth, newHeight);
+            break;
+        }
       }
       else {
-
-        // It's a mix!
-        if (newWidth < width) {
-
-          // Gaussian for width, bilinear for height...
-          let partial = _gaussian(input, newWidth, height);
-          return _bilinear(partial, newWidth, newHeight);
+        // Both upscaling and downscaling... do the upscale first, then send the
+        // result back to this function again for downscaling...
+        let partiallyScaled;
+        if (newWidth > input.width) {
+          // Upscale width
+          partiallyScaled = _bilinear(input, newWidth, input.height);
         }
-        else if (newHeight < height) {
-
-          // Gaussian for height, bilinear for width...
-          let partial = _gaussian(input, width, newHeight);
-          return _bilinear(partial, newWidth, newHeight);
+        else {
+          // Upscale height
+          partiallyScaled = _bilinear(input, input.width, newHeight);
         }
+        // Downscale the rest...
+        return scaleImage(partiallyScaled, newWidth, newHeight, method, downscaleFilter);
       }
       break;
   }
 }
 
 // This utility function is used for adding info, warning and error messages to
-// the appropriate spots in my tools. It uses custom-modified versions of the
-// SVG Famfamfam Silk icon set via https://github.com/frhun/silk-icon-scalable
+// the appropriate spots in my tools...
 function setMessage(type, divID, text) {
-  var icon;
+  let icon = "";
   switch(type) {
     case "info":
-      icon = '<img class="icon" alt="An icon of a blue circle with a white lowercase letter I, indicating an informative message" aria-hidden="true" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHhtbG5zOnhsaW5rPSdodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rJyB2aWV3Qm94PScwIDAgNjQgNjQnPjxkZWZzPjxsaW5lYXJHcmFkaWVudCBpZD0nYSc+PHN0b3Agb2Zmc2V0PScwJyBzdG9wLWNvbG9yPScjNDk5MWQyJyBzdG9wLW9wYWNpdHk9Jy45Jy8+PHN0b3Agb2Zmc2V0PScxJyBzdG9wLWNvbG9yPScjMmU0NjgxJyBzdG9wLW9wYWNpdHk9Jy45NicvPjwvbGluZWFyR3JhZGllbnQ+PGxpbmVhckdyYWRpZW50IHhsaW5rOmhyZWY9JyNhJyBpZD0nYycgeDE9JzEyJyB4Mj0nNTInIHkxPScxMicgeTI9JzUyJyBncmFkaWVudFVuaXRzPSd1c2VyU3BhY2VPblVzZScvPjxsaW5lYXJHcmFkaWVudCBpZD0nYic+PHN0b3Agb2Zmc2V0PScwJyBzdG9wLWNvbG9yPScjN2RhOWQ2Jy8+PHN0b3Agb2Zmc2V0PScxJyBzdG9wLWNvbG9yPScjNWU4NWIzJy8+PC9saW5lYXJHcmFkaWVudD48bGluZWFyR3JhZGllbnQgeGxpbms6aHJlZj0nI2InIGlkPSdkJyB4MT0nMTYnIHgyPSc0OCcgeTE9JzE2JyB5Mj0nNDgnIGdyYWRpZW50VW5pdHM9J3VzZXJTcGFjZU9uVXNlJy8+PC9kZWZzPjxnIHBhaW50LW9yZGVyPSdtYXJrZXJzIHN0cm9rZSBmaWxsJz48Y2lyY2xlIGN4PSczMicgY3k9JzMyJyByPScyOCcgZmlsbD0ndXJsKCNjKScvPjxjaXJjbGUgY3g9JzMyJyBjeT0nMzInIHI9JzI0JyBmaWxsPScjYWVjNWUzJy8+PGNpcmNsZSBjeD0nMzInIGN5PSczMicgcj0nMjAnIGZpbGw9J3VybCgjZCknLz48cGF0aCBmaWxsPScjZmZmJyBkPSdNMjYgNDB2NGgxMnYtNGgtM1YyOGgtOHY0aDJ2OHpNMzUgMTloLTZ2Nmg2eicvPjwvZz48L3N2Zz4=">';
-    break;
+      icon = "ℹ️";
+      break;
 
     case "warning":
-      icon = '<img class="icon" alt="An icon of a yellow triangle with a dark orange exclamation point, indicating a warning or notice" aria-hidden="true" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHhtbG5zOnhsaW5rPSdodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rJyB2aWV3Qm94PScwIDAgNjQgNjQnPjxkZWZzPjxsaW5lYXJHcmFkaWVudCBpZD0nYSc+PHN0b3Agb2Zmc2V0PScwJyBzdG9wLWNvbG9yPScjZTliYjNhJy8+PHN0b3Agb2Zmc2V0PScxJyBzdG9wLWNvbG9yPScjYzE2ODAzJy8+PC9saW5lYXJHcmFkaWVudD48bGluZWFyR3JhZGllbnQgeGxpbms6aHJlZj0nI2EnIGlkPSdiJyB4MT0nMjAnIHgyPSc1NicgeTE9JzEyJyB5Mj0nNjAnIGdyYWRpZW50VW5pdHM9J3VzZXJTcGFjZU9uVXNlJy8+PC9kZWZzPjxwYXRoIGZpbGw9JyNmZmYnIHN0cm9rZT0ndXJsKCNiKScgc3Ryb2tlLWxpbmVqb2luPSdyb3VuZCcgc3Ryb2tlLXdpZHRoPSc4JyBkPSdNNCA1Nmg1NkwzMiA4WicgcGFpbnQtb3JkZXI9J3N0cm9rZSBtYXJrZXJzIGZpbGwnLz48cGF0aCBmaWxsPScjZjVkODUyJyBkPSdNMTIgNTJoNDBMMzIgMThaJyBwYWludC1vcmRlcj0nbWFya2VycyBmaWxsIHN0cm9rZScvPjxwYXRoIGZpbGw9JyNjNTg3MTEnIGQ9J00yOSA0M3Y2aDZ2LTZ6TTI5IDQwaDZWMjZoLTZ6JyBwYWludC1vcmRlcj0nc3Ryb2tlIG1hcmtlcnMgZmlsbCcvPjwvc3ZnPg==">';
-    break;
+      icon = "⚠️";
+      break;
 
     case "error":
-      icon = '<img class="icon" alt="An icon of a red circle with a white exclamation point, indicating an error has occurred" aria-hidden="true" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHhtbG5zOnhsaW5rPSdodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rJyB2aWV3Qm94PScwIDAgNjQgNjQnPjxkZWZzPjxsaW5lYXJHcmFkaWVudCBpZD0nYic+PHN0b3Agb2Zmc2V0PScwJyBzdG9wLWNvbG9yPScjZjU4MTYyJy8+PHN0b3Agb2Zmc2V0PScxJyBzdG9wLWNvbG9yPScjZTI1ZjUzJy8+PC9saW5lYXJHcmFkaWVudD48bGluZWFyR3JhZGllbnQgaWQ9J2EnPjxzdG9wIG9mZnNldD0nMCcgc3RvcC1jb2xvcj0nI2VjODE2YycvPjxzdG9wIG9mZnNldD0nMScgc3RvcC1jb2xvcj0nI2JmNDMyOScvPjwvbGluZWFyR3JhZGllbnQ+PGxpbmVhckdyYWRpZW50IHhsaW5rOmhyZWY9JyNhJyBpZD0nYycgeDE9JzEyJyB4Mj0nNTInIHkxPScxMicgeTI9JzUyJyBncmFkaWVudFVuaXRzPSd1c2VyU3BhY2VPblVzZScvPjxsaW5lYXJHcmFkaWVudCB4bGluazpocmVmPScjYicgaWQ9J2QnIHgxPScyMCcgeDI9JzQ4JyB5MT0nMTYnIHkyPSc0NCcgZ3JhZGllbnRVbml0cz0ndXNlclNwYWNlT25Vc2UnLz48L2RlZnM+PGNpcmNsZSBjeD0nMzInIGN5PSczMicgcj0nMjgnIGZpbGw9J3VybCgjYyknIHBhaW50LW9yZGVyPSdtYXJrZXJzIHN0cm9rZSBmaWxsJy8+PGNpcmNsZSBjeD0nMzInIGN5PSczMicgcj0nMjQnIGZpbGw9JyNmOWQzY2MnIHBhaW50LW9yZGVyPSdtYXJrZXJzIHN0cm9rZSBmaWxsJy8+PGNpcmNsZSBjeD0nMzInIGN5PSczMicgcj0nMjAnIGZpbGw9J3VybCgjZCknIHBhaW50LW9yZGVyPSdtYXJrZXJzIHN0cm9rZSBmaWxsJy8+PHBhdGggZmlsbD0nI2ZmZicgZD0nTTI5IDE2djIwaDZWMTZaTTI5IDQwdjZoNnYtNnonIHBhaW50LW9yZGVyPSdmaWxsIG1hcmtlcnMgc3Ryb2tlJy8+PC9zdmc+">';
-    break;
+      icon = "🛑";
+      break;
   }
-
   document.getElementById(divID).innerHTML = "<p class=\"" + type + "\">" + icon + " " + text + "</p>";
-
-  return;
 }

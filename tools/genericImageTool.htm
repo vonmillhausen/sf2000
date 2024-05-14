@@ -15,8 +15,8 @@
         <h2>Step 1: Select Operating Mode</h2>
         <p>This tool can operate in two main modes - you can use it to convert <em>from</em> an SF2000 format <em>to</em> RGB888/RGBA, or you can use it to convert <em>to</em> an SF2000 format <em>from</em> RGB888/RGBA. Choose the mode you want, and follow the next instruction that appears.</p>
         <div class="controlContainer">
-          <label class="control"><input type="radio" id="radioFrom" name="toolMode" value="fromSF2000" autocomplete="off"> Convert <em>from</em> SF2000</label><br>
-          <label class="control"><input type="radio" id="radioTo" name="toolMode" value="toSF2000" autocomplete="off"> Convert <em>to</em> SF2000</label>
+          <label for="radioFrom" class="control"><input type="radio" id="radioFrom" name="toolMode" value="fromSF2000" autocomplete="off"> Convert <em>from</em> SF2000</label><br>
+          <label for="radioTo" class="control"><input type="radio" id="radioTo" name="toolMode" value="toSF2000" autocomplete="off"> Convert <em>to</em> SF2000</label>
         </div>
       </section>
     </div>
@@ -25,24 +25,28 @@
 
       // Global Variables
       // ================
-      var sf2000ImageData;          // Holds binary data for images coming from the SF2000
-      var userImageData;            // Holds the original data of the PNG/JPEG coming from the user
-      var previewCanvasData;        // Holds the binary data used for drawing to our preview canvases
-      var outputImageWidth = 320;   // The width the user wants to interpret the image from the SF2000 as, default to 320px
-      var outputImageHeight = 240;  // The height the user wants to interpret the image from the SF2000 as, default to 240px
-      var imageFormat = "RGB565";   // The format the user wants to interpret the image coming from the SF2000 as, default to RGB565
-      var fileName;                 // Holds the name of the user-selected file
-      var userScaleMode = "scale";  // The type of scaling the user wants for their image, default to preset scales
-      var userScaleFactor = "1x";   // Holds the currently selected scaling factor, defaults to 1x
-      var userFitWidth = 320;       // Holds the current fit-to width, default to 320px
-      var userFitHeight = 240;      // Holds the current fit-to height, default to 240px
-      var userFilterType = "Nearest Neighbour"; // Holds the currently selected filter type, defaulting to Nearest Neighbour
+      let sf2000ImageData;            // Holds binary data for images coming from the SF2000
+      let userImageData;              // Holds the original data of the PNG/JPEG coming from the user
+      let previewCanvasData;          // Holds the binary data used for drawing to our preview canvases
+      let outputImageWidth = 320;     // The width the user wants to interpret the image from the SF2000 as, default to 320px
+      let outputImageHeight = 240;    // The height the user wants to interpret the image from the SF2000 as, default to 240px
+      let fileName;                   // Holds the name of the user-selected file
+      let imageFormat = "RGB565";     // The format the user wants to interpret the image coming from the SF2000 as, default to RGB565
+      let ditherEnabled = false;      // Holds whether the user wants to enable dithering for RGB565 mode or not
+      let ditherStrength = 0.2;       // Holds the selected dither strength value - 0.2 seems to be a good general balance
+      let userScaleMode = "scale";    // The type of scaling the user wants for their image, default to preset scales
+      let userScaleFactor = "1x";     // Holds the currently selected scaling factor, defaults to 1x
+      let fitToWidthEnabled = true;   // Holds whether the "fit to width" checkbox is ticked or not
+      let userFitWidth = 320;         // Holds the current fit-to width, default to 320px
+      let fitToHeightEnabled = true;  // Holds whether the "fit to width" checkbox is ticked or not
+      let userFitHeight = 240;        // Holds the current fit-to height, default to 240px
+      let userFilterType = "Nearest Neighbour"; // Holds the currently selected filter type, defaulting to Nearest Neighbour
 
       // When the tool loads, add some event watchers for when the Step 1 radio
       // buttons change; and depending on which mode the user selects, begin
       // rewriting the rest of the page...
-      var modes = document.getElementsByName("toolMode");
-      for (var i = 0; i < modes.length; i++) {
+      const modes = document.getElementsByName("toolMode");
+      for (let i = 0; i < modes.length; i++) {
         modes[i].addEventListener("change", function() {
 
           // Clear out any HTML that might already exist after Step 1, just so
@@ -69,10 +73,10 @@
 
         // Create the new section, add our heading and our instruction
         // paragraph...
-        var html = "<section id=\"selectSF2000File\"><h2>Step 2: Select SF2000 Image File</h2><p>Select the SF2000 image file you want to convert from. If you need help choosing the image you want to convert, you can <a href=\"https://vonmillhausen.github.io/sf2000/#images-used\" target=\"_blank\" rel=\"noreferrer noopener\">find a reference to all of the used UI images in my overview of the SF2000 here</a>.</p><div id=\"step2Messages\"></div>";
+        let html = "<section id=\"selectSF2000File\"><h2>Step 2: Select SF2000 Image File</h2><p>Select the SF2000 image file you want to convert from. If you need help choosing the image you want to convert, you can <a href=\"https://vonmillhausen.github.io/sf2000/#images-used\" target=\"_blank\" rel=\"noreferrer noopener\">find a reference to all of the used UI images in my overview of the SF2000 here</a>.</p><div id=\"step2Messages\"></div>";
 
         // Add our file chooser...
-        html += "<div class=\"controlContainer\"><label class=\"control\"><input id=\"inputImage\" type=\"file\"></label></div>";
+        html += "<form class=\"controlContainer\"><label for=\"inputImage\" class=\"control\"><input id=\"inputImage\" name=\"inputImage\" type=\"file\"></label></form>";
 
         // Close off our section...
         html += "</section>";
@@ -83,7 +87,7 @@
         document.getElementById("steps").insertAdjacentHTML("beforeend", html);
 
         // Attach our event handler to our new file input control...
-        var sf2000ImageInput = document.getElementById("inputImage");
+        const sf2000ImageInput = document.getElementById("inputImage");
         sf2000ImageInput.addEventListener("change", function() {
 
           // The user has chosen a new file; it should be a binary blob we can
@@ -92,22 +96,22 @@
 
           // Now let's check to make sure the data URI indicates
           // "application/octet-stream"...
-          var frImage = new FileReader();
+          const frImage = new FileReader();
           fileName = event.target.files[0].name;
           frImage.readAsDataURL(event.target.files[0]);
           frImage.onload = function(event) {
-            var fileData = event.target.result;
-            var dataType = fileData.substring(5, fileData.indexOf(";"));
+            const fileData = event.target.result;
+            const dataType = fileData.substring(5, fileData.indexOf(";"));
             if (dataType === "application/octet-stream") {
 
               // The user selected a file that appears to contain binary data;
               // it's a good candidate for image interpretation so! Extract the
               // binary data, store it in our sf2000ImageData global, and start
               // setting up Step 3...
-              var base64Data = fileData.substring(fileData.indexOf(",") + 1);
-              var binaryData = atob(base64Data);
+              const base64Data = fileData.substring(fileData.indexOf(",") + 1);
+              const binaryData = atob(base64Data);
               sf2000ImageData = new Uint8Array(binaryData.length);
-              for (var i = 0; i < binaryData.length; i++) {
+              for (let i = 0; i < binaryData.length; i++) {
                 sf2000ImageData[i] = binaryData.charCodeAt(i);
               }
 
@@ -137,10 +141,10 @@
       function setupStepTwo_To() {
 
         // Start our new section, add our header and our instructions...
-        var html = "<section id=\"selectImageFile\"><h2>Step 2: Select RGB888/RGBA Image File</h2><p>Select the image file you want to convert to an SF2000 image format. You can select either a PNG or JPEG format image. Transparency is respected for PNGs, but only if outputting to the BGRA output format.</p><div id=\"step2Messages\"></div>";
+        let html = "<section id=\"selectImageFile\"><h2>Step 2: Select RGB888/RGBA Image File</h2><p>Select the image file you want to convert to an SF2000 image format. You can select either a PNG or JPEG format image. Transparency is respected for PNGs, but only if outputting to the BGRA output format.</p><div id=\"step2Messages\"></div>";
 
         // Add our file chooser...
-        html += "<div class=\"controlContainer\"><label class=\"control\"><input id=\"inputImage\" type=\"file\"></label></div>";
+        html += "<div class=\"controlContainer\"><label for=\"inputImage\" class=\"control\"><input id=\"inputImage\" type=\"file\" accept=\".jpg,.jpeg,.png\"></label></div>";
 
         // Close our section...
         html += "</section>";
@@ -151,17 +155,16 @@
         document.getElementById("steps").insertAdjacentHTML("beforeend", html);
 
         // Attach our event handler to our new file input control...
-        var userImageInput = document.getElementById("inputImage");
+        const userImageInput = document.getElementById("inputImage");
         userImageInput.addEventListener("change", function() {
 
           // The user has chosen a new file; it should be either a PNG or JPEG
-          // image for converting to an SF2000 binary image format...
-
-          // First let's clear any old messages...
+          // image for converting to an SF2000 binary image format. First let's
+          // clear any old messages...
           document.getElementById("step2Messages").innerHTML = "";
 
           // Now let's read in the file...
-          var frImage = new FileReader();
+          const frImage = new FileReader();
           fileName = event.target.files[0].name;
           frImage.readAsDataURL(event.target.files[0]);
           frImage.onload = function(event) {
@@ -173,7 +176,6 @@
               // Whoops! Doesn't look like the user provided a PNG or a JPEG!
               setMessage("error", "step2Messages", "ERROR: The selected file does not appear to be either a PNG or JPEG image; please make sure you're selecting an appropriate image file.");
               return;
-
             }
             
             // Now we're going to load the file's data into an Image object, so
@@ -335,15 +337,15 @@
 
         // Create the new section, add our heading and our instruction
         // paragraph...
-        var html = "<section id=\"processSF2000File\"><h2>Step 3: Set Data Interpretation Options</h2><p>As the image files on the SF2000 are raw binary blobs, there's no information stored in them to say what their width or height is, what format the pixel information is stored in, etc.. Therefore, it is up to <em>you</em> to specify those details yourself, which you can do using the options below.</p><p>A preview of the image will appear below the options, reflecting the current options; the preview has a white dash outline so you can better judge where the bounds of transparent images are. Below the preview image is a \"Download\" button you can use to download the image as a PNG.</p><p>Depending on the size of the file you selected, this tool may recognise it as a \"known\" file from the SF2000, and if so the options below will have been set automatically for you. If not, or if the options are automatically set incorrectly, here's a brief description of what each option does:</p><dl><dt>Image Format:</dt><dd>Specifies the data format for each pixel in the image. There are two image formats currently used by the SF2000 - RGB565 (used for most of the \"basic\" UI elements, including main backgrounds, etc.), and BGRA (used for anything that requires transparency, such as the system logos on the main menu, etc.).</dd><dt>Width:</dt><dd>Specifies the width of the image in pixels.</dd><dt>Height:</dt><dd>Specifies the height of the image in pixels.</dd></dl>";
+        let html = "<section id=\"processSF2000File\"><h2>Step 3: Set Data Interpretation Options</h2><p>As the image files on the SF2000 are raw binary blobs, there's no information stored in them to say what their width or height is, what format the pixel information is stored in, etc.. Therefore, it is up to <em>you</em> to specify those details yourself, which you can do using the options below.</p><p>A preview of the image will appear below the options, reflecting the current options; the preview has a white dash outline so you can better judge where the bounds of transparent images are. Below the preview image is a \"Download\" button you can use to download the image as a PNG.</p><p>Depending on the size of the file you selected, this tool may recognise it as a \"known\" file from the SF2000, and if so the options below will have been set automatically for you. If not, or if the options are automatically set incorrectly, here's a brief description of what each option does:</p><dl><dt>Image Format:</dt><dd>Specifies the data format for each pixel in the image. There are two image formats currently used by the SF2000 - RGB565 (used for most of the \"basic\" UI elements, including main backgrounds, etc.), and BGRA (used for anything that requires transparency, such as the system logos on the main menu, etc.).</dd><dt>Width:</dt><dd>Specifies the width of the image in pixels.</dd><dt>Height:</dt><dd>Specifies the height of the image in pixels.</dd></dl>";
 
         // Next, let's add our image controls; a select list for the image
         // format, and number inputs for the interpreted width and height...
-        html += "<div class=\"controlContainer\">";
-        html += "<div class=\"control\"><label>Image Format: <select id=\"imageFormat\"><option" + (imageFormat == "RGB565" ? " selected" : "") + ">RGB565</option><option" + (imageFormat == "BGRA" ? " selected" : "") + ">BGRA</option></select></label></div>";
-        html += "<div class=\"control\"><label>Width: <input id=\"outputImageWidth\" type=\"number\" min=\"1\" step=\"1\" value=\"" + outputImageWidth + "\"></label></div>";
-        html += "<div class=\"control\"><label>Height: <input id=\"outputImageHeight\" type=\"number\" min=\"1\" step=\"1\" value=\"" + outputImageHeight + "\"></label></div>";
-        html += "</div>";
+        html += "<form id=\"fromSF2000ImageSettings\"class=\"controlContainer\">";
+        html += "<div class=\"control\"><label for=\"imageFormat\">Image Format: <select id=\"imageFormat\" name=\"imageFormat\"><option" + (imageFormat == "RGB565" ? " selected" : "") + ">RGB565</option><option" + (imageFormat == "BGRA" ? " selected" : "") + ">BGRA</option></select></label></div>";
+        html += "<div class=\"control\"><label for=\"outputImageWidth\">Width: <input id=\"outputImageWidth\" name=\"outputImageWidth\" type=\"number\" min=\"1\" step=\"1\" value=\"" + outputImageWidth + "\"></label></div>";
+        html += "<div class=\"control\"><label for=\"outputImageHeight\">Height: <input id=\"outputImageHeight\" name=\"outputImageHeight\" type=\"number\" min=\"1\" step=\"1\" value=\"" + outputImageHeight + "\"></label></div>";
+        html += "</form>";
 
         // Next, we'll add the image preview...
         html += "<div class=\"controlContainer\"><div class=\"control\"><canvas id=\"processFilePreview\"></canvas></div></div>";
@@ -359,18 +361,12 @@
         document.getElementById("steps").insertAdjacentHTML("beforeend", "<hr>");
         document.getElementById("steps").insertAdjacentHTML("beforeend", html);
 
-        // Now, add our interactivity by attaching our event handlers; first up,
-        // our format selector...
-        var ifField = document.getElementById("imageFormat");
-        ifField.addEventListener("change", function() {
-          // Set our global imageFormat to the new value, and update our
-          // preview...
-          imageFormat = this.value;
-          convertFromSF2000AndRender();
-        });
-
-        // Next our width and height fields...
-        var whFields = [document.getElementById("outputImageWidth"), document.getElementById("outputImageHeight")];
+        // Now, attach some event handlers to our form controls; these will
+        // handle some of the logic for how I want the controls to behave. First
+        // up, our width and height fields - I have some limitations on the
+        // types of things I want typed in them, and how I want them to be
+        // changed...
+        const whFields = [document.getElementById("outputImageWidth"), document.getElementById("outputImageHeight")];
         whFields.forEach(field => {
 
           // When a key is pressed, only allow the events through under certain
@@ -390,23 +386,37 @@
             if (this.value === "" || this.value === "0") {
               this.value = "1";
             }
-            if (this.id == "outputImageWidth") {
-              outputImageWidth = this.value;
-            }
-            else {
-              outputImageHeight = this.value;
-            }
-            convertFromSF2000AndRender();
           });
         });
 
-        // And attach the event handler for the download button...
-        var downloadButton = document.getElementById("sf2000Download");
+        // Next, attach the event handler for the download button...
+        const downloadButton = document.getElementById("sf2000Download");
         downloadButton.addEventListener("click", function() {
-          var canvas = document.getElementById("processFilePreview");
+          const canvas = document.getElementById("processFilePreview");
           canvas.toBlob(function(blob) {
             downloadToBrowser(blob, "image/png", fileName + ".png");
           });
+        });
+
+        // That's the end of the specific UI event handlers; the final handler
+        // we'll set up is a general event handler for the entire form itself.
+        // Any time *any* of the controls in the form change, that event will
+        // bubble-up and trigger this handler, where we'll get the current state
+        // of the form's controls, and use it to re-convert and re-render the
+        // image using the current settings...
+        const fromSF2000Form = document.getElementById("fromSF2000ImageSettings");
+        fromSF2000Form.addEventListener("change", function() {
+
+          // Get the state of all of the form's controls...
+          const formData = Object.fromEntries(new FormData(fromSF2000Form));
+
+          // Set our general globals from the current form state...
+          imageFormat = formData.imageFormat;
+          outputImageWidth = formData.outputImageWidth;
+          outputImageHeight = formData.outputImageHeight;
+
+          // And re-convert and re-render based on those globals...
+          convertFromSF2000AndRender();
         });
 
         // We're nearly ready to wrap up Step 3; all that's left is to perform
@@ -423,7 +433,7 @@
         // from a known image, we already have our width and height this time,
         // and so we can just get on to rendering the HTML. Create our new
         // section, add its heading and instruction paragraphs...
-        html = "<section id=\"processUserFile\"><h2>Step 3: Set Conversion Options</h2><p>The options below control how your image is converted for use on the SF2000. A preview of the image will appear below the options, reflecting their current settings; the preview has a white dash outline so you can better judge where the bounds of transparent images are. Below the preview image is a \"Download\" button you can use to download the image as binary blob for the SF2000. If you name your input image like <code>name.extension.extension</code> (e.g., <code>c1eac.pal.png</code>), then the download will automatically be named like <code>name.extension</code> (e.g., <code>c1eac.pal</code>); this may help to speed up your workflow.</p><p>Here's a brief description of what each option does:</p><dl><dt>Image Format:</dt><dd>Specifies the data format for the output image. There are two image formats currently used by the SF2000 - RGB565 (used for most of the \"basic\" UI elements, including main backgrounds, etc.), and BGRA (used for anything that requires transparency, such as the system logos on the main menu, etc.). If you're not sure which format to choose, <a href=\"https://vonmillhausen.github.io/sf2000/#images-used\" target=\"_blank\" rel=\"noreferrer noopener\">refer to my list of images used by the SF2000</a>.</dd><dt>Scaling:</dt><dd>One of two available scaling modes for your input image; the \"Scaling\" option lets you scale your image maintaining aspect ratio amongst several common sizes (e.g., 1x scaling to maintain the input image size, 2x scaling to double it, etc.)</dd><dt>Fit to:</dt><dd>The other available scaling mode; this will scale your image to the specified width and height, <em>without</em> maintaining aspect ratio. This will allow you to scale an image to any dimension you want, but it'll be up to you to do your own aspect ratio calculations.</dd><dt>Filter Type:</dt><dd>When scaling an image by anything other than 1x, specifies the type of image filtering to use. \"Nearest Neighbour\" will give sharp pixel scaling but only at integer upscales; any other scale will appear aliased. \"Bilinear\" will give a fuzzier scale, but it works better for non-integer scale factors and for downscaling.</dd></dl>";
+        let html = "<section id=\"processUserFile\"><h2>Step 3: Set Conversion Options</h2><p>The options below control how your image is converted for use on the SF2000. A preview of the image will appear below the options, reflecting their current settings; the preview has a white dash outline so you can better judge where the bounds of transparent images are. Below the preview image is a \"Download\" button you can use to download the image as binary blob for the SF2000. If you name your input image like <code>name.extension.extension</code> (e.g., <code>c1eac.pal.png</code>), then the download will automatically be named like <code>name.extension</code> (e.g., <code>c1eac.pal</code>); this may help to speed up your workflow.</p><p>Here's a brief description of what each option does:</p><dl><dt>Image Format:</dt><dd>Specifies the data format for the output image. There are two image formats currently used by the SF2000 - RGB565 (used for most of the \"basic\" UI elements, including main backgrounds, etc.), and BGRA (used for anything that requires transparency, such as the system logos on the main menu, etc.). If you're not sure which format to choose, <a href=\"https://vonmillhausen.github.io/sf2000/#images-used\" target=\"_blank\" rel=\"noreferrer noopener\">refer to my list of images used by the SF2000</a>.</dd><dt>Scaling:</dt><dd>One of two available scaling modes for your input image; the \"Scaling\" option lets you scale your image maintaining aspect ratio amongst several common sizes (e.g., 1x scaling to maintain the input image size, 2x scaling to double it, etc.)</dd><dt>Fit to:</dt><dd>The other available scaling mode; this will scale your image to the specified width and height, <em>without</em> maintaining aspect ratio. This will allow you to scale an image to any dimension you want, but it'll be up to you to do your own aspect ratio calculations.</dd><dt>Filter Type:</dt><dd>When scaling an image by anything other than 1x, specifies the type of image filtering to use. \"Nearest Neighbour\" will give sharp pixel scaling but only at integer upscales; any other scale will appear aliased. \"Bilinear\" will give a fuzzier scale, but it works better for non-integer scale factors and for downscaling.</dd></dl>";
 
         // Now let's add our image controls; there's a few of them! We have a
         // select box for choosing the image format, we have two different
@@ -431,21 +441,24 @@
         // scales, and one for user-defined output size), and we have a select
         // box for choosing nearest-neighbour or hybrid gaussian/bilinear
         // image filtering...
-        html += "<div class=\"controlContainer\">";
-        // Image format...
-        html += "<div class=\"control\"><label>Image Format: <select id=\"imageFormat\"><option" + (imageFormat == "RGB565" ? " selected" : "") + ">RGB565</option><option" + (imageFormat == "BGRA" ? " selected" : "") + ">BGRA</option></select></label></div>";
+        html += "<form id=\"toSF2000ImageSettings\" class=\"controlContainer\">";
+        // Image format and dithering options...
+        html += "<div class=\"control\">";
+        html += "<div class=\"control\"><label for=\"imageFormat\">Image Format: <select id=\"imageFormat\" name=\"imageFormat\"><option" + (imageFormat == "RGB565" ? " selected" : "") + ">RGB565</option><option" + (imageFormat == "BGRA" ? " selected" : "") + ">BGRA</option></select></label></div>";
+        html += "<div class=\"control\"><label for=\"ditherEnabled\">Dithering: <input type=\"checkbox\" id=\"ditherEnabled\" name=\"ditherEnabled\"" + (ditherEnabled == true ? " checked" : "") + (imageFormat == "BGRA" ? " disabled" : "") + "></label> <label for=\"ditherStrength\">Strength: <select id=\"ditherStrength\" name=\"ditherStrength\"" + (imageFormat == "BGRA" ? " disabled" : "") + "><option" + (ditherStrength == 0.1 ? " selected" : "") + ">0.1</option><option" + (ditherStrength == 0.2 ? " selected" : "") + ">0.2</option><option" + (ditherStrength == 0.3 ? " selected" : "") + ">0.3</option><option" + (ditherStrength == 0.5 ? " selected" : "") + ">0.5</option><option" + (ditherStrength == 0.75 ? " selected" : "") + ">0.75</option><option" + (ditherStrength == 1.0 ? " selected" : "") + ">1</option><option" + (ditherStrength == 2.0 ? " selected" : "") + ">2</option></select></label></div>";
+        html += "</div>";
         // Scaling options...
         html += "<div class=\"control\">";
-        html += "<div class=\"control\"><label><input type=\"radio\" name=\"scaleMode\" value=\"scale\"" + (userScaleMode == "scale" ? " checked" : "") + "> Scaling: </label><select id=\"scaleFactor\"" + (userScaleMode == "fit" ? " disabled" : "") + "><option" + (userScaleFactor == "0.5x" ? " selected" : "") + ">0.5x</option><option" + (userScaleFactor == "1x" ? " selected" : "") + ">1x</option><option" + (userScaleFactor == "2x" ? " selected" : "") + ">2x</option><option" + (userScaleFactor == "3x" ? " selected" : "") + ">3x</option><option" + (userScaleFactor == "4x" ? " selected" : "") + ">4x</option></select></div>";
+        html += "<div class=\"control\"><label for=\"scaleModeScale\"><input type=\"radio\" id=\"scaleModeScale\" name=\"scaleMode\" value=\"scale\"" + (userScaleMode == "scale" ? " checked" : "") + "> Scaling: </label><select id=\"scaleFactor\" name=\"scaleFactor\"" + (userScaleMode == "fit" ? " disabled" : "") + "><option" + (userScaleFactor == "0.5x" ? " selected" : "") + ">0.5x</option><option" + (userScaleFactor == "1x" ? " selected" : "") + ">1x</option><option" + (userScaleFactor == "2x" ? " selected" : "") + ">2x</option><option" + (userScaleFactor == "3x" ? " selected" : "") + ">3x</option><option" + (userScaleFactor == "4x" ? " selected" : "") + ">4x</option></select></div>";
         html += " OR ";
-        html += "<div class=\"control\"><label><input type=\"radio\" name=\"scaleMode\" value=\"fit\"" + (userScaleMode == "fit" ? " checked" : "") + "> Fit to: </label><label>width <input id=\"userFitWidth\" type=\"number\" min=\"1\" step=\"1\" value=\""+ userFitWidth + "\"" + (userScaleMode == "scale" ? " disabled" : "") + "></label> and <label>height <input id=\"userFitHeight\" type=\"number\" min=\"1\" step=\"1\" value=\""+ userFitHeight + "\"" + (userScaleMode == "scale" ? " disabled" : "") + "></label></div>";
+        html += "<div class=\"control\"><label for=\"scaleModeFit\"><input type=\"radio\" id=\"scaleModeFit\" name=\"scaleMode\" value=\"fit\"" + (userScaleMode == "fit" ? " checked" : "") + "> Fit to: </label><label for=\"fitToWidthEnabled\"><input type=\"checkbox\" id=\"fitToWidthEnabled\" name=\"fitToWidthEnabled\"" + (fitToWidthEnabled == true ? " checked" : "") + (userScaleMode == "scale" ? " disabled" : "") + "> width </label><input id=\"userFitWidth\" name=\"userFitWidth\" type=\"number\" min=\"1\" step=\"1\" value=\""+ userFitWidth + "\"" + (userScaleMode == "scale" ? " disabled" : "") + "> and <label for=\"fitToHeightEnabled\"><input type=\"checkbox\" id=\"fitToHeightEnabled\" name=\"fitToHeightEnabled\"" + (fitToHeightEnabled == true ? " checked" : "") + (userScaleMode == "scale" ? " disabled" : "") + "> height </label><input id=\"userFitHeight\" name=\"userFitHeight\" type=\"number\" min=\"1\" step=\"1\" value=\""+ userFitHeight + "\"" + (userScaleMode == "scale" ? " disabled" : "") + "></div>";
         html += "</div>";
         // Filter type...
-        html += "<div class=\"control\"><label>Filter Type: <select id=\"userFilterType\"><option" + (userFilterType == "Nearest Neighbour" ? " selected" : "") + ">Nearest Neighbour</option><option" + (userFilterType == "Bilinear" ? " selected" : "") + ">Bilinear</option></select></label></div>";
-        html += "</div>";
+        html += "<div class=\"control\"><label for=\"userFilterType\">Filter Type: <select id=\"userFilterType\" name=\"userFilterType\"><option" + (userFilterType == "Nearest Neighbour" ? " selected" : "") + ">Nearest Neighbour</option><option" + (userFilterType == "Bilinear" ? " selected" : "") + ">Bilinear</option></select></label></div>";
+        html += "</form>";
 
         // Next we'll add our image preview...
-        html += "<div class=\"controlContainer\"><div class=\"control\"><canvas id=\"processFilePreview\"></canvas></div></div>";
+        html += "<div class=\"controlContainer\"><div class=\"control alignC\"><span id=\"previewDimensions\"></span><br><canvas id=\"processFilePreview\"></canvas></div></div>";
 
         // ... and our Download button...
         html += "<div class=\"controlContainer\"><div class=\"control\"><input id=\"userDownload\" type=\"button\" value=\"Download\"></div></div>";
@@ -458,76 +471,80 @@
         document.getElementById("steps").insertAdjacentHTML("beforeend", "<hr>");
         document.getElementById("steps").insertAdjacentHTML("beforeend", html);
 
-        // Now we'll attach event listeners for all of the interactive elements
-        // in this step. We'll start with our image format select box...
-        var ifField = document.getElementById("imageFormat");
-        ifField.addEventListener("change", function() {
+        // Now, attach some event handlers to our form controls; these will
+        // handle some of the logic for how I want the controls to behave.
+        // First, let's enable/disable dithering options depending on whether or
+        // not image format is set to RGB565...
+        const formatSelect = document.getElementById("imageFormat");
+        formatSelect.addEventListener("change", function() {
+          switch (this.value){
+            case "RGB565":
+              document.getElementById("ditherEnabled").removeAttribute("disabled");
+              document.getElementById("ditherStrength").removeAttribute("disabled");
+              break;
 
-          // Update our global variable with the new value, convert the user's
-          // image using the new format and render a preview...
-          imageFormat = this.value;
-          let newWH = calculateNewSize(userImageData);
-          convertImageToSF2000(scaleImage(userImageData, newWH.width, newWH.height, userFilterType));
-          convertFromSF2000AndRender();
+            case "BGRA":
+              document.getElementById("ditherEnabled").setAttribute("disabled", "");
+              document.getElementById("ditherStrength").setAttribute("disabled", "");
+              break;
+          }
         });
 
-        // The scaling mode radio buttons; these let the user choose between
-        // fixed-ratio scaling, or fixed width/height scaling...
-        var modes = document.getElementsByName("scaleMode");
-        for (var i = 0; i < modes.length; i++) {
+        // Now let's do the scaling mode radio buttons; these let the user
+        // choose between fixed-ratio scaling, or fixed width/height scaling...
+        const modes = document.getElementsByName("scaleMode");
+        for (let i = 0; i < modes.length; i++) {
           modes[i].addEventListener("change", function() {
 
-            // Update our global variable with the new selection...
-            userScaleMode = this.value;
-
             // Check what they chose...
-            if (userScaleMode == "scale") {
-
+            if (this.value == "scale") {
               // They chose fixed-ratio scaling, so enable the ratio selector,
-              // and disable the fixed-width/height number inputs...
+              // and disable the fixed-width/height controls...
               document.getElementById("scaleFactor").removeAttribute("disabled");
+              document.getElementById("fitToWidthEnabled").setAttribute("disabled", "");
               document.getElementById("userFitWidth").setAttribute("disabled", "");
+              document.getElementById("fitToHeightEnabled").setAttribute("disabled", "");
               document.getElementById("userFitHeight").setAttribute("disabled", "");
             }
-            else if (userScaleMode == "fit") {
-
+            else if (this.value == "fit") {
               // They chose fixed width/height scaling, so enable our
               // width/height number inputs, and disable the ratio-scaling
               // selection box...
+              document.getElementById("fitToWidthEnabled").removeAttribute("disabled");
               document.getElementById("userFitWidth").removeAttribute("disabled");
+              document.getElementById("fitToHeightEnabled").removeAttribute("disabled");
               document.getElementById("userFitHeight").removeAttribute("disabled");
               document.getElementById("scaleFactor").setAttribute("disabled", "");
             }
-
-            // We'll also want to re-convert the user's image data and render
-            // a new preview...
-            let newWH = calculateNewSize(userImageData);
-            convertImageToSF2000(scaleImage(userImageData, newWH.width, newWH.height, userFilterType));
-            convertFromSF2000AndRender();
           });
         }
 
-        // The fixed-ratio scaling selector...
-        var sField = document.getElementById("scaleFactor");
-        sField.addEventListener("change", function() {
-
-          // Update our global variable with the newly chosen scaling factor,
-          // and then re-convert the user's image data and render a new
-          // preview...
-          userScaleFactor = this.value;
-          let newWH = calculateNewSize(userImageData);
-          convertImageToSF2000(scaleImage(userImageData, newWH.width, newWH.height, userFilterType));
-          convertFromSF2000AndRender();
+        // Next, the fixed-width/height checkboxes; these have a little twist
+        // whereby we don't want to allow them both to be unticked at the same
+        // time - so we catch click events, and ignore them if they would cause
+        // both checkboxes to be unticked...
+        const widthCheckbox = document.getElementById("fitToWidthEnabled");
+        widthCheckbox.addEventListener("click", function() {
+          const heightCheckbox = document.getElementById("fitToHeightEnabled");
+          if (heightCheckbox.checked == false) {
+            event.preventDefault();
+          }
+        });
+        const heightCheckbox = document.getElementById("fitToHeightEnabled");
+        heightCheckbox.addEventListener("click", function() {
+          const widthCheckbox = document.getElementById("fitToWidthEnabled");
+          if (widthCheckbox.checked == false) {
+            event.preventDefault();
+          }
         });
 
-        // And the fixed-width/height number inputs...
-        var whFields = [document.getElementById("userFitWidth"), document.getElementById("userFitHeight")];
+        // And now the fixed-width/height number inputs...
+        const whFields = [document.getElementById("userFitWidth"), document.getElementById("userFitHeight")];
         whFields.forEach(field => {
 
           // These get two event listeners; the first is designed to prevent the
           // user from entering anything other than positive integers...
           field.addEventListener("keydown", function(event) {
-
             // Only allow integer entry and things like arrow keys, etc!
             if (event.key.length > 1 || /\d/.test(event.key)) {
               return;
@@ -535,95 +552,129 @@
             event.preventDefault();
           });
 
-          // ... and this updates our global variables, re-converts the user's
-          // image data and renders a new preview image when the numbers are
-          // changed...
+          // ... and the second catches when if the value is blank or set to 0,
+          // and if so sets it to 1 instead...
           field.addEventListener("change", function() {
-
             if (this.value === "" || this.value === "0") {
               this.value = "1";
             }
-            if (this.id == "userFitWidth") {
-              userFitWidth = this.value;
-            }
-            else {
-              userFitHeight = this.value;
-            }
-            let newWH = calculateNewSize(userImageData);
-            convertImageToSF2000(scaleImage(userImageData, newWH.width, newWH.height, userFilterType));
-            convertFromSF2000AndRender();
           });
         });
 
-        // Next, the event listener for our filter type selection...
-        var ftField = document.getElementById("userFilterType");
-        ftField.addEventListener("change", function() {
-
-          // Update our global variable with the new filter type, re-convert
-          // the user's image data, and update our preview...
-          userFilterType = this.value;
-          let newWH = calculateNewSize(userImageData);
-          convertImageToSF2000(scaleImage(userImageData, newWH.width, newWH.height, userFilterType));
-          convertFromSF2000AndRender();
-        });
-
         // And last but not least, our Download button...
-        var dButton = document.getElementById("userDownload");
+        const dButton = document.getElementById("userDownload");
         dButton.addEventListener("click", function() {
 
           // For the file-name we're going to do something semi-fancy; if the
           // user's original image file name had *two* extensions (e.g.,
-          // c1eac.pal.png), then we'll strip off the second extension and
-          // just save the file with the remainder of the name (e.g.,
-          // c1eac.pal) - this will speed up their workflow if their source
-          // image came from a design tool that exports images named after
-          // layers/artboards. Otherwise, we'll just use the name of the
-          // file they provided with ".bin" appended to the end...
-          var downloadName = fileName + ".bin";
-          var match = fileName.match(/(.+)\.([^.]+)\.([^.]+)/);
+          // c1eac.pal.png), then we'll strip off the second extension and just
+          // save the file with the remainder of the name (e.g., c1eac.pal) -
+          // this will speed up their workflow if their source image came from a
+          // design tool that exports images named after layers/art-boards.
+          // Otherwise, we'll just use the name of the file they provided with
+          // ".bin" appended to the end...
+          let downloadName = fileName + ".bin";
+          const match = fileName.match(/(.+)\.([^.]+)\.([^.]+)/);
           if (match) {
 
-            // It's got a double extension - so let's just strip off the
-            // second one...
+            // It's got a double extension - so let's just strip off the second
+            // one...
             downloadName = match[1] + "." + match[2];
           }
           downloadToBrowser(sf2000ImageData, "application/octet-stream", downloadName);
         });
 
+        // Great, that's all the UI handling done. The final event we'll set up
+        // is on the overall control strip itself, to watch for changes to any
+        // of the controls. When any of them change, this event will trigger,
+        // and we'll get the new control state and use their current values to
+        // render an updated image...
+        const toSF2000Form = document.getElementById("toSF2000ImageSettings");
+        toSF2000Form.addEventListener("change", function() {
+
+          // Get the state of all of our form controls...
+          const formData = Object.fromEntries(new FormData(toSF2000Form));
+
+          // Set our general globals from the current form state...
+          imageFormat = formData.imageFormat;
+          if (formData.ditherEnabled !== undefined) {ditherEnabled = true;}
+          else if (imageFormat == "RGB565") {ditherEnabled = false;}
+          ditherEnabled = formData.ditherEnabled ? true : ditherEnabled;
+          ditherStrength = formData.ditherStrength? parseFloat(formData.ditherStrength) : ditherStrength;
+          userScaleMode = formData.scaleMode;
+          userScaleFactor = formData.scaleFactor;
+          if (formData.fitToWidthEnabled !== undefined) {fitToWidthEnabled = true;}
+          else if (userScaleMode == "fit") {fitToWidthEnabled = false;}
+          if (formData.fitToHeightEnabled !== undefined) {fitToHeightEnabled = true;}
+          else if (userScaleMode == "fit") {fitToHeightEnabled = false;}
+          userFitWidth = formData.userFitWidth ? formData.userFitWidth : userFitWidth;
+          userFitHeight = formData.userFitHeight ? formData.userFitHeight : userFitHeight;
+          userFilterType = formData.userFilterType;
+
+          // Finally render an updated preview...
+          calculateOutputDimensions();
+          convertImageToSF2000(scaleImage(userImageData, outputImageWidth, outputImageHeight, userFilterType), ditherEnabled, ditherStrength);
+          convertFromSF2000AndRender();
+        });
+
         // The last thing to do here in Step 3 is to perform our initial
         // image data conversion and preview rendering... so let's do it!
-        let newWH = calculateNewSize(userImageData);
-        convertImageToSF2000(scaleImage(userImageData, newWH.width, newWH.height, userFilterType));
+        calculateOutputDimensions();
+        convertImageToSF2000(scaleImage(userImageData, outputImageWidth, outputImageHeight, userFilterType), ditherEnabled, ditherStrength);
         convertFromSF2000AndRender();
       }
 
-      // This function takes in an ImageData object, and given our global
-      // variables for the image conversion options, returns an object
-      // containing the new width and height of the image based on those
-      // options...
-      function calculateNewSize(imageData) {
-        var newWidth = userFitWidth;
-        var newHeight = userFitHeight;
-        if (userScaleMode == "scale") {
-          newWidth = Math.round(imageData.width * Number(userScaleFactor.slice(0, -1)));
-          newHeight = Math.round(imageData.height * Number(userScaleFactor.slice(0, -1)));
+      // This function takes our userImageData global, and given our other
+      // global variables for the image conversion options, sets
+      // outputImageWidth and outputImageHeight based on calculated dimensions
+      // from the options...
+      function calculateOutputDimensions() {
+
+        // Default to just being the same size as the original image...
+        outputImageWidth = userImageData.width;
+        outputImageHeight = userImageData.height;
+
+        // Check to see which scaling mode the user has selected...
+        switch (userScaleMode){
+
+          case "scale":
+            // They've selected "scale" mode! So take the value from the
+            // selection box, strip off the "x" character at the end, and use it
+            // as a multiplier for the original image dimensions, rounding to
+            // the nearest whole number...
+            outputImageWidth = Math.round(outputImageWidth * Number(userScaleFactor.slice(0, -1)));
+            outputImageHeight = Math.round(outputImageHeight * Number(userScaleFactor.slice(0, -1)));
+            break;
+          
+          case "fit":
+            // They've selected "fit to width/height" mode! This is a little
+            // more involved than "scale", as the final width/height will depend
+            // on which combination of the width/height fitting checkboxes are
+            // currently checked...
+            if (fitToWidthEnabled){
+              outputImageWidth = Number(userFitWidth);
+              if (fitToHeightEnabled) {
+                outputImageHeight = Number(userFitHeight);
+              }
+              else {
+                outputImageHeight = Math.round(userImageData.height * (outputImageWidth / userImageData.width));
+              }
+            }
+            else if (fitToHeightEnabled){
+              outputImageHeight = Number(userFitHeight);
+              outputImageWidth = Math.round(userImageData.width * (outputImageHeight / userImageData.height));
+            }
+            break;
         }
-
-        // Update the global variables used for rendering SF2000 image data with
-        // our new output width and height...
-        outputImageWidth = newWidth;
-        outputImageHeight = newHeight;
-
-        return {width: newWidth, height: newHeight};
       }
 
       // This function takes in an ImageData object, and uses our standard
       // library conversion functions to convert it to either RGB565 or BGRA
       // format, and sets the sf2000ImageData global to the resulting
       // Uint8Array object...
-      function convertImageToSF2000(sourceData) {
+      function convertImageToSF2000(sourceData, dither, ditherStrength) {
         if (imageFormat == "RGB565") {
-          sf2000ImageData = imageDataToRgb565(sourceData);
+          sf2000ImageData = imageDataToRgb565(sourceData, dither, ditherStrength);
         }
         else if (imageFormat == "BGRA") {
           sf2000ImageData = imageDataToBgra(sourceData);
@@ -641,15 +692,20 @@
         else if (imageFormat == "BGRA") {
           previewCanvasData = bgraToImageData(sf2000ImageData, outputImageWidth, outputImageHeight);
         }
-        var canvas = document.getElementById("processFilePreview");
-        var context = canvas.getContext("2d");
+        const canvas = document.getElementById("processFilePreview");
+        const context = canvas.getContext("2d");
         canvas.width = previewCanvasData.width;
         canvas.height = previewCanvasData.height;
         context.clearRect(0, 0, canvas.width, canvas.height);
         context.putImageData(previewCanvasData, 0, 0);
+
+        // Just as a utility, let's also show the output image's width and
+        // height; we'll also set this as a title on the canvas...
+        document.getElementById("previewDimensions").innerText = previewCanvasData.width + " x " + previewCanvasData.height;
+        canvas.setAttribute("title", previewCanvasData.width + " x " + previewCanvasData.height);
       }
     </script>
     <hr>
-    <p><a rel="license" href="https://creativecommons.org/publicdomain/zero/1.0/">CC0</a>: public domain. Version 1.1, 20230626.1</p>
+    <p><a rel="license" href="https://creativecommons.org/publicdomain/zero/1.0/">CC0</a>: public domain. Version 1.2, 20240514.1</p>
   </body>
 </html>

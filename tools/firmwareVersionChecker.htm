@@ -24,13 +24,13 @@
     <script type="text/javascript">
 
       // Global variables...
-      var bisrvData;    // Used to store the binary data from the bisrv.asd file
+      let bisrvData;    // Used to store the binary data from the bisrv.asd file
 
       // This function is triggered when the person selects a file...
       function bisrvLoad(file) {
 
         // Read in the contents of the selected file as array buffer...
-        var frBisrv = new FileReader();
+        const frBisrv = new FileReader();
         frBisrv.readAsArrayBuffer(file);
         frBisrv.onload = function(event) {
 
@@ -41,7 +41,7 @@
           bisrvData = new Uint8Array(event.target.result);
 
           // We'll do a hash-check against it...
-          hashResult = getFirmwareHash(bisrvData);
+          const hashResult = getFirmwareHash(bisrvData);
 
           // The result could be either a Promise if it had a bisrv.asd-like structure and we got
           // a hash, or false otherwise... let's check!
@@ -107,6 +107,6 @@
       }
     </script>
     <hr>
-    <p><a rel="license" href="https://creativecommons.org/publicdomain/zero/1.0/">CC0</a>: public domain. Version 1.2, 20231019.1</p>
+    <p><a rel="license" href="https://creativecommons.org/publicdomain/zero/1.0/">CC0</a>: public domain. Version 1.3, 20240514.1</p>
   </body>
 </html>

@@ -308,7 +308,7 @@ The firmware for the SF2000 is actually located on the microSD card, in a file c
 
 Note that Data Frog's official server for downloading firmware is _very_ slow, with typical transfers taking many hours to complete as their firmware images are full images including ROM files. If you don't care about the stock ROM files, an alternative method for downloading the latest firmware _without_ the ROM files is to use [Tadpole](https://github.com/EricGoldsteinNz/tadpole). Refer to Tadpole's documentation for more information. You can also [download ROM-free copies of various firmware versions compiled by `Dteyn` here](https://github.com/Dteyn/Datafrog_SF2000_Vanilla).
 
-Known firmware versions are currently (dates approximate):
+Known firmware versions are currently (dates are approximate, and all relative to 2023 which was when the device and all its stock firmware revisions were released):
 
 | Date | Version | Notes |
 | ---- | ------- | ----- |
@@ -699,6 +699,8 @@ All of these are linked above already in their relevant sections, but just in ca
 ---
 
 ## Document Version History
+- `20240514 - 1.51`: Added a note to the Firmware section indicating that all firmware dates are relative to 2023 (thanks to `uli42` for the suggestion!)
+
 - `20240505 - 1.50`: Updated [the custom firmware FAQ](#is-there-any-custom-firmware) to reference the new [porting of the GB300 stock firmware](#gb300-firmware-ported) to the SF2000.
 
 - `20240429 - 1.49`: Updated date in [the custom firmware FAQ](#is-there-any-custom-firmware). Corrected some image paths. Identified the usage of `mhg4s.ihg`, `zaqrc.olc` and `help.lis` resources files (thanks to `nummacway` for the hint!).
